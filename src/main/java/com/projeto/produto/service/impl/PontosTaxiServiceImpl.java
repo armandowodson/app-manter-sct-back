@@ -44,8 +44,8 @@ public class PontosTaxiServiceImpl {
         return converterEntityToDTO(listaPontosTaxi);
     }
 
-    public PontoTaxiDTO buscarPontoTaxiId(Long idPontosTaxi) {
-        PontoTaxi pontoTaxi = pontosTaxiRepository.findByIdPontosTaxi(idPontosTaxi);
+    public PontoTaxiDTO buscarPontoTaxiId(Long idPontoTaxi) {
+        PontoTaxi pontoTaxi = pontosTaxiRepository.findByIdPontoTaxi(idPontoTaxi);
         PontoTaxiDTO pontoTaxiDTO = new PontoTaxiDTO();
         if (pontoTaxi != null){
             pontoTaxiDTO = converterPontoTaxiToPontoTaxiDTO(pontoTaxi);
@@ -53,12 +53,15 @@ public class PontosTaxiServiceImpl {
         return pontoTaxiDTO;
     }
 
-    public List<PontoTaxiDTO> listarTodosPontosTaxiFiltros(PontoTaxiDTO pontoTaxiDTO) {
+    public List<PontoTaxiDTO> listarTodosPontosTaxiFiltros(String numeroPonto, String descricaoPonto,
+                                                           String fatorRotatividade, String numeroVagas,
+                                                           String referenciaPonto) {
         List<PontoTaxi> listaPontosTaxi = pontosTaxiRepository.listarTodosPontosTaxiFiltros(
-                pontoTaxiDTO.getNumeroPonto(),
-                pontoTaxiDTO.getDescricaoPonto() != null ? pontoTaxiDTO.getDescricaoPonto().toUpperCase() : pontoTaxiDTO.getDescricaoPonto(),
-                pontoTaxiDTO.getFatorRotatividade(),
-                pontoTaxiDTO.getReferenciaPonto() != null ? pontoTaxiDTO.getReferenciaPonto().toUpperCase() : pontoTaxiDTO.getReferenciaPonto()
+                numeroPonto,
+                descricaoPonto != null ? descricaoPonto.toUpperCase() : descricaoPonto,
+                fatorRotatividade,
+                referenciaPonto != null ? referenciaPonto.toUpperCase() : referenciaPonto,
+                numeroVagas
         );
 
         List<PontoTaxiDTO> listaPontoTaxiDTO = new ArrayList<>();
@@ -73,9 +76,9 @@ public class PontosTaxiServiceImpl {
     }
 
     @Transactional
-    public ResponseEntity<Void> excluirPontoTaxi(Long idPontosTaxi) {
+    public ResponseEntity<Void> excluirPontoTaxi(Long idPontoTaxi) {
         try{
-            pontosTaxiRepository.deletePontoTaxiByIdPontosTaxi(idPontosTaxi);
+            pontosTaxiRepository.deletePontoTaxiByIdPontoTaxi(idPontoTaxi);
             return ResponseEntity.noContent().build();
         }catch (Exception e){
             throw new RuntimeException("Erro ao Excluir o Ponto de Táxi!!!");
@@ -94,13 +97,14 @@ public class PontosTaxiServiceImpl {
 
     public PontoTaxiDTO converterPontoTaxiToPontoTaxiDTO(PontoTaxi pontoTaxi){
         PontoTaxiDTO pontoTaxiDTO = new PontoTaxiDTO();
-        if (pontoTaxi.getIdPontosTaxi() != null){
-            pontoTaxiDTO.setIdPontosTaxi(pontoTaxi.getIdPontosTaxi());
+        if (pontoTaxi.getIdPontoTaxi() != null){
+            pontoTaxiDTO.setIdPontoTaxi(pontoTaxi.getIdPontoTaxi());
         }
         pontoTaxiDTO.setDescricaoPonto(pontoTaxi.getDescricaoPonto());
         pontoTaxiDTO.setNumeroPonto(pontoTaxi.getNumeroPonto());
         pontoTaxiDTO.setReferenciaPonto(pontoTaxi.getReferenciaPonto());
         pontoTaxiDTO.setFatorRotatividade(pontoTaxi.getFatorRotatividade());
+        pontoTaxiDTO.setNumeroVagas(pontoTaxi.getNumeroVagas());
         pontoTaxiDTO.setDataCriacao(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(pontoTaxi.getDataCriacao()));
 
         return  pontoTaxiDTO;
@@ -108,13 +112,14 @@ public class PontosTaxiServiceImpl {
 
     public PontoTaxi converterPontoTaxiDTOToPontoTaxi(PontoTaxiDTO pontoTaxiDTO){
         PontoTaxi pontoTaxi = new PontoTaxi();
-        if (pontoTaxiDTO.getIdPontosTaxi() != null && pontoTaxiDTO.getIdPontosTaxi() != 0){
-            pontoTaxi = pontosTaxiRepository.findByIdPontosTaxi(pontoTaxiDTO.getIdPontosTaxi());
+        if (pontoTaxiDTO.getIdPontoTaxi() != null && pontoTaxiDTO.getIdPontoTaxi() != 0){
+            pontoTaxi = pontosTaxiRepository.findByIdPontoTaxi(pontoTaxiDTO.getIdPontoTaxi());
         }
         pontoTaxi.setDescricaoPonto(pontoTaxiDTO.getDescricaoPonto());
         pontoTaxi.setNumeroPonto(pontoTaxiDTO.getNumeroPonto());
         pontoTaxi.setReferenciaPonto(pontoTaxiDTO.getReferenciaPonto());
         pontoTaxi.setFatorRotatividade(pontoTaxiDTO.getFatorRotatividade());
+        pontoTaxi.setNumeroVagas(pontoTaxiDTO.getNumeroVagas());
 
         return  pontoTaxi;
     }

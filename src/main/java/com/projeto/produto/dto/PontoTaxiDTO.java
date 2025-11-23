@@ -6,10 +6,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PontoTaxiDTO {
-    private Long idPontosTaxi;
+    private Long idPontoTaxi;
     private String numeroPonto;
     private String descricaoPonto;
     private String fatorRotatividade;
     private String referenciaPonto;
+    private String numeroVagas;
     private String dataCriacao;
 }

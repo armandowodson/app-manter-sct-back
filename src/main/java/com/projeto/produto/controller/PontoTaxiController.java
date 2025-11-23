@@ -19,14 +19,18 @@ public class PontoTaxiController {
         return ResponseEntity.ok(service.listarTodosPontosTaxi());
     }
 
-    @GetMapping("/buscar/{idPontosTaxi}")
-    public ResponseEntity<PontoTaxiDTO> listarTodosPontosTaxi(@PathVariable Long idPontosTaxi) {
-        return ResponseEntity.ok(service.buscarPontoTaxiId(idPontosTaxi));
+    @GetMapping("/buscar/{idPontoTaxi}")
+    public ResponseEntity<PontoTaxiDTO> buscarPontoTaxiId(@PathVariable Long idPontoTaxi) {
+        return ResponseEntity.ok(service.buscarPontoTaxiId(idPontoTaxi));
     }
 
     @GetMapping("/buscar-filtros")
-    public ResponseEntity<List<PontoTaxiDTO>> listarTodosPontosTaxi(@RequestBody PontoTaxiDTO pontoTaxiDTO) {
-        return ResponseEntity.ok(service.listarTodosPontosTaxiFiltros(pontoTaxiDTO));
+    public ResponseEntity<List<PontoTaxiDTO>> buscarPontosTaxiFiltros(@RequestParam(required = false) String numeroPonto,
+                                                                      @RequestParam(required = false) String descricaoPonto,
+                                                                      @RequestParam(required = false) String fatorRotatividade,
+                                                                      @RequestParam(required = false) String numeroVagas,
+                                                                      @RequestParam(required = false) String referenciaPonto) {
+        return ResponseEntity.ok(service.listarTodosPontosTaxiFiltros(numeroPonto, descricaoPonto, fatorRotatividade, numeroVagas, referenciaPonto));
     }
 
     @PostMapping("/inserir")
@@ -39,9 +43,9 @@ public class PontoTaxiController {
         return ResponseEntity.ok(service.atualizarPontoTaxi(pontoTaxiDTO));
     }
 
-    @DeleteMapping("/excluir/{idPontosTaxi}")
-    public ResponseEntity<Void> excluirPontoTaxi(@PathVariable Long idPontosTaxi) {
-        return service.excluirPontoTaxi(idPontosTaxi);
+    @DeleteMapping("/excluir/{idPontoTaxi}")
+    public ResponseEntity<Void> excluirPontoTaxi(@PathVariable Long idPontoTaxi) {
+        return service.excluirPontoTaxi(idPontoTaxi);
     }
 
 }

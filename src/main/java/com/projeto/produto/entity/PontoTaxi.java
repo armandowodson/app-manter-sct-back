@@ -13,7 +13,7 @@ public class PontoTaxi {
     @Id
     @Column(name = "ID_PONTOS_TAXI")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_pontos_taxi")
-    private Long idPontosTaxi;
+    private Long idPontoTaxi;
     @Column(name = "NUMERO_PONTO")
     private String numeroPonto;
     @Column(name = "DESCRICAO_PONTO")
@@ -22,6 +22,8 @@ public class PontoTaxi {
     private String fatorRotatividade;
     @Column(name = "REFERENCIA_PONTO")
     private String referenciaPonto;
+    @Column(name = "NUMERO_VAGAS")
+    private String numeroVagas;
     @Column(name = "DATA_CRIACAO")
     private LocalDate dataCriacao;
 }
