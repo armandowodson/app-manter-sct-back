@@ -30,13 +30,15 @@ public class PermissionarioController {
 
     @GetMapping("/buscar-filtros")
     public ResponseEntity<List<PermissionarioResponseDTO>> buscarPermissionariosFiltros(@RequestParam(required = false) String numeroPermissao,
-                                                                                       @RequestParam(required = false) String placa,
-                                                                                       @RequestParam(required = false) String renavam,
-                                                                                       @RequestParam(required = false) String numeroTaximetro,
-                                                                                       @RequestParam(required = false) String anoRenovacao) {
-        return ResponseEntity.ok(service.listarTodosPermissionarioFiltros(numeroPermissao, placa, renavam, numeroTaximetro, anoRenovacao));
+                                                                                       @RequestParam(required = false) String nomePermissionario,
+                                                                                       @RequestParam(required = false) String cpfPermissionario,
+                                                                                       @RequestParam(required = false) String cnpjEmpresa,
+                                                                                       @RequestParam(required = false) String cnhPermissionario) {
+        return ResponseEntity.ok(service.listarTodosPermissionarioFiltros(
+                numeroPermissao, nomePermissionario, cpfPermissionario, cnpjEmpresa, cnhPermissionario
+        ));
     }
-//
+
     @PostMapping("/inserir")
     public ResponseEntity<PermissionarioResponseDTO> inserirPermissionario(
             @RequestParam("permissionario") String permissionario,
@@ -51,9 +53,9 @@ public class PermissionarioController {
 
     @PostMapping("/alterar")
     public ResponseEntity<PermissionarioResponseDTO> atualizarPermissionario(@RequestParam("permissionario") String permissionario,
-                                                                             @RequestParam("certidaoNegativaCriminal") MultipartFile certidaoNegativaCriminal,
-                                                                             @RequestParam("certidaoNegativaMunicipal") MultipartFile certidaoNegativaMunicipal,
-                                                                             @RequestParam("foto") MultipartFile foto) throws IOException {
+                                                                             @RequestParam(value = "certidaoNegativaCriminal", required = false) MultipartFile certidaoNegativaCriminal,
+                                                                             @RequestParam(value = "certidaoNegativaCriminal", required = false) MultipartFile certidaoNegativaMunicipal,
+                                                                             @RequestParam(value = "certidaoNegativaCriminal", required = false) MultipartFile foto) throws IOException {
         PermissionarioRequestDTO permissionarioDTO = new ObjectMapper().readValue(permissionario, PermissionarioRequestDTO.class);
         return ResponseEntity.ok(service.atualizarPermissionario(permissionarioDTO, certidaoNegativaCriminal,
                 certidaoNegativaMunicipal, foto));

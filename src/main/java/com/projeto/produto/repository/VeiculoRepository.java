@@ -14,11 +14,11 @@ public interface VeiculoRepository extends JpaRepository<Veiculo,Integer> {
             value = "SELECT * " +
                     "FROM proj.veiculo " +
                     "WHERE 1 = 1 " +
-                    "AND (:numeroPermissao IS NULL OR NUMERO_PONTO = :numeroPermissao) " +
-                    "AND (:placa IS NULL OR FATOR_ROTATIVIDADE = :placa) " +
-                    "AND (:renavam IS NULL OR NUMERO_VAGAS = :renavam) " +
-                    "AND (:numeroTaximetro IS NULL OR NUMERO_VAGAS = :numeroTaximetro) " +
-                    "AND (:anoFabricacao IS NULL OR NUMERO_VAGAS = :anoFabricacao) ",
+                    "AND (:numeroPermissao IS NULL OR NUMERO_PERMISSAO = :numeroPermissao) " +
+                    "AND (:placa IS NULL OR PLACA = :placa) " +
+                    "AND (:renavam IS NULL OR RENAVAM = :renavam) " +
+                    "AND (:numeroTaximetro IS NULL OR NUMERO_TAXIMETRO = :numeroTaximetro) " +
+                    "AND (:anoFabricacao IS NULL OR ANO_FABRICACAO = :anoFabricacao) ",
             nativeQuery = true
     )
     List<Veiculo> listarTodosVeiculosFiltros(String numeroPermissao, String placa, String renavam,

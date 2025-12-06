@@ -1,19 +1,18 @@
 package com.projeto.produto.service.impl;
 
-import com.projeto.produto.dto.PontoTaxiDTO;
-import com.projeto.produto.dto.VeiculoDTO;
-import com.projeto.produto.entity.PontoTaxi;
+import com.projeto.produto.dto.VeiculoRequestDTO;
+import com.projeto.produto.dto.VeiculoResponseDTO;
 import com.projeto.produto.entity.Veiculo;
-import com.projeto.produto.repository.PontosTaxiRepository;
 import com.projeto.produto.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,57 +23,69 @@ public class VeiculoServiceImpl {
     private VeiculoRepository veiculoRepository;
 
     @Transactional
-    public VeiculoDTO inserirVeiculo(VeiculoDTO veiculoDTO) {
-        if (Objects.isNull(veiculoDTO.getMarca()) || Objects.isNull(veiculoDTO.getModelo()) ||
-                Objects.isNull(veiculoDTO.getModelo()) || Objects.isNull(veiculoDTO.getAnoModelo()) ||
-                Objects.isNull(veiculoDTO.getCor()) || Objects.isNull(veiculoDTO.getPlaca()) ||
-                Objects.isNull(veiculoDTO.getChassi()) || Objects.isNull(veiculoDTO.getRenavam()) ||
-                Objects.isNull(veiculoDTO.getCrlv()) || Objects.isNull(veiculoDTO.getComprovanteVistoria()) ||
-                Objects.isNull(veiculoDTO.getIdPermissionario()) || Objects.isNull(veiculoDTO.getNumeroPermissao())) {
+    public VeiculoResponseDTO inserirVeiculo(VeiculoRequestDTO veiculoRequestDTO,
+                                             MultipartFile crlv,
+                                             MultipartFile comprovanteVistoria) throws IOException {
+        if (Objects.isNull(veiculoRequestDTO.getMarca()) || Objects.isNull(veiculoRequestDTO.getModelo()) ||
+                Objects.isNull(veiculoRequestDTO.getModelo()) || Objects.isNull(veiculoRequestDTO.getAnoModelo()) ||
+                Objects.isNull(veiculoRequestDTO.getCor()) || Objects.isNull(veiculoRequestDTO.getPlaca()) ||
+                Objects.isNull(veiculoRequestDTO.getChassi()) || Objects.isNull(veiculoRequestDTO.getRenavam()) ||
+                Objects.isNull(crlv) || Objects.isNull(comprovanteVistoria) ||
+                Objects.isNull(veiculoRequestDTO.getIdPermissionario()) || Objects.isNull(veiculoRequestDTO.getNumeroPermissao())) {
             throw new RuntimeException("Dados inválidos para o Veículo!");
         }
-        Veiculo veiculo = converterVeiculoDTOToVeiculo(veiculoDTO);
+        Veiculo veiculo = converterVeiculoDTOToVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria);
         veiculo.setDataCriacao(LocalDate.now());
         veiculo = veiculoRepository.save(veiculo);
         return converterVeiculoToVeiculoDTO(veiculo);
     }
 
     @Transactional
-    public VeiculoDTO atualizarVeiculo(VeiculoDTO veiculoDTO) {
-        Veiculo veiculo = converterVeiculoDTOToVeiculo(veiculoDTO);
+    public VeiculoResponseDTO atualizarVeiculo(VeiculoRequestDTO veiculoRequestDTO,
+                                               MultipartFile crlv,
+                                               MultipartFile comprovanteVistoria) throws IOException {
+        if (Objects.isNull(veiculoRequestDTO.getMarca()) || Objects.isNull(veiculoRequestDTO.getModelo()) ||
+                Objects.isNull(veiculoRequestDTO.getModelo()) || Objects.isNull(veiculoRequestDTO.getAnoModelo()) ||
+                Objects.isNull(veiculoRequestDTO.getCor()) || Objects.isNull(veiculoRequestDTO.getPlaca()) ||
+                Objects.isNull(veiculoRequestDTO.getChassi()) || Objects.isNull(veiculoRequestDTO.getRenavam()) ||
+                Objects.isNull(crlv) || Objects.isNull(comprovanteVistoria) ||
+                Objects.isNull(veiculoRequestDTO.getIdPermissionario()) || Objects.isNull(veiculoRequestDTO.getNumeroPermissao())) {
+            throw new RuntimeException("Dados inválidos para o Veículo!");
+        }
+        Veiculo veiculo = converterVeiculoDTOToVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria);
         return converterVeiculoToVeiculoDTO(veiculoRepository.save(veiculo));
     }
 
-    public List<VeiculoDTO> listarTodosVeiculos() {
+    public List<VeiculoResponseDTO> listarTodosVeiculos() {
         List<Veiculo> listaVeiculos = veiculoRepository.findAll(Sort.by(Sort.Direction.ASC, "placa"));
         return converterEntityToDTO(listaVeiculos);
     }
 
-    public VeiculoDTO buscarVeiculoId(Long idVeiculo) {
+    public VeiculoResponseDTO buscarVeiculoId(Long idVeiculo) {
         Veiculo veiculo = veiculoRepository.findVeiculoByIdVeiculo(idVeiculo);
-        VeiculoDTO veiculoDTO = new VeiculoDTO();
+        VeiculoResponseDTO veiculoResponseDTO = new VeiculoResponseDTO();
         if (veiculo != null){
-            veiculoDTO = converterVeiculoToVeiculoDTO(veiculo);
+            veiculoResponseDTO = converterVeiculoToVeiculoDTO(veiculo);
         }
-        return veiculoDTO;
+        return veiculoResponseDTO;
     }
 
-    public List<VeiculoDTO> listarTodosVeiculosFiltros(String numeroPermissao, String placa,
-                                                       String renavam, String numeroTaximetro,
-                                                       String anoFabricacao) {
+    public List<VeiculoResponseDTO> listarTodosVeiculosFiltros(String numeroPermissao, String placa,
+                                                               String renavam, String numeroTaximetro,
+                                                               String anoFabricacao) {
         List<Veiculo> listaVeiculos = veiculoRepository.listarTodosVeiculosFiltros(
                 numeroPermissao,  placa, renavam, numeroTaximetro, anoFabricacao
         );
 
-        List<VeiculoDTO> listaVeiculoDTO = new ArrayList<>();
+        List<VeiculoResponseDTO> listaVeiculoResponseDTO = new ArrayList<>();
         if (!listaVeiculos.isEmpty()){
             for (Veiculo veiculo : listaVeiculos) {
-                VeiculoDTO veiculoDTORetornado = converterVeiculoToVeiculoDTO(veiculo);
-                listaVeiculoDTO.add(veiculoDTORetornado);
+                VeiculoResponseDTO veiculoResponseDTORetornado = converterVeiculoToVeiculoDTO(veiculo);
+                listaVeiculoResponseDTO.add(veiculoResponseDTORetornado);
             }
         }
 
-        return listaVeiculoDTO;
+        return listaVeiculoResponseDTO;
     }
 
     @Transactional
@@ -87,73 +98,79 @@ public class VeiculoServiceImpl {
         }
     }
 
-    public List<VeiculoDTO> converterEntityToDTO(List<Veiculo> listaVeiculos){
-        List<VeiculoDTO> listaVeiculosDTO = new ArrayList<>();
+    public List<VeiculoResponseDTO> converterEntityToDTO(List<Veiculo> listaVeiculos){
+        List<VeiculoResponseDTO> listaVeiculosDTO = new ArrayList<>();
         for(Veiculo veiculo : listaVeiculos){
-            VeiculoDTO veiculoDTO = converterVeiculoToVeiculoDTO(veiculo);
-            listaVeiculosDTO.add(veiculoDTO);
+            VeiculoResponseDTO veiculoResponseDTO = converterVeiculoToVeiculoDTO(veiculo);
+            listaVeiculosDTO.add(veiculoResponseDTO);
         }
 
         return  listaVeiculosDTO;
     }
 
-    public VeiculoDTO converterVeiculoToVeiculoDTO(Veiculo veiculo){
-        VeiculoDTO veiculoDTO = new VeiculoDTO();
+    public VeiculoResponseDTO converterVeiculoToVeiculoDTO(Veiculo veiculo){
+        VeiculoResponseDTO veiculoResponseDTO = new VeiculoResponseDTO();
         if (veiculo.getIdVeiculo() != null){
-            veiculoDTO.setIdVeiculo(veiculo.getIdVeiculo());
+            veiculoResponseDTO.setIdVeiculo(veiculo.getIdVeiculo());
         }
 
-        veiculoDTO.setIdPermissionario(veiculo.getIdPermissionario());
-        veiculoDTO.setNumeroPermissao(veiculo.getNumeroPermissao());
-        veiculoDTO.setPlaca(veiculo.getPlaca());
-        veiculoDTO.setRenavam(veiculo.getRenavam());
-        veiculoDTO.setChassi(veiculo.getChassi());
-        veiculoDTO.setAnoFabricacao(veiculo.getAnoFabricacao());
-        veiculoDTO.setMarca(veiculo.getMarca());
-        veiculoDTO.setModelo(veiculo.getModelo());
-        veiculoDTO.setAnoModelo(veiculo.getAnoModelo());
-        veiculoDTO.setCor(veiculo.getCor());
-        veiculoDTO.setCombustivel(veiculo.getCombustivel());
-        veiculoDTO.setCrlv(veiculo.getCrlv());
-        veiculoDTO.setNumeroTaximetro(veiculo.getNumeroTaximetro());
-        veiculoDTO.setAnoRenovacao(veiculo.getAnoRenovacao());
-        veiculoDTO.setDataVistoria(veiculo.getDataVistoria().toString());
-        veiculoDTO.setDataRetorno(veiculo.getDataRetorno().toString());
-        veiculoDTO.setComprovanteVistoria(veiculo.getComprovanteVistoria());
-        veiculoDTO.setSituacaoVeiculo(veiculo.getSituacaoVeiculo());
-        veiculoDTO.setDataMidiaTaxi(veiculo.getDataMidiaTaxi().toString());
-        veiculoDTO.setEmpresaMidiaTaxi(veiculo.getEmpresaMidiaTaxi());
-        veiculoDTO.setDataCriacao(veiculo.getDataCriacao().toString());
+        veiculoResponseDTO.setIdPermissionario(veiculo.getIdPermissionario());
+        veiculoResponseDTO.setNumeroPermissao(veiculo.getNumeroPermissao());
+        veiculoResponseDTO.setPlaca(veiculo.getPlaca());
+        veiculoResponseDTO.setRenavam(veiculo.getRenavam());
+        veiculoResponseDTO.setChassi(veiculo.getChassi());
+        veiculoResponseDTO.setAnoFabricacao(veiculo.getAnoFabricacao());
+        veiculoResponseDTO.setMarca(veiculo.getMarca());
+        veiculoResponseDTO.setModelo(veiculo.getModelo());
+        veiculoResponseDTO.setAnoModelo(veiculo.getAnoModelo());
+        veiculoResponseDTO.setCor(veiculo.getCor());
+        veiculoResponseDTO.setCombustivel(veiculo.getCombustivel());
+        veiculoResponseDTO.setCrlv(veiculo.getCrlv());
+        veiculoResponseDTO.setNumeroTaximetro(veiculo.getNumeroTaximetro());
+        veiculoResponseDTO.setAnoRenovacao(veiculo.getAnoRenovacao());
+        veiculoResponseDTO.setDataVistoria(veiculo.getDataVistoria().toString());
+        veiculoResponseDTO.setDataRetorno(veiculo.getDataRetorno().toString());
+        veiculoResponseDTO.setComprovanteVistoria(veiculo.getComprovanteVistoria());
+        veiculoResponseDTO.setSituacaoVeiculo(veiculo.getSituacaoVeiculo());
+        veiculoResponseDTO.setDataMidiaTaxi(veiculo.getDataMidiaTaxi().toString());
+        veiculoResponseDTO.setEmpresaMidiaTaxi(veiculo.getEmpresaMidiaTaxi());
+        veiculoResponseDTO.setDataCriacao(veiculo.getDataCriacao().toString());
 
-        return  veiculoDTO;
+        return veiculoResponseDTO;
     }
 
-    public Veiculo converterVeiculoDTOToVeiculo(VeiculoDTO veiculoDTO){
+    public Veiculo converterVeiculoDTOToVeiculo(VeiculoRequestDTO veiculoRequestDTO,
+                                                MultipartFile crlv,
+                                                MultipartFile comprovanteVistoria) throws IOException {
         Veiculo veiculo = new Veiculo();
-        if (veiculoDTO.getIdVeiculo() != null && veiculoDTO.getIdVeiculo() != 0){
-            veiculo = veiculoRepository.findVeiculoByIdVeiculo(veiculoDTO.getIdVeiculo());
+        if (veiculoRequestDTO.getIdVeiculo() != null && veiculoRequestDTO.getIdVeiculo() != 0){
+            veiculo = veiculoRepository.findVeiculoByIdVeiculo(veiculoRequestDTO.getIdVeiculo());
         }
 
-        veiculo.setNumeroPermissao(veiculoDTO.getNumeroPermissao());
-        veiculo.setPlaca(veiculoDTO.getPlaca());
-        veiculo.setRenavam(veiculoDTO.getRenavam());
-        veiculo.setChassi(veiculoDTO.getChassi());
-        veiculo.setAnoFabricacao(veiculoDTO.getAnoFabricacao());
-        veiculo.setMarca(veiculoDTO.getMarca());
-        veiculo.setModelo(veiculoDTO.getModelo());
-        veiculo.setAnoModelo(veiculoDTO.getAnoModelo());
-        veiculo.setCor(veiculoDTO.getCor());
-        veiculo.setCombustivel(veiculoDTO.getCombustivel());
-        veiculo.setCrlv(veiculoDTO.getCrlv());
-        veiculo.setNumeroTaximetro(veiculoDTO.getNumeroTaximetro());
-        veiculo.setAnoRenovacao(veiculoDTO.getAnoRenovacao());
-        veiculo.setDataVistoria(LocalDate.parse(veiculoDTO.getDataVistoria()));
-        veiculo.setDataRetorno(LocalDate.parse(veiculoDTO.getDataRetorno()));
-        veiculo.setComprovanteVistoria(veiculoDTO.getComprovanteVistoria());
-        veiculo.setSituacaoVeiculo(veiculoDTO.getSituacaoVeiculo());
-        veiculo.setDataMidiaTaxi(LocalDate.parse(veiculoDTO.getDataMidiaTaxi()));
-        veiculo.setEmpresaMidiaTaxi(veiculoDTO.getEmpresaMidiaTaxi());
-        veiculo.setDataCriacao(LocalDate.parse(veiculoDTO.getDataCriacao()));
+        veiculo.setIdPermissionario(veiculoRequestDTO.getIdPermissionario());
+        veiculo.setNumeroPermissao(veiculoRequestDTO.getNumeroPermissao());
+        veiculo.setPlaca(veiculoRequestDTO.getPlaca());
+        veiculo.setRenavam(veiculoRequestDTO.getRenavam());
+        veiculo.setChassi(veiculoRequestDTO.getChassi());
+        veiculo.setAnoFabricacao(veiculoRequestDTO.getAnoFabricacao());
+        veiculo.setMarca(veiculoRequestDTO.getMarca());
+        veiculo.setModelo(veiculoRequestDTO.getModelo());
+        veiculo.setAnoModelo(veiculoRequestDTO.getAnoModelo());
+        veiculo.setCor(veiculoRequestDTO.getCor());
+        veiculo.setCombustivel(veiculoRequestDTO.getCombustivel());
+        veiculo.setCrlv(crlv.getBytes());
+        veiculo.setNumeroTaximetro(veiculoRequestDTO.getNumeroTaximetro());
+        veiculo.setAnoRenovacao(veiculoRequestDTO.getAnoRenovacao());
+        veiculo.setDataVistoria(LocalDate.parse(veiculoRequestDTO.getDataVistoria()));
+        veiculo.setDataRetorno(LocalDate.parse(veiculoRequestDTO.getDataRetorno()));
+        veiculo.setComprovanteVistoria(comprovanteVistoria.getBytes());
+        veiculo.setSituacaoVeiculo(veiculoRequestDTO.getSituacaoVeiculo());
+        veiculo.setDataMidiaTaxi(LocalDate.parse(veiculoRequestDTO.getDataMidiaTaxi()));
+        veiculo.setEmpresaMidiaTaxi(veiculoRequestDTO.getEmpresaMidiaTaxi());
+        if(Objects.nonNull(veiculoRequestDTO.getDataCriacao()))
+            veiculo.setDataCriacao(LocalDate.parse(veiculoRequestDTO.getDataCriacao()));
+        else
+            veiculo.setDataCriacao(LocalDate.now());
 
         return  veiculo;
     }

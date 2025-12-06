@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity (name = "proj.veiculo")
-@Table(name="login", schema="proj")
+@Table(name="veiculo", schema="proj")
 @SequenceGenerator(name = "seq_veiculo", schema = "proj", sequenceName = "seq_veiculo", initialValue = 10, allocationSize = 1)
 @Data
 public class Veiculo {

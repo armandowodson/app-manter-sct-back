@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class VeiculoDTO {
+public class VeiculoRequestDTO {
     private Long idVeiculo;
     private Long idPermissionario;
     private String numeroPermissao;
@@ -18,12 +18,10 @@ public class VeiculoDTO {
     private String anoModelo;
     private String cor;
     private String combustivel;
-    private byte[] crlv;
     private String numeroTaximetro;
     private String anoRenovacao;
     private String dataVistoria;
     private String dataRetorno;
-    private byte[] comprovanteVistoria;
     private String situacaoVeiculo;
     private String dataMidiaTaxi;
     private String empresaMidiaTaxi;

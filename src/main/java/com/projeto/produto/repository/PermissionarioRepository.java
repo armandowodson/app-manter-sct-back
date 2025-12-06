@@ -16,7 +16,7 @@ public interface PermissionarioRepository extends JpaRepository<Permissionario, 
                     "AND (:numeroPermissao IS NULL OR NUMERO_PERMISSAO = :numeroPermissao) " +
                     "AND (:nomePermissionario IS NULL OR UPPER(NOME_PERMISSIONARIO) LIKE %:nomePermissionario%) " +
                     "AND (:cpfPermissionario IS NULL OR CPF_PERMISSIONARIO = :cpfPermissionario) " +
-                    "AND (:cnpjEmpresa IS NULL OR NPJ_EMPRESA = :cnpjEmpresa) " +
+                    "AND (:cnpjEmpresa IS NULL OR CNPJ_EMPRESA = :cnpjEmpresa) " +
                     "AND (:cnhPermissionario IS NULL OR CNH_PERMISSIONARIO = :cnhPermissionario) ",
             nativeQuery = true
     )
