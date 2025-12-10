@@ -2,8 +2,10 @@ package com.projeto.produto.service.impl;
 
 import com.projeto.produto.api.model.ProdutoDTO;
 import com.projeto.produto.dto.PontoTaxiDTO;
+import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.entity.PontoTaxi;
 import com.projeto.produto.entity.Produto;
+import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.PontosTaxiRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +25,9 @@ public class PontosTaxiServiceImpl {
     @Autowired
     private PontosTaxiRepository pontosTaxiRepository;
 
+    @Autowired
+    private AuditoriaRepository auditoriaRepository;
+
     @Transactional
     public PontoTaxiDTO inserirPontoTaxi(PontoTaxiDTO pontoTaxiDTO) {
         if (Objects.isNull(pontoTaxiDTO.getDescricaoPonto()) || Objects.isNull(pontoTaxiDTO.getNumeroPonto())) {
@@ -30,13 +36,19 @@ public class PontosTaxiServiceImpl {
         PontoTaxi pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO);
         pontoTaxi.setDataCriacao(LocalDate.now());
         pontoTaxi = pontosTaxiRepository.save(pontoTaxi);
+
+        //Auditoria
+        salvarAuditoria("PONTO DE ESTACIONAMENTO DE TÁXI", "INCLUSÃO", pontoTaxiDTO.getUsuario());
         return converterPontoTaxiToPontoTaxiDTO(pontoTaxi);
     }
 
     @Transactional
     public PontoTaxiDTO atualizarPontoTaxi(PontoTaxiDTO pontoTaxiDTO) {
         PontoTaxi pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO);
-        return converterPontoTaxiToPontoTaxiDTO(pontosTaxiRepository.save(pontoTaxi));
+        pontoTaxi = pontosTaxiRepository.save(pontoTaxi);
+        //Auditoria
+        salvarAuditoria("PONTO DE ESTACIONAMENTO DE TÁXI", "ALTERAÇÃO", pontoTaxiDTO.getUsuario());
+        return converterPontoTaxiToPontoTaxiDTO(pontoTaxi);
     }
 
     public List<PontoTaxiDTO> listarTodosPontosTaxi() {
@@ -76,9 +88,13 @@ public class PontosTaxiServiceImpl {
     }
 
     @Transactional
-    public ResponseEntity<Void> excluirPontoTaxi(Long idPontoTaxi) {
+    public ResponseEntity<Void> excluirPontoTaxi(Long idPontoTaxi, String usuario) {
         try{
             pontosTaxiRepository.deletePontoTaxiByIdPontoTaxi(idPontoTaxi);
+
+            //Auditoria
+            salvarAuditoria("PONTO DE ESTACIONAMENTO DE TÁXI", "EXCLUSÃO", usuario);
+
             return ResponseEntity.noContent().build();
         }catch (Exception e){
             throw new RuntimeException("Erro ao Excluir o Ponto de Táxi!!!");
@@ -124,4 +140,12 @@ public class PontosTaxiServiceImpl {
         return  pontoTaxi;
     }
 
+    public void salvarAuditoria(String modulo, String operacao, String usuario){
+        Auditoria auditoria = new Auditoria();
+        auditoria.setNomeModulo(modulo);
+        auditoria.setOperacao(operacao);
+        auditoria.setUsuarioOperacao(usuario);
+        auditoria.setDataOperacao(LocalDate.now());
+        auditoriaRepository.save(auditoria);
+    }
 }

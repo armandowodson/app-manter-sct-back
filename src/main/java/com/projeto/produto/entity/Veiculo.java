@@ -52,10 +52,14 @@ public class Veiculo {
     private byte[] comprovanteVistoria;
     @Column(name = "SITUACAO_VEICULO")
     private String situacaoVeiculo;
-    @Column(name = "DATA_MIDIA_TAXI")
-    private LocalDate dataMidiaTaxi;
-    @Column(name = "EMPRESA_MIDIA_TAXI")
-    private String empresaMidiaTaxi;
+    @Column(name = "NUMERO_CRLV")
+    private String numeroCrlv;
+    @Column(name = "ANO_CRLV")
+    private String anoCrlv;
+    @Column(name = "CERTIFICADO_AFERICAO")
+    private String certificadoAfericao;
+    @Column(name = "OBSERVACAO")
+    private String observacao;
     @Column(name = "DATA_CRIACAO")
     private LocalDate dataCriacao;
 

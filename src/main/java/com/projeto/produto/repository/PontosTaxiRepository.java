@@ -1,16 +1,12 @@
 package com.projeto.produto.repository;
 
-import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.entity.PontoTaxi;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface PontosTaxiRepository extends JpaRepository<PontoTaxi,Integer> {
+public interface PontosTaxiRepository extends JpaRepository<PontoTaxi, Long> {
     PontoTaxi findByIdPontoTaxi(Long idPontoTaxi);
 
     void deletePontoTaxiByIdPontoTaxi(Long idPontoTaxi);

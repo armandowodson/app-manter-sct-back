@@ -48,16 +48,16 @@ public class VeiculoController {
 
     @PostMapping("/alterar")
     public ResponseEntity<VeiculoResponseDTO> atualizarVeiculo(@RequestParam("veiculo") String veiculo,
-                                                               @RequestParam("crlv") MultipartFile crlv,
-                                                               @RequestParam("comprovanteVistoria") MultipartFile comprovanteVistoria
+                                                               @RequestParam(value = "crlv", required = false) MultipartFile crlv,
+                                                               @RequestParam(value = "comprovanteVistoria", required = false) MultipartFile comprovanteVistoria
     ) throws IOException {
         VeiculoRequestDTO veiculoRequestDTO = new ObjectMapper().readValue(veiculo, VeiculoRequestDTO.class);
         return ResponseEntity.ok(service.atualizarVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria));
     }
 
-    @DeleteMapping("/excluir/{idVeiculo}")
-    public ResponseEntity<Void> excluirVeiculo(@PathVariable Long idVeiculo) {
-        return service.excluirVeiculo(idVeiculo);
+    @DeleteMapping("/excluir/{idVeiculo}/usuario/{usuario}")
+    public ResponseEntity<Void> excluirVeiculo(@PathVariable Long idVeiculo, @PathVariable String usuario) {
+        return service.excluirVeiculo(idVeiculo, usuario);
     }
 
 }

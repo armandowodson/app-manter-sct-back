@@ -43,9 +43,9 @@ public class PontoTaxiController {
         return ResponseEntity.ok(service.atualizarPontoTaxi(pontoTaxiDTO));
     }
 
-    @DeleteMapping("/excluir/{idPontoTaxi}")
-    public ResponseEntity<Void> excluirPontoTaxi(@PathVariable Long idPontoTaxi) {
-        return service.excluirPontoTaxi(idPontoTaxi);
+    @DeleteMapping("/excluir/{idPontoTaxi}/usuario/{usuario}")
+    public ResponseEntity<Void> excluirPontoTaxi(@PathVariable Long idPontoTaxi, @PathVariable String usuario) {
+        return service.excluirPontoTaxi(idPontoTaxi, usuario);
     }
 
 }

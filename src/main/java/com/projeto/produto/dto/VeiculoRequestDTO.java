@@ -23,9 +23,11 @@ public class VeiculoRequestDTO {
     private String dataVistoria;
     private String dataRetorno;
     private String situacaoVeiculo;
-    private String dataMidiaTaxi;
-    private String empresaMidiaTaxi;
+    private String numeroCrlv;
+    private String anoCrlv;
+    private String certificadoAfericao;
+    private String observacao;
     private String dataCriacao;
-
+    private String usuario;
 
 }

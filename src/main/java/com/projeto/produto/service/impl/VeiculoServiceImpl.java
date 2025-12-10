@@ -2,7 +2,9 @@ package com.projeto.produto.service.impl;
 
 import com.projeto.produto.dto.VeiculoRequestDTO;
 import com.projeto.produto.dto.VeiculoResponseDTO;
+import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.entity.Veiculo;
+import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -13,14 +15,20 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 @Service
 public class VeiculoServiceImpl {
     @Autowired
     private VeiculoRepository veiculoRepository;
+
+    @Autowired
+    private AuditoriaRepository auditoriaRepository;
 
     @Transactional
     public VeiculoResponseDTO inserirVeiculo(VeiculoRequestDTO veiculoRequestDTO,
@@ -37,6 +45,10 @@ public class VeiculoServiceImpl {
         Veiculo veiculo = converterVeiculoDTOToVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria);
         veiculo.setDataCriacao(LocalDate.now());
         veiculo = veiculoRepository.save(veiculo);
+
+        //Auditoria
+        salvarAuditoria("VEÍCULO TÁXI", "INCLUSÃO", veiculoRequestDTO.getUsuario());
+
         return converterVeiculoToVeiculoDTO(veiculo);
     }
 
@@ -48,11 +60,14 @@ public class VeiculoServiceImpl {
                 Objects.isNull(veiculoRequestDTO.getModelo()) || Objects.isNull(veiculoRequestDTO.getAnoModelo()) ||
                 Objects.isNull(veiculoRequestDTO.getCor()) || Objects.isNull(veiculoRequestDTO.getPlaca()) ||
                 Objects.isNull(veiculoRequestDTO.getChassi()) || Objects.isNull(veiculoRequestDTO.getRenavam()) ||
-                Objects.isNull(crlv) || Objects.isNull(comprovanteVistoria) ||
                 Objects.isNull(veiculoRequestDTO.getIdPermissionario()) || Objects.isNull(veiculoRequestDTO.getNumeroPermissao())) {
             throw new RuntimeException("Dados inválidos para o Veículo!");
         }
         Veiculo veiculo = converterVeiculoDTOToVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria);
+
+        //Auditoria
+        salvarAuditoria("VEÍCULO TÁXI", "ALTERAÇÃO", veiculoRequestDTO.getUsuario());
+
         return converterVeiculoToVeiculoDTO(veiculoRepository.save(veiculo));
     }
 
@@ -89,9 +104,13 @@ public class VeiculoServiceImpl {
     }
 
     @Transactional
-    public ResponseEntity<Void> excluirVeiculo(Long idVeiculo) {
+    public ResponseEntity<Void> excluirVeiculo(Long idVeiculo, String usuario) {
         try{
             veiculoRepository.deleteVeiculoByIdVeiculo(idVeiculo);
+
+            //Auditoria
+            salvarAuditoria("VEÍCULO TÁXI", "EXCLUSÃO", usuario);
+
             return ResponseEntity.noContent().build();
         }catch (Exception e){
             throw new RuntimeException("Erro ao Excluir o Veículo!!!");
@@ -128,12 +147,14 @@ public class VeiculoServiceImpl {
         veiculoResponseDTO.setCrlv(veiculo.getCrlv());
         veiculoResponseDTO.setNumeroTaximetro(veiculo.getNumeroTaximetro());
         veiculoResponseDTO.setAnoRenovacao(veiculo.getAnoRenovacao());
-        veiculoResponseDTO.setDataVistoria(veiculo.getDataVistoria().toString());
-        veiculoResponseDTO.setDataRetorno(veiculo.getDataRetorno().toString());
+        veiculoResponseDTO.setDataVistoria(veiculo.getDataVistoria().plusDays(1).toString());
+        veiculoResponseDTO.setDataRetorno(veiculo.getDataRetorno().plusDays(1).toString());
         veiculoResponseDTO.setComprovanteVistoria(veiculo.getComprovanteVistoria());
         veiculoResponseDTO.setSituacaoVeiculo(veiculo.getSituacaoVeiculo());
-        veiculoResponseDTO.setDataMidiaTaxi(veiculo.getDataMidiaTaxi().toString());
-        veiculoResponseDTO.setEmpresaMidiaTaxi(veiculo.getEmpresaMidiaTaxi());
+        veiculoResponseDTO.setNumeroCrlv(veiculo.getNumeroCrlv());
+        veiculoResponseDTO.setAnoCrlv(veiculo.getAnoCrlv());
+        veiculoResponseDTO.setCertificadoAfericao(veiculo.getCertificadoAfericao());
+        veiculoResponseDTO.setObservacao(veiculo.getObservacao());
         veiculoResponseDTO.setDataCriacao(veiculo.getDataCriacao().toString());
 
         return veiculoResponseDTO;
@@ -158,15 +179,44 @@ public class VeiculoServiceImpl {
         veiculo.setAnoModelo(veiculoRequestDTO.getAnoModelo());
         veiculo.setCor(veiculoRequestDTO.getCor());
         veiculo.setCombustivel(veiculoRequestDTO.getCombustivel());
-        veiculo.setCrlv(crlv.getBytes());
+        if(Objects.nonNull(crlv))
+            veiculo.setCrlv(crlv.getBytes());
         veiculo.setNumeroTaximetro(veiculoRequestDTO.getNumeroTaximetro());
         veiculo.setAnoRenovacao(veiculoRequestDTO.getAnoRenovacao());
-        veiculo.setDataVistoria(LocalDate.parse(veiculoRequestDTO.getDataVistoria()));
-        veiculo.setDataRetorno(LocalDate.parse(veiculoRequestDTO.getDataRetorno()));
-        veiculo.setComprovanteVistoria(comprovanteVistoria.getBytes());
+
+        if(Objects.nonNull(veiculoRequestDTO.getDataVistoria())) {
+            String data = veiculoRequestDTO.getDataVistoria();
+            Integer indexChar = data.indexOf('(');
+            if(indexChar > 0){
+                data = data.substring(0, indexChar);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss 'GMT'Z", Locale.ENGLISH);
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(data.trim(), formatter);
+                LocalDate localDateVistoria = zonedDateTime.toLocalDate();
+                veiculo.setDataVistoria(localDateVistoria);
+            }
+        }
+
+        if(Objects.nonNull(veiculoRequestDTO.getDataRetorno())) {
+            String data = veiculoRequestDTO.getDataRetorno();
+            Integer indexChar = data.indexOf('(');
+            if(indexChar > 0){
+                data = data.substring(0, indexChar);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss 'GMT'Z", Locale.ENGLISH);
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(data.trim(), formatter);
+                LocalDate localDateRetorno = zonedDateTime.toLocalDate();
+                veiculo.setDataRetorno(localDateRetorno);
+            }
+        }
+
+        if(Objects.nonNull(comprovanteVistoria))
+            veiculo.setComprovanteVistoria(comprovanteVistoria.getBytes());
         veiculo.setSituacaoVeiculo(veiculoRequestDTO.getSituacaoVeiculo());
-        veiculo.setDataMidiaTaxi(LocalDate.parse(veiculoRequestDTO.getDataMidiaTaxi()));
-        veiculo.setEmpresaMidiaTaxi(veiculoRequestDTO.getEmpresaMidiaTaxi());
+
+        veiculo.setNumeroCrlv(veiculoRequestDTO.getNumeroCrlv());
+        veiculo.setAnoCrlv(veiculoRequestDTO.getAnoCrlv());
+        veiculo.setCertificadoAfericao(veiculoRequestDTO.getCertificadoAfericao());
+        veiculo.setObservacao(veiculoRequestDTO.getObservacao());
+
         if(Objects.nonNull(veiculoRequestDTO.getDataCriacao()))
             veiculo.setDataCriacao(LocalDate.parse(veiculoRequestDTO.getDataCriacao()));
         else
@@ -175,4 +225,12 @@ public class VeiculoServiceImpl {
         return  veiculo;
     }
 
+    public void salvarAuditoria(String modulo, String operacao, String usuario){
+        Auditoria auditoria = new Auditoria();
+        auditoria.setNomeModulo(modulo);
+        auditoria.setOperacao(operacao);
+        auditoria.setUsuarioOperacao(usuario);
+        auditoria.setDataOperacao(LocalDate.now());
+        auditoriaRepository.save(auditoria);
+    }
 }

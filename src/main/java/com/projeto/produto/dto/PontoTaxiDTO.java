@@ -13,4 +13,5 @@ public class PontoTaxiDTO {
     private String referenciaPonto;
     private String numeroVagas;
     private String dataCriacao;
+    private String usuario;
 }

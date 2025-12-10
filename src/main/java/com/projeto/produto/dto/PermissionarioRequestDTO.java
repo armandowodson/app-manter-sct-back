@@ -19,5 +19,6 @@ public class PermissionarioRequestDTO {
     private String enderecoPermissionario;
     private String celularPermissionario;
     private String dataCriacao;
+    private String usuario;
 
 }

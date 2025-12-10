@@ -2,7 +2,9 @@ package com.projeto.produto.service.impl;
 
 import com.projeto.produto.dto.PermissionarioRequestDTO;
 import com.projeto.produto.dto.PermissionarioResponseDTO;
+import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.entity.Permissionario;
+import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.PermissionarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -22,6 +24,9 @@ public class PermissionarioServiceImpl {
     @Autowired
     private PermissionarioRepository permissionarioRepository;
 
+    @Autowired
+    private AuditoriaRepository auditoriaRepository;
+
     @Transactional
     public PermissionarioResponseDTO inserirPermissionario(    PermissionarioRequestDTO permissionarioRequestDTO,
                                                                MultipartFile certidaoNegativaCriminal,
@@ -38,6 +43,10 @@ public class PermissionarioServiceImpl {
         );
         permissionario.setDataCriacao(LocalDate.now());
         permissionario = permissionarioRepository.save(permissionario);
+
+        //Auditoria
+        salvarAuditoria("PERMISSIONÁRIO TÁXI", "INCLUSÃO", permissionarioRequestDTO.getUsuario());
+
         return converterPermissionarioToPermissionarioDTO(permissionario);
     }
 
@@ -55,6 +64,12 @@ public class PermissionarioServiceImpl {
         Permissionario permissionario = converterPermissionarioDTOToPermissionario(
                 permissionarioRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto
         );
+
+        permissionario = permissionarioRepository.save(permissionario);
+
+        //Auditoria
+        salvarAuditoria("PERMISSIONÁRIO TÁXI", "ALTERAÇÃO", permissionarioRequestDTO.getUsuario());
+
         return converterPermissionarioToPermissionarioDTO(permissionarioRepository.save(permissionario));
     }
 
@@ -95,9 +110,13 @@ public class PermissionarioServiceImpl {
     }
 
     @Transactional
-    public ResponseEntity<Void> excluirPermissionario(Long idPermissionario) {
+    public ResponseEntity<Void> excluirPermissionario(Long idPermissionario, String usuario) {
         try{
             permissionarioRepository.deletePermissionarioByIdPermissionario(idPermissionario);
+
+            //Auditoria
+            salvarAuditoria("PERMISSIONÁRIO TÁXI", "EXCLUSÃO", usuario);
+
             return ResponseEntity.noContent().build();
         }catch (Exception e){
             throw new RuntimeException("Erro ao Excluir o Ponto de Táxi!!!");
@@ -181,6 +200,15 @@ public class PermissionarioServiceImpl {
             permissionario.setDataCriacao(LocalDate.now());
 
         return  permissionario;
+    }
+
+    public void salvarAuditoria(String modulo, String operacao, String usuario){
+        Auditoria auditoria = new Auditoria();
+        auditoria.setNomeModulo(modulo);
+        auditoria.setOperacao(operacao);
+        auditoria.setUsuarioOperacao(usuario);
+        auditoria.setDataOperacao(LocalDate.now());
+        auditoriaRepository.save(auditoria);
     }
 
 }

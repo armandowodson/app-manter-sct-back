@@ -25,8 +25,10 @@ public class VeiculoResponseDTO {
     private String dataRetorno;
     private byte[] comprovanteVistoria;
     private String situacaoVeiculo;
-    private String dataMidiaTaxi;
-    private String empresaMidiaTaxi;
+    private String numeroCrlv;
+    private String anoCrlv;
+    private String certificadoAfericao;
+    private String observacao;
     private String dataCriacao;
 
 
