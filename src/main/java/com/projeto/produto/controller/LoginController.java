@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.NoSuchAlgorithmException;
+
 @RestController
 @RequestMapping("/login")
 public class LoginController {
@@ -14,12 +16,12 @@ public class LoginController {
     public LoginServiceImpl service;
 
     @GetMapping("/conectar")
-    public ResponseEntity<LoginDTO> efetuarLogin(@RequestParam String usuario, @RequestParam String senha) {
+    public ResponseEntity<LoginDTO> efetuarLogin(@RequestParam String usuario, @RequestParam String senha) throws NoSuchAlgorithmException {
         return ResponseEntity.ok(service.efetuarLogin(usuario, senha));
     }
 
     @PostMapping("/gravar")
-    public ResponseEntity<LoginDTO> gravarUsuario(@RequestBody RegistroDTO registro) {
+    public ResponseEntity<LoginDTO> gravarUsuario(@RequestBody RegistroDTO registro) throws NoSuchAlgorithmException {
         return ResponseEntity.ok(service.gravarUsuario(registro));
     }
 

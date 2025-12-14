@@ -25,6 +25,14 @@ public interface PermissionarioRepository extends JpaRepository<Permissionario, 
             String cnpjEmpresa, String cnhPermissionario
     );
 
+    @Query(
+            value = "SELECT * " +
+                    "FROM proj.permissionario " +
+                    "WHERE ID_PERMISSIONARIO NOT IN (SELECT ID_PERMISSIONARIO FROM proj.veiculo) ",
+            nativeQuery = true
+    )
+    List<Permissionario> listarPermissionariosDisponiveis();
+
     void deletePermissionarioByIdPermissionario(Long idPermissionario);
 }
 

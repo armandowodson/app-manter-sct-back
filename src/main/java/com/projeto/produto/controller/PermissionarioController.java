@@ -39,6 +39,16 @@ public class PermissionarioController {
         ));
     }
 
+    @GetMapping("/buscar-disponiveis")
+    public ResponseEntity<List<PermissionarioResponseDTO>> buscarPermissionariosDisponiveis() {
+        return ResponseEntity.ok(service.listarPermissionariosDisponiveis(null));
+    }
+
+    @GetMapping("/buscar-disponiveis/{idPermissionario}")
+    public ResponseEntity<List<PermissionarioResponseDTO>> buscarPermissionariosDisponiveisAlteracao(Long idPermissionario) {
+        return ResponseEntity.ok(service.listarPermissionariosDisponiveis(idPermissionario));
+    }
+
     @PostMapping("/inserir")
     public ResponseEntity<PermissionarioResponseDTO> inserirPermissionario(
             @RequestParam("permissionario") String permissionario,
@@ -61,9 +71,9 @@ public class PermissionarioController {
                 certidaoNegativaMunicipal, foto));
     }
 
-    @DeleteMapping("/excluir/{idPermissionario}")
-    public ResponseEntity<Void> excluirPermissionario(@PathVariable Long idPermissionario) {
-        return service.excluirPermissionario(idPermissionario);
+    @DeleteMapping("/excluir/{idPermissionario}/usuario/{usuario}")
+    public ResponseEntity<Void> excluirPermissionario(@PathVariable Long idPermissionario, @PathVariable String usuario) {
+        return service.excluirPermissionario(idPermissionario, usuario);
     }
 
 }

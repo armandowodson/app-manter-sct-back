@@ -24,10 +24,10 @@ public class Permissionario {
     private String cnpjEmpresa;
     @Column(name = "RG_PERMISSIONARIO")
     private String rgPermissionario;
+    @Column(name = "ORGAO_EMISSOR")
+    private String orgaoEmissor;
     @Column(name = "NATUREZA_PESSOA")
     private String naturezaPessoa;
-    @Column(name = "CNH_PERMISSIONARIO")
-    private String cnhPermissionario;
     @Column(name = "UF_PERMISSIONARIO")
     private String ufPermissionario;
     @Column(name = "BAIRRO_PERMISSIONARIO")
@@ -36,6 +36,18 @@ public class Permissionario {
     private String enderecoPermissionario;
     @Column(name = "CELULAR_PERMISSIONARIO")
     private String celularPermissionario;
+    @Column(name = "CNH_PERMISSIONARIO")
+    private String cnhPermissionario;
+    @Column(name = "CATEGORIA_CNH_PERMISSIONARIO")
+    private String categoriaCnhPermissionario;
+    @Column(name = "NUMERO_QUITACAO_MILITAR")
+    private String numeroQuitacaoMilitar;
+    @Column(name = "NUMERO_QUITACAO_ELEITORAL")
+    private String numeroQuitacaoEleitoral;
+    @Column(name = "NUMERO_INSCRICAO_INSS")
+    private String numeroInscricaoInss;
+    @Column(name = "NUMERO_CERTIFICADO_CONDUTOR")
+    private String numeroCertificadoCondutor;
     @Lob
     @Column(name = "CERTIDAO_NEGATIVA_CRIMINAL")
     private byte[] certidaoNegativaCriminal;

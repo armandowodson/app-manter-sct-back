@@ -4,8 +4,10 @@ import com.projeto.produto.dto.PermissionarioRequestDTO;
 import com.projeto.produto.dto.PermissionarioResponseDTO;
 import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.entity.Permissionario;
+import com.projeto.produto.entity.Veiculo;
 import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.PermissionarioRepository;
+import com.projeto.produto.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,9 @@ public class PermissionarioServiceImpl {
     @Autowired
     private AuditoriaRepository auditoriaRepository;
 
+    @Autowired
+    private VeiculoRepository veiculoRepository;
+
     @Transactional
     public PermissionarioResponseDTO inserirPermissionario(    PermissionarioRequestDTO permissionarioRequestDTO,
                                                                MultipartFile certidaoNegativaCriminal,
@@ -38,6 +43,9 @@ public class PermissionarioServiceImpl {
                 Objects.isNull(permissionarioRequestDTO.getNumeroPermissao())) {
             throw new RuntimeException("Dados inválidos para o Permissionário/Proprietário!");
         }
+        if(Objects.isNull(permissionarioRequestDTO.getUsuario()) || permissionarioRequestDTO.getUsuario().isEmpty())
+            throw new RuntimeException("Usuário vazio ou não identificado!");
+
         Permissionario permissionario = converterPermissionarioDTOToPermissionario(
                 permissionarioRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto
         );
@@ -61,6 +69,9 @@ public class PermissionarioServiceImpl {
                 Objects.isNull(permissionarioRequestDTO.getNumeroPermissao())) {
             throw new RuntimeException("Dados inválidos para o Permissionário/Proprietário!");
         }
+        if(Objects.isNull(permissionarioRequestDTO.getUsuario()) || permissionarioRequestDTO.getUsuario().isEmpty())
+            throw new RuntimeException("Usuário vazio ou não identificado!");
+
         Permissionario permissionario = converterPermissionarioDTOToPermissionario(
                 permissionarioRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto
         );
@@ -109,9 +120,38 @@ public class PermissionarioServiceImpl {
         return listaPermissionarioResponseDTO;
     }
 
+    public List<PermissionarioResponseDTO> listarPermissionariosDisponiveis(Long idPermissionario) {
+        List<PermissionarioResponseDTO> listaPermissionarioResponseDTO = new ArrayList<>();
+        List<Permissionario> listaPermissionario = permissionarioRepository.listarPermissionariosDisponiveis();
+        if(Objects.nonNull(idPermissionario)){
+            Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(idPermissionario);
+            PermissionarioResponseDTO permissionarioResponseDTORetornado = converterPermissionarioToPermissionarioDTO(permissionario);
+            listaPermissionarioResponseDTO.add(permissionarioResponseDTORetornado);
+        }
+
+        if (!listaPermissionario.isEmpty()){
+            for (Permissionario permissionarioDisponivel : listaPermissionario) {
+                PermissionarioResponseDTO permissionarioResponseDTORetornado = converterPermissionarioToPermissionarioDTO(permissionarioDisponivel);
+                listaPermissionarioResponseDTO.add(permissionarioResponseDTORetornado);
+            }
+        }
+
+        return listaPermissionarioResponseDTO;
+    }
+
     @Transactional
     public ResponseEntity<Void> excluirPermissionario(Long idPermissionario, String usuario) {
+        String msgErro = "Erro ao Excluir o Permissionário!!";
         try{
+            if(Objects.isNull(usuario) || usuario.isEmpty())
+                throw new RuntimeException("Usuário vazio ou não identificado!");
+
+            Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(idPermissionario);
+            Veiculo veiculo = veiculoRepository.findVeiculoByPermissionario(permissionario);
+            if(Objects.nonNull(veiculo)){
+                msgErro = "Existe um Veículo associado a este Permissionário";
+                throw new Exception();
+            }
             permissionarioRepository.deletePermissionarioByIdPermissionario(idPermissionario);
 
             //Auditoria
@@ -119,7 +159,7 @@ public class PermissionarioServiceImpl {
 
             return ResponseEntity.noContent().build();
         }catch (Exception e){
-            throw new RuntimeException("Erro ao Excluir o Ponto de Táxi!!!");
+            throw new RuntimeException(msgErro);
         }
     }
 
@@ -142,14 +182,20 @@ public class PermissionarioServiceImpl {
         permissionarioResponseDTO.setNumeroPermissao(permissionario.getNumeroPermissao());
         permissionarioResponseDTO.setNomePermissionario(permissionario.getNomePermissionario());
         permissionarioResponseDTO.setCpfPermissionario(permissionario.getCpfPermissionario());
-        permissionarioResponseDTO.setCnpjEmpresa(permissionario.getCnpjEmpresa());
+        permissionarioResponseDTO.setCnpjEmpresa(permissionario.getCnpjEmpresa() != null ? permissionario.getCnpjEmpresa() : "");
         permissionarioResponseDTO.setRgPermissionario(permissionario.getRgPermissionario());
+        permissionarioResponseDTO.setOrgaoEmissor(permissionario.getOrgaoEmissor());
         permissionarioResponseDTO.setNaturezaPessoa(permissionario.getNaturezaPessoa().equals("1") ? "FÍSICA" : "JURÍDICA");
         permissionarioResponseDTO.setCnhPermissionario(permissionario.getCnhPermissionario());
+        permissionarioResponseDTO.setCategoriaCnhPermissionario(converterIdCategoriaCnh(permissionario.getCategoriaCnhPermissionario()));
         permissionarioResponseDTO.setUfPermissionario(permissionario.getUfPermissionario());
         permissionarioResponseDTO.setBairroPermissionario(permissionario.getBairroPermissionario());
         permissionarioResponseDTO.setEnderecoPermissionario(permissionario.getEnderecoPermissionario());
         permissionarioResponseDTO.setCelularPermissionario(permissionario.getCelularPermissionario());
+        permissionarioResponseDTO.setNumeroQuitacaoMilitar(permissionario.getNumeroQuitacaoMilitar());
+        permissionarioResponseDTO.setNumeroQuitacaoEleitoral(permissionario.getNumeroQuitacaoEleitoral());
+        permissionarioResponseDTO.setNumeroInscricaoInss(permissionario.getNumeroInscricaoInss());
+        permissionarioResponseDTO.setNumeroCertificadoCondutor(permissionario.getNumeroCertificadoCondutor());
         permissionarioResponseDTO.setCertidaoNegativaCriminal(permissionario.getCertidaoNegativaCriminal());
         permissionarioResponseDTO.setCertidaoNegativaMunicipal(permissionario.getCertidaoNegativaMunicipal());
         permissionarioResponseDTO.setFoto(permissionario.getFoto());
@@ -182,12 +228,17 @@ public class PermissionarioServiceImpl {
             permissionario.setCnpjEmpresa(permissionarioRequestDTO.getCnpjEmpresa());
         }
         permissionario.setRgPermissionario(permissionarioRequestDTO.getRgPermissionario());
+        permissionario.setOrgaoEmissor(permissionarioRequestDTO.getOrgaoEmissor());
         permissionario.setNaturezaPessoa(permissionarioRequestDTO.getNaturezaPessoa().equals("FÍSICA") ? "1" : "2");
-        permissionario.setCnhPermissionario(permissionarioRequestDTO.getCnhPermissionario());
         permissionario.setUfPermissionario(permissionarioRequestDTO.getUfPermissionario());
         permissionario.setBairroPermissionario(permissionarioRequestDTO.getBairroPermissionario());
         permissionario.setEnderecoPermissionario(permissionarioRequestDTO.getEnderecoPermissionario());
         permissionario.setCelularPermissionario(permissionarioRequestDTO.getCelularPermissionario());
+        permissionario.setCnhPermissionario(permissionarioRequestDTO.getCnhPermissionario());
+        permissionario.setCategoriaCnhPermissionario(converterNomeCategoriaCnh(permissionarioRequestDTO.getCategoriaCnhPermissionario()));
+        permissionario.setNumeroQuitacaoMilitar(permissionarioRequestDTO.getNumeroQuitacaoMilitar());
+        permissionario.setNumeroQuitacaoEleitoral(permissionarioRequestDTO.getNumeroQuitacaoEleitoral());
+        permissionario.setNumeroCertificadoCondutor(permissionarioRequestDTO.getNumeroCertificadoCondutor());
         if(Objects.nonNull(certidaoNegativaCriminal))
             permissionario.setCertidaoNegativaCriminal(certidaoNegativaCriminal.getBytes());
         if(Objects.nonNull(certidaoNegativaMunicipal))
@@ -209,6 +260,36 @@ public class PermissionarioServiceImpl {
         auditoria.setUsuarioOperacao(usuario);
         auditoria.setDataOperacao(LocalDate.now());
         auditoriaRepository.save(auditoria);
+    }
+
+    public String converterIdCategoriaCnh(String categoria){
+        switch (categoria){
+            case "1":
+                return "B";
+            case "2":
+                return "C";
+            case "3":
+                return "D";
+            case "4":
+                return "E";
+        }
+
+        return "";
+    }
+
+    public String converterNomeCategoriaCnh(String categoria){
+        switch (categoria){
+            case "B":
+                return "1";
+            case "C":
+                return "2";
+            case "D":
+                return "3";
+            case "E":
+                return "4";
+        }
+
+        return "";
     }
 
 }

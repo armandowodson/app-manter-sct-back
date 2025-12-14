@@ -14,8 +14,9 @@ public class Veiculo {
     @Column(name = "ID_VEICULO")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_veiculo")
     private Long idVeiculo;
-    @Column(name = "ID_PERMISSIONARIO")
-    private Long idPermissionario;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_PERMISSIONARIO")
+    private Permissionario permissionario;
     @Column(name = "NUMERO_PERMISSAO")
     private String numeroPermissao;
     @Column(name = "PLACA")

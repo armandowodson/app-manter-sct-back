@@ -1,6 +1,6 @@
 package com.projeto.produto.repository;
 
-import com.projeto.produto.entity.PontoTaxi;
+import com.projeto.produto.entity.Permissionario;
 import com.projeto.produto.entity.Veiculo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface VeiculoRepository extends JpaRepository<Veiculo,Integer> {
     Veiculo findVeiculoByIdVeiculo(Long idVeiculo);
+
+    Veiculo findVeiculoByPermissionario(Permissionario permissionario);
 
     @Query(
             value = "SELECT * " +

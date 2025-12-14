@@ -31,8 +31,11 @@ public class PontosTaxiServiceImpl {
     @Transactional
     public PontoTaxiDTO inserirPontoTaxi(PontoTaxiDTO pontoTaxiDTO) {
         if (Objects.isNull(pontoTaxiDTO.getDescricaoPonto()) || Objects.isNull(pontoTaxiDTO.getNumeroPonto())) {
-            throw new RuntimeException("Dados inválidos para o Ponto de Táxi!");
+            throw new RuntimeException("Dados inválidos para o Ponto de Estacionamento de Táxi!");
         }
+        if(Objects.isNull(pontoTaxiDTO.getUsuario()) || pontoTaxiDTO.getUsuario().isEmpty())
+            throw new RuntimeException("Usuário vazio ou não identificado!");
+
         PontoTaxi pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO);
         pontoTaxi.setDataCriacao(LocalDate.now());
         pontoTaxi = pontosTaxiRepository.save(pontoTaxi);
@@ -44,6 +47,12 @@ public class PontosTaxiServiceImpl {
 
     @Transactional
     public PontoTaxiDTO atualizarPontoTaxi(PontoTaxiDTO pontoTaxiDTO) {
+        if (Objects.isNull(pontoTaxiDTO.getDescricaoPonto()) || Objects.isNull(pontoTaxiDTO.getNumeroPonto())) {
+            throw new RuntimeException("Dados inválidos para o Ponto de Estacionamento de Táxi!");
+        }
+        if(Objects.isNull(pontoTaxiDTO.getUsuario()) || pontoTaxiDTO.getUsuario().isEmpty())
+            throw new RuntimeException("Usuário vazio ou não identificado!");
+
         PontoTaxi pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO);
         pontoTaxi = pontosTaxiRepository.save(pontoTaxi);
         //Auditoria
@@ -90,6 +99,9 @@ public class PontosTaxiServiceImpl {
     @Transactional
     public ResponseEntity<Void> excluirPontoTaxi(Long idPontoTaxi, String usuario) {
         try{
+            if(Objects.isNull(usuario) || usuario.isEmpty())
+                throw new RuntimeException("Usuário vazio ou não identificado!");
+
             pontosTaxiRepository.deletePontoTaxiByIdPontoTaxi(idPontoTaxi);
 
             //Auditoria
@@ -97,7 +109,7 @@ public class PontosTaxiServiceImpl {
 
             return ResponseEntity.noContent().build();
         }catch (Exception e){
-            throw new RuntimeException("Erro ao Excluir o Ponto de Táxi!!!");
+            throw new RuntimeException("Erro ao Excluir o Ponto de Estacionamento de Táxi!!!");
         }
     }
 

@@ -5,6 +5,7 @@ import com.projeto.produto.dto.VeiculoResponseDTO;
 import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.entity.Veiculo;
 import com.projeto.produto.repository.AuditoriaRepository;
+import com.projeto.produto.repository.PermissionarioRepository;
 import com.projeto.produto.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -30,6 +31,9 @@ public class VeiculoServiceImpl {
     @Autowired
     private AuditoriaRepository auditoriaRepository;
 
+    @Autowired
+    private PermissionarioRepository permissionarioRepository;
+
     @Transactional
     public VeiculoResponseDTO inserirVeiculo(VeiculoRequestDTO veiculoRequestDTO,
                                              MultipartFile crlv,
@@ -42,6 +46,9 @@ public class VeiculoServiceImpl {
                 Objects.isNull(veiculoRequestDTO.getIdPermissionario()) || Objects.isNull(veiculoRequestDTO.getNumeroPermissao())) {
             throw new RuntimeException("Dados inválidos para o Veículo!");
         }
+        if(Objects.isNull(veiculoRequestDTO.getUsuario()) || veiculoRequestDTO.getUsuario().isEmpty())
+            throw new RuntimeException("Usuário vazio ou não identificado!");
+
         Veiculo veiculo = converterVeiculoDTOToVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria);
         veiculo.setDataCriacao(LocalDate.now());
         veiculo = veiculoRepository.save(veiculo);
@@ -63,6 +70,9 @@ public class VeiculoServiceImpl {
                 Objects.isNull(veiculoRequestDTO.getIdPermissionario()) || Objects.isNull(veiculoRequestDTO.getNumeroPermissao())) {
             throw new RuntimeException("Dados inválidos para o Veículo!");
         }
+        if(Objects.isNull(veiculoRequestDTO.getUsuario()) || veiculoRequestDTO.getUsuario().isEmpty())
+            throw new RuntimeException("Usuário vazio ou não identificado!");
+
         Veiculo veiculo = converterVeiculoDTOToVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria);
 
         //Auditoria
@@ -106,6 +116,9 @@ public class VeiculoServiceImpl {
     @Transactional
     public ResponseEntity<Void> excluirVeiculo(Long idVeiculo, String usuario) {
         try{
+            if(Objects.isNull(usuario) || usuario.isEmpty())
+                throw new RuntimeException("Usuário vazio ou não identificado!");
+
             veiculoRepository.deleteVeiculoByIdVeiculo(idVeiculo);
 
             //Auditoria
@@ -133,7 +146,7 @@ public class VeiculoServiceImpl {
             veiculoResponseDTO.setIdVeiculo(veiculo.getIdVeiculo());
         }
 
-        veiculoResponseDTO.setIdPermissionario(veiculo.getIdPermissionario());
+        veiculoResponseDTO.setIdPermissionario(veiculo.getPermissionario().getIdPermissionario());
         veiculoResponseDTO.setNumeroPermissao(veiculo.getNumeroPermissao());
         veiculoResponseDTO.setPlaca(veiculo.getPlaca());
         veiculoResponseDTO.setRenavam(veiculo.getRenavam());
@@ -168,7 +181,7 @@ public class VeiculoServiceImpl {
             veiculo = veiculoRepository.findVeiculoByIdVeiculo(veiculoRequestDTO.getIdVeiculo());
         }
 
-        veiculo.setIdPermissionario(veiculoRequestDTO.getIdPermissionario());
+        veiculo.setPermissionario(permissionarioRepository.findPermissionarioByIdPermissionario(veiculoRequestDTO.getIdPermissionario()));
         veiculo.setNumeroPermissao(veiculoRequestDTO.getNumeroPermissao());
         veiculo.setPlaca(veiculoRequestDTO.getPlaca());
         veiculo.setRenavam(veiculoRequestDTO.getRenavam());
