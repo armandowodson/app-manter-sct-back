@@ -3,17 +3,22 @@ package com.projeto.produto.service.impl;
 import com.projeto.produto.dto.AuditoriaDTO;
 import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.repository.AuditoriaRepository;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.view.JasperViewer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class AuditoriaServiceImpl {
@@ -68,7 +73,7 @@ public class AuditoriaServiceImpl {
             localDateFim = null;
         }
 
-        List<Auditoria> listaAuditoria = new ArrayList<>();
+        List<Auditoria> listaAuditoria;
 
         if(localDateInicio != null && localDateFim != null){
             listaAuditoria = auditoriaRepository.listarTodasAuditoriasFiltros(
@@ -114,6 +119,25 @@ public class AuditoriaServiceImpl {
         auditoriaDTO.setDataOperacao(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(auditoria.getDataOperacao()));
 
         return  auditoriaDTO;
+    }
+
+    public void gerarRelatorio() throws JRException, SQLException, IOException {
+        ClassPathResource resource = new ClassPathResource("reports/auditoria.jrxml");
+        JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
+        //JasperReport jasperReport = JasperCompileManager.compileReport("src/main/resources/reports/auditoria.jrxml");
+        FileInputStream  logoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/LogoPrefeitura.png" ).getAbsolutePath());
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("imagemPath", logoStream);
+        Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "system", "1978");
+        Statement stm = connection.createStatement();
+        String query = "SELECT * FROM PROJ.AUDITORIA";
+        ResultSet rs = stm.executeQuery( query );
+        JRResultSetDataSource jrRS = new JRResultSetDataSource( rs );
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, jrRS);
+        String destinationFileName = "C:/exports/final_report.pdf";
+        JasperExportManager.exportReportToPdfFile(jasperPrint, "C:/Relatorios/auditoria-" + LocalDate.now() + ".pdf");
+        //JasperViewer viewer = new JasperViewer( jasperPrint , true );
+        //viewer.show();
     }
 
 }

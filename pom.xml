@@ -12,8 +12,8 @@
     <artifactId>produto</artifactId>
     <version>1.2-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>ManterProdutos</name>
-    <description>Aplicação Manter Produtos</description>
+    <name>ManterTransportes</name>
+    <description>Sistema de Controle de Transportes</description>
     <properties>
         <java.version>1.8</java.version>
     </properties>
@@ -72,7 +72,6 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations -->
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-codegen-maven-plugin</artifactId>
@@ -98,6 +97,21 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>6.20.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports-fonts</artifactId>
+            <version>6.20.0</version>
+        </dependency>
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.4.01</version>
         </dependency>
     </dependencies>
 
