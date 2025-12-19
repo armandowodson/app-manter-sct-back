@@ -45,7 +45,7 @@ public class PermissionarioController {
     }
 
     @GetMapping("/buscar-disponiveis/{idPermissionario}")
-    public ResponseEntity<List<PermissionarioResponseDTO>> buscarPermissionariosDisponiveisAlteracao(Long idPermissionario) {
+    public ResponseEntity<List<PermissionarioResponseDTO>> buscarPermissionariosDisponiveisAlteracao(@PathVariable Long idPermissionario) {
         return ResponseEntity.ok(service.listarPermissionariosDisponiveis(idPermissionario));
     }
 

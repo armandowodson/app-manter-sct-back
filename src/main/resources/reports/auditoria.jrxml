@@ -7,40 +7,135 @@
 	<queryString language="SQL">
 		<![CDATA[]]>
 	</queryString>
+	<field name="operacao" class="java.lang.String"/>
+	<field name="nomeModulo" class="java.lang.String"/>
+	<field name="usuarioOperacao" class="java.lang.String"/>
+	<field name="dataOperacao" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="131" splitType="Stretch">
+		<band height="119" splitType="Stretch">
 			<staticText>
-				<reportElement x="108" y="90" width="350" height="30" uuid="194fb156-d8a9-4b34-83d0-7782f192d0da"/>
+				<reportElement x="108" y="85" width="350" height="30" uuid="194fb156-d8a9-4b34-83d0-7782f192d0da"/>
 				<textElement textAlignment="Center">
 					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[MUNICÍPIO DE BARREIRINHAS - MA]]></text>
 			</staticText>
 			<image>
-				<reportElement x="240" y="10" width="80" height="70" uuid="2e93be38-7968-440a-8e18-aa219e0bce36"/>
+				<reportElement x="240" y="5" width="80" height="70" uuid="2e93be38-7968-440a-8e18-aa219e0bce36"/>
 				<imageExpression><![CDATA[$P{imagemPath}]]></imageExpression>
 			</image>
 		</band>
 	</title>
 	<pageHeader>
-		<band height="35" splitType="Stretch"/>
+		<band height="41" splitType="Stretch">
+			<staticText>
+				<reportElement x="101" y="7" width="399" height="30" uuid="b0eb1979-2828-4735-963a-0c75012c905e"/>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Relatório de Auditoria dos Módulos do Sistema]]></text>
+			</staticText>
+		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="61" splitType="Stretch"/>
+		<band height="38" splitType="Stretch">
+			<staticText>
+				<reportElement x="4" y="16" width="216" height="20" uuid="2450918d-3696-4f1f-a033-868a07d50705">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NOME MÓDULO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="220" y="16" width="134" height="20" uuid="4fe447c9-42c0-4561-86da-8de925bd10d9">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[USUÁRIO OPERAÇÃO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="358" y="16" width="90" height="20" uuid="0b123b44-c5c7-4fc6-a3bf-7c800c1583ff">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[OPERAÇÃO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="450" y="16" width="103" height="20" uuid="2c7cbcc1-cfd1-403c-a2e2-7c1bcb322cba">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DATA OPERAÇÃO]]></text>
+			</staticText>
+		</band>
 	</columnHeader>
 	<detail>
-		<band height="125" splitType="Stretch"/>
+		<band height="25" splitType="Stretch">
+			<textField>
+				<reportElement x="358" y="2" width="90" height="20" uuid="f0b8de71-acfa-4619-ae14-e2ba7eb8aba1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{operacao}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="4" y="2" width="216" height="20" uuid="85a2a9de-2007-4c42-9d98-00a2032a8feb">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nomeModulo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="220" y="2" width="134" height="20" uuid="f11df101-86ab-4381-8244-d1c14bcb2ad1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usuarioOperacao}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="450" y="2" width="103" height="20" uuid="e7c283eb-92c1-435b-ada8-d2644a934e2d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dataOperacao}]]></textFieldExpression>
+			</textField>
+		</band>
 	</detail>
 	<columnFooter>
-		<band height="45" splitType="Stretch"/>
+		<band splitType="Stretch"/>
 	</columnFooter>
 	<pageFooter>
-		<band height="54" splitType="Stretch"/>
+		<band height="40" splitType="Stretch">
+			<textField>
+				<reportElement x="466" y="10" width="87" height="20" uuid="543fce21-dc75-4be1-b18a-f9899dfe6936"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
 	</pageFooter>
 	<summary>
-		<band height="42" splitType="Stretch"/>
+		<band splitType="Stretch"/>
 	</summary>
 </jasperReport>

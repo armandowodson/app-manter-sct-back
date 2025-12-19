@@ -76,13 +76,13 @@ public class PontosTaxiServiceImpl {
 
     public List<PontoTaxiDTO> listarTodosPontosTaxiFiltros(String numeroPonto, String descricaoPonto,
                                                            String fatorRotatividade, String numeroVagas,
-                                                           String referenciaPonto) {
+                                                           String referenciaPonto, String modalidade) {
         List<PontoTaxi> listaPontosTaxi = pontosTaxiRepository.listarTodosPontosTaxiFiltros(
                 numeroPonto,
                 descricaoPonto != null ? descricaoPonto.toUpperCase() : descricaoPonto,
                 fatorRotatividade,
                 referenciaPonto != null ? referenciaPonto.toUpperCase() : referenciaPonto,
-                numeroVagas
+                numeroVagas, modalidade
         );
 
         List<PontoTaxiDTO> listaPontoTaxiDTO = new ArrayList<>();
@@ -133,6 +133,7 @@ public class PontosTaxiServiceImpl {
         pontoTaxiDTO.setReferenciaPonto(pontoTaxi.getReferenciaPonto());
         pontoTaxiDTO.setFatorRotatividade(pontoTaxi.getFatorRotatividade());
         pontoTaxiDTO.setNumeroVagas(pontoTaxi.getNumeroVagas());
+        pontoTaxiDTO.setModalidade(pontoTaxi.getModalidade());
         pontoTaxiDTO.setDataCriacao(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(pontoTaxi.getDataCriacao()));
 
         return  pontoTaxiDTO;
@@ -148,6 +149,7 @@ public class PontosTaxiServiceImpl {
         pontoTaxi.setReferenciaPonto(pontoTaxiDTO.getReferenciaPonto());
         pontoTaxi.setFatorRotatividade(pontoTaxiDTO.getFatorRotatividade());
         pontoTaxi.setNumeroVagas(pontoTaxiDTO.getNumeroVagas());
+        pontoTaxi.setModalidade(pontoTaxiDTO.getModalidade());
 
         return  pontoTaxi;
     }

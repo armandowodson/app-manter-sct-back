@@ -28,6 +28,7 @@ public class VeiculoResponseDTO {
     private String numeroCrlv;
     private String anoCrlv;
     private String certificadoAfericao;
+    private String tipoVeiculo;
     private String observacao;
     private String dataCriacao;
 

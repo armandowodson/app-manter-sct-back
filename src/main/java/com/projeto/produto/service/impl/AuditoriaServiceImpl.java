@@ -4,6 +4,7 @@ import com.projeto.produto.dto.AuditoriaDTO;
 import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.repository.AuditoriaRepository;
 import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.view.JasperViewer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -39,6 +40,14 @@ public class AuditoriaServiceImpl {
             auditoriaDTO = converterAuditoriaToAuditoriaDTO(auditoria);
         }
         return auditoriaDTO;
+    }
+
+    public List<AuditoriaDTO> imprimirAuditoria(String nomeModulo, String usuarioOperacao,
+                                                String operacao, String dataInicioOperacao,
+                                                String dataFimOperacao) throws JRException, SQLException, IOException {
+        List<AuditoriaDTO> listaAuditorias = listarTodosAuditoriaFiltros(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao);
+        gerarRelatorio(listaAuditorias);
+        return listaAuditorias;
     }
 
     public List<AuditoriaDTO> listarTodosAuditoriaFiltros(String nomeModulo, String usuarioOperacao,
@@ -121,23 +130,28 @@ public class AuditoriaServiceImpl {
         return  auditoriaDTO;
     }
 
-    public void gerarRelatorio() throws JRException, SQLException, IOException {
+    public void gerarRelatorio(List<AuditoriaDTO> listaAuditorias) throws JRException, SQLException, IOException {
         ClassPathResource resource = new ClassPathResource("reports/auditoria.jrxml");
         JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
-        //JasperReport jasperReport = JasperCompileManager.compileReport("src/main/resources/reports/auditoria.jrxml");
         FileInputStream  logoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/LogoPrefeitura.png" ).getAbsolutePath());
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("imagemPath", logoStream);
         Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "system", "1978");
         Statement stm = connection.createStatement();
-        String query = "SELECT * FROM PROJ.AUDITORIA";
-        ResultSet rs = stm.executeQuery( query );
-        JRResultSetDataSource jrRS = new JRResultSetDataSource( rs );
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, jrRS);
-        String destinationFileName = "C:/exports/final_report.pdf";
-        JasperExportManager.exportReportToPdfFile(jasperPrint, "C:/Relatorios/auditoria-" + LocalDate.now() + ".pdf");
-        //JasperViewer viewer = new JasperViewer( jasperPrint , true );
-        //viewer.show();
+        String query = "";
+        if(Objects.nonNull(listaAuditorias)){
+            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(listaAuditorias);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+            JasperExportManager.exportReportToPdfFile(jasperPrint, "C:/Relatorios/auditoria-" + LocalDate.now() + ".pdf");
+
+        }else{
+            query = "SELECT NOME_MODULO, USUARIO_OPERACAO, OPERACAO, TO_CHAR(DATA_OPERACAO, 'dd/MM/yyyy') DATA_OPERACAO FROM PROJ.AUDITORIA";
+            ResultSet rs = stm.executeQuery( query );
+            JRResultSetDataSource jrRS = new JRResultSetDataSource( rs );
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, jrRS);
+            JasperExportManager.exportReportToPdfFile(jasperPrint, "C:/Relatorios/auditoria-" + LocalDate.now() + ".pdf");
+        }
+
     }
 
 }

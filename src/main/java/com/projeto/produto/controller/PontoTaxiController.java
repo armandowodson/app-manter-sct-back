@@ -29,8 +29,10 @@ public class PontoTaxiController {
                                                                       @RequestParam(required = false) String descricaoPonto,
                                                                       @RequestParam(required = false) String fatorRotatividade,
                                                                       @RequestParam(required = false) String numeroVagas,
-                                                                      @RequestParam(required = false) String referenciaPonto) {
-        return ResponseEntity.ok(service.listarTodosPontosTaxiFiltros(numeroPonto, descricaoPonto, fatorRotatividade, numeroVagas, referenciaPonto));
+                                                                      @RequestParam(required = false) String referenciaPonto,
+                                                                      @RequestParam(required = false) String modalidade) {
+        return ResponseEntity.ok(service.listarTodosPontosTaxiFiltros(numeroPonto, descricaoPonto, fatorRotatividade,
+                                                                      numeroVagas, referenciaPonto, modalidade));
     }
 
     @PostMapping("/inserir")

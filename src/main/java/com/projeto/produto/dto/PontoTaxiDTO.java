@@ -12,6 +12,7 @@ public class PontoTaxiDTO {
     private String fatorRotatividade;
     private String referenciaPonto;
     private String numeroVagas;
+    private String modalidade;
     private String dataCriacao;
     private String usuario;
 }

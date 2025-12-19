@@ -164,6 +164,7 @@ public class VeiculoServiceImpl {
         veiculoResponseDTO.setDataRetorno(veiculo.getDataRetorno().plusDays(1).toString());
         veiculoResponseDTO.setComprovanteVistoria(veiculo.getComprovanteVistoria());
         veiculoResponseDTO.setSituacaoVeiculo(veiculo.getSituacaoVeiculo());
+        veiculoResponseDTO.setTipoVeiculo(veiculo.getTipoVeiculo());
         veiculoResponseDTO.setNumeroCrlv(veiculo.getNumeroCrlv());
         veiculoResponseDTO.setAnoCrlv(veiculo.getAnoCrlv());
         veiculoResponseDTO.setCertificadoAfericao(veiculo.getCertificadoAfericao());
@@ -224,6 +225,7 @@ public class VeiculoServiceImpl {
         if(Objects.nonNull(comprovanteVistoria))
             veiculo.setComprovanteVistoria(comprovanteVistoria.getBytes());
         veiculo.setSituacaoVeiculo(veiculoRequestDTO.getSituacaoVeiculo());
+        veiculo.setTipoVeiculo(veiculoRequestDTO.getTipoVeiculo());
 
         veiculo.setNumeroCrlv(veiculoRequestDTO.getNumeroCrlv());
         veiculo.setAnoCrlv(veiculoRequestDTO.getAnoCrlv());

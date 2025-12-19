@@ -47,7 +47,7 @@ public class PermissionarioServiceImpl {
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
         Permissionario permissionario = converterPermissionarioDTOToPermissionario(
-                permissionarioRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto
+                permissionarioRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 1
         );
         permissionario.setDataCriacao(LocalDate.now());
         permissionario = permissionarioRepository.save(permissionario);
@@ -73,7 +73,7 @@ public class PermissionarioServiceImpl {
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
         Permissionario permissionario = converterPermissionarioDTOToPermissionario(
-                permissionarioRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto
+                permissionarioRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 2
         );
 
         permissionario = permissionarioRepository.save(permissionario);
@@ -182,7 +182,7 @@ public class PermissionarioServiceImpl {
         permissionarioResponseDTO.setNumeroPermissao(permissionario.getNumeroPermissao());
         permissionarioResponseDTO.setNomePermissionario(permissionario.getNomePermissionario());
         permissionarioResponseDTO.setCpfPermissionario(permissionario.getCpfPermissionario());
-        permissionarioResponseDTO.setCnpjEmpresa(permissionario.getCnpjEmpresa() != null ? permissionario.getCnpjEmpresa() : "");
+        permissionarioResponseDTO.setCnpjEmpresa((permissionario.getCnpjEmpresa() != null && !permissionario.getCnpjEmpresa().equals("null")) ? permissionario.getCnpjEmpresa() : "");
         permissionarioResponseDTO.setRgPermissionario(permissionario.getRgPermissionario());
         permissionarioResponseDTO.setOrgaoEmissor(permissionario.getOrgaoEmissor());
         permissionarioResponseDTO.setNaturezaPessoa(permissionario.getNaturezaPessoa().equals("1") ? "FÍSICA" : "JURÍDICA");
@@ -207,7 +207,7 @@ public class PermissionarioServiceImpl {
     public Permissionario converterPermissionarioDTOToPermissionario(PermissionarioRequestDTO permissionarioRequestDTO,
                                                                      MultipartFile certidaoNegativaCriminal,
                                                                      MultipartFile certidaoNegativaMunicipal,
-                                                                     MultipartFile foto) throws IOException {
+                                                                     MultipartFile foto, Integer tipo) throws IOException {
         Permissionario permissionario = new Permissionario();
         if (permissionarioRequestDTO.getIdPermissionario() != null && permissionarioRequestDTO.getIdPermissionario() != 0){
             permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(permissionarioRequestDTO.getIdPermissionario());
@@ -215,18 +215,22 @@ public class PermissionarioServiceImpl {
 
         permissionario.setNumeroPermissao(permissionarioRequestDTO.getNumeroPermissao());
         permissionario.setNomePermissionario(permissionarioRequestDTO.getNomePermissionario());
+
         if(Objects.nonNull(permissionarioRequestDTO.getCpfPermissionario()) && !permissionarioRequestDTO.getCpfPermissionario().isEmpty()){
             permissionarioRequestDTO.setCpfPermissionario(
                     permissionarioRequestDTO.getCpfPermissionario().replace(".", "").replace("-", "").replace("/", "")
             );
             permissionario.setCpfPermissionario(permissionarioRequestDTO.getCpfPermissionario());
         }
-        if(Objects.nonNull(permissionarioRequestDTO.getCnpjEmpresa()) && !permissionarioRequestDTO.getCnpjEmpresa().isEmpty()){
+
+        if(Objects.nonNull(permissionarioRequestDTO.getCnpjEmpresa()) && !permissionarioRequestDTO.getCnpjEmpresa().isEmpty() &&
+                !permissionarioRequestDTO.getCnpjEmpresa().equals("null")){
             permissionarioRequestDTO.setCnpjEmpresa(
                     permissionarioRequestDTO.getCnpjEmpresa().replace(".", "").replace("-", "").replace("/", "")
             );
             permissionario.setCnpjEmpresa(permissionarioRequestDTO.getCnpjEmpresa());
         }
+
         permissionario.setRgPermissionario(permissionarioRequestDTO.getRgPermissionario());
         permissionario.setOrgaoEmissor(permissionarioRequestDTO.getOrgaoEmissor());
         permissionario.setNaturezaPessoa(permissionarioRequestDTO.getNaturezaPessoa().equals("FÍSICA") ? "1" : "2");
@@ -235,16 +239,25 @@ public class PermissionarioServiceImpl {
         permissionario.setEnderecoPermissionario(permissionarioRequestDTO.getEnderecoPermissionario());
         permissionario.setCelularPermissionario(permissionarioRequestDTO.getCelularPermissionario());
         permissionario.setCnhPermissionario(permissionarioRequestDTO.getCnhPermissionario());
-        permissionario.setCategoriaCnhPermissionario(converterNomeCategoriaCnh(permissionarioRequestDTO.getCategoriaCnhPermissionario()));
+
+        if(tipo == 1){
+            permissionario.setCategoriaCnhPermissionario(converterIdCategoriaCnh(permissionarioRequestDTO.getCategoriaCnhPermissionario()));
+        }else{
+            permissionario.setCategoriaCnhPermissionario(converterNomeCategoriaCnh(permissionarioRequestDTO.getCategoriaCnhPermissionario()));
+        }
+
         permissionario.setNumeroQuitacaoMilitar(permissionarioRequestDTO.getNumeroQuitacaoMilitar());
         permissionario.setNumeroQuitacaoEleitoral(permissionarioRequestDTO.getNumeroQuitacaoEleitoral());
         permissionario.setNumeroCertificadoCondutor(permissionarioRequestDTO.getNumeroCertificadoCondutor());
+        permissionario.setNumeroInscricaoInss(permissionarioRequestDTO.getNumeroInscricaoInss());
+
         if(Objects.nonNull(certidaoNegativaCriminal))
             permissionario.setCertidaoNegativaCriminal(certidaoNegativaCriminal.getBytes());
         if(Objects.nonNull(certidaoNegativaMunicipal))
             permissionario.setCertidaoNegativaMunicipal(certidaoNegativaMunicipal.getBytes());
         if(Objects.nonNull(foto))
             permissionario.setFoto(foto.getBytes());
+
         if(Objects.nonNull(permissionarioRequestDTO.getDataCriacao()))
             permissionario.setDataCriacao(LocalDate.parse(permissionarioRequestDTO.getDataCriacao()));
         else

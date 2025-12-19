@@ -59,6 +59,8 @@ public class Veiculo {
     private String anoCrlv;
     @Column(name = "CERTIFICADO_AFERICAO")
     private String certificadoAfericao;
+    @Column(name = "TIPO_VEICULO")
+    private String tipoVeiculo;
     @Column(name = "OBSERVACAO")
     private String observacao;
     @Column(name = "DATA_CRIACAO")

@@ -37,9 +37,18 @@ public class AuditoriaController {
         return ResponseEntity.ok(service.listarTodosAuditoriaFiltros(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao));
     }
 
+    @GetMapping("/imprimir")
+    public ResponseEntity<List<AuditoriaDTO>> imprimirAuditoria( @RequestParam(required = false) String nomeModulo,
+                                                                 @RequestParam(required = false) String usuarioOperacao,
+                                                                 @RequestParam(required = false) String operacao,
+                                                                 @RequestParam(required = false) String dataInicioOperacao,
+                                                                 @RequestParam(required = false) String dataFimOperacao) throws JRException, SQLException, IOException {
+        return ResponseEntity.ok(service.imprimirAuditoria(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao));
+    }
+
     @GetMapping("/gerar-relatorio")
     public void gerarRelatorio() throws JRException, SQLException, IOException {
-        service.gerarRelatorio();
+        service.gerarRelatorio(null);
     }
 
 }
