@@ -1,6 +1,7 @@
 package com.projeto.produto.repository;
 
 import com.projeto.produto.entity.Auditoria;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -8,6 +9,15 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface AuditoriaRepository extends JpaRepository<Auditoria, Long> {
+    @Query(
+            value = "SELECT * " +
+                    "FROM proj.auditoria " +
+                    "WHERE 1 = 1 " +
+                    "ORDER BY NOME_MODULO ASC" ,
+            nativeQuery = true
+    )
+    List<Auditoria> buscarTodos(Pageable pageable);
+
     Auditoria findByIdAuditoria(Long idAuditoria);
 
     @Query(
@@ -23,7 +33,7 @@ public interface AuditoriaRepository extends JpaRepository<Auditoria, Long> {
     )
     List<Auditoria> listarTodasAuditoriasFiltros(String nomeModulo, String usuarioOperacao,
                                                  String operacao, LocalDate dataInicioOperacao,
-                                                 LocalDate dataFimOperacao);
+                                                 LocalDate dataFimOperacao, Pageable pageable);
 
     @Query(
             value = "SELECT * " +
@@ -34,7 +44,7 @@ public interface AuditoriaRepository extends JpaRepository<Auditoria, Long> {
                     "AND (:operacao IS NULL OR OPERACAO = :operacao) " ,
             nativeQuery = true
     )
-    List<Auditoria> listarTodasAuditoriasFiltrosSemDatas(String nomeModulo, String usuarioOperacao, String operacao);
+    List<Auditoria> listarTodasAuditoriasFiltrosSemDatas(String nomeModulo, String usuarioOperacao, String operacao, Pageable pageable);
 
 }
 

@@ -4,6 +4,9 @@ import com.projeto.produto.dto.AuditoriaDTO;
 import com.projeto.produto.service.impl.AuditoriaServiceImpl;
 import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +22,10 @@ public class AuditoriaController {
     public AuditoriaServiceImpl service;
 
     @GetMapping("/buscar-todas")
-    public ResponseEntity<List<AuditoriaDTO>> listarTodosAuditoria() {
-        return ResponseEntity.ok(service.listarTodosAuditoria());
+    public Page<AuditoriaDTO> listarTodosAuditoria(@RequestParam(required = true) Integer pageIndex, @RequestParam(required = true) Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<AuditoriaDTO> auditorias = service.listarTodosAuditoria(pageRequest);
+        return auditorias;
     }
 
     @GetMapping("/buscar/{idAuditoria}")
@@ -29,12 +34,16 @@ public class AuditoriaController {
     }
 
     @GetMapping("/buscar-filtros")
-    public ResponseEntity<List<AuditoriaDTO>> buscarAuditoriaFiltros( @RequestParam(required = false) String nomeModulo,
+    public Page<AuditoriaDTO> buscarAuditoriaFiltros( @RequestParam(required = false) String nomeModulo,
                                                                       @RequestParam(required = false) String usuarioOperacao,
                                                                       @RequestParam(required = false) String operacao,
                                                                       @RequestParam(required = false) String dataInicioOperacao,
-                                                                      @RequestParam(required = false) String dataFimOperacao) {
-        return ResponseEntity.ok(service.listarTodosAuditoriaFiltros(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao));
+                                                                      @RequestParam(required = false) String dataFimOperacao,
+                                                                      @RequestParam(required = true) Integer pageIndex,
+                                                                      @RequestParam(required = true) Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<AuditoriaDTO> auditorias = service.listarTodosAuditoriaFiltros(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao, pageRequest);
+        return auditorias;
     }
 
     @GetMapping("/imprimir")
@@ -42,8 +51,11 @@ public class AuditoriaController {
                                                                  @RequestParam(required = false) String usuarioOperacao,
                                                                  @RequestParam(required = false) String operacao,
                                                                  @RequestParam(required = false) String dataInicioOperacao,
-                                                                 @RequestParam(required = false) String dataFimOperacao) throws JRException, SQLException, IOException {
-        return ResponseEntity.ok(service.imprimirAuditoria(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao));
+                                                                 @RequestParam(required = false) String dataFimOperacao,
+                                                                 @RequestParam(required = true) Integer pageIndex,
+                                                                 @RequestParam(required = true) Integer pageSize) throws JRException, SQLException, IOException {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        return ResponseEntity.ok(service.imprimirAuditoria(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao, pageRequest));
     }
 
     @GetMapping("/gerar-relatorio")

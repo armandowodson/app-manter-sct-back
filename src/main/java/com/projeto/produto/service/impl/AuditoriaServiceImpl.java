@@ -8,6 +8,9 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.view.JasperViewer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
@@ -28,9 +31,11 @@ public class AuditoriaServiceImpl {
     private AuditoriaRepository auditoriaRepository;
     
 
-    public List<AuditoriaDTO> listarTodosAuditoria() {
-        List<Auditoria> listaAuditoria = auditoriaRepository.findAll(Sort.by(Sort.Direction.ASC, "nomeModulo"));
-        return converterEntityToDTO(listaAuditoria);
+    public Page<AuditoriaDTO> listarTodosAuditoria(PageRequest pageRequest) {
+        List<Auditoria> listaAuditoria = auditoriaRepository.buscarTodos(pageRequest);
+        Integer countLista = auditoriaRepository.buscarTodos(null).size();
+        List<AuditoriaDTO> auditoriaDTOList = converterEntityToDTO(listaAuditoria);
+        return new PageImpl<>(auditoriaDTOList, pageRequest, countLista);
     }
 
     public AuditoriaDTO buscarAuditoriaId(Long idAuditoria) {
@@ -44,15 +49,16 @@ public class AuditoriaServiceImpl {
 
     public List<AuditoriaDTO> imprimirAuditoria(String nomeModulo, String usuarioOperacao,
                                                 String operacao, String dataInicioOperacao,
-                                                String dataFimOperacao) throws JRException, SQLException, IOException {
-        List<AuditoriaDTO> listaAuditorias = listarTodosAuditoriaFiltros(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao);
+                                                String dataFimOperacao, PageRequest pageRequest) throws JRException, SQLException, IOException {
+        Page<AuditoriaDTO> listaAuditoriasPage = listarTodosAuditoriaFiltros(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao, pageRequest);
+        List<AuditoriaDTO> listaAuditorias = listaAuditoriasPage.getContent();
         gerarRelatorio(listaAuditorias);
         return listaAuditorias;
     }
 
-    public List<AuditoriaDTO> listarTodosAuditoriaFiltros(String nomeModulo, String usuarioOperacao,
+    public Page<AuditoriaDTO> listarTodosAuditoriaFiltros(String nomeModulo, String usuarioOperacao,
                                                           String operacao, String dataInicioOperacao,
-                                                          String dataFimOperacao) {
+                                                          String dataFimOperacao, PageRequest pageRequest) {
 
         LocalDate localDateInicio = LocalDate.now();
         if(Objects.nonNull(dataInicioOperacao)) {
@@ -83,17 +89,22 @@ public class AuditoriaServiceImpl {
         }
 
         List<Auditoria> listaAuditoria;
+        Integer countRegistros = 0;
 
         if(localDateInicio != null && localDateFim != null){
             listaAuditoria = auditoriaRepository.listarTodasAuditoriasFiltros(
-                    nomeModulo != null ? nomeModulo.toUpperCase() : null,
-                    usuarioOperacao, operacao, localDateInicio, localDateFim
+                    nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, localDateInicio, localDateFim, pageRequest
             );
+            countRegistros = auditoriaRepository.listarTodasAuditoriasFiltros(
+                    nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, localDateInicio, localDateFim, null
+            ).size();
         }else{
             listaAuditoria = auditoriaRepository.listarTodasAuditoriasFiltrosSemDatas(
-                    nomeModulo != null ? nomeModulo.toUpperCase() : null,
-                    usuarioOperacao, operacao
+                    nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, pageRequest
             );
+            countRegistros = auditoriaRepository.listarTodasAuditoriasFiltrosSemDatas(
+                    nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, null
+            ).size();
         }
 
         List<AuditoriaDTO> listaAuditoriaDTO = new ArrayList<>();
@@ -104,7 +115,8 @@ public class AuditoriaServiceImpl {
             }
         }
 
-        return listaAuditoriaDTO;
+        List<AuditoriaDTO> auditoriaDTOList = converterEntityToDTO(listaAuditoria);
+        return new PageImpl<>(auditoriaDTOList, pageRequest, countRegistros);
     }
 
     public List<AuditoriaDTO> converterEntityToDTO(List<Auditoria> listaAuditoria){
