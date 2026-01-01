@@ -1,12 +1,23 @@
 package com.projeto.produto.repository;
 
+import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.entity.PontoTaxi;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 public interface PontosTaxiRepository extends JpaRepository<PontoTaxi, Long> {
+    @Query(
+            value = "SELECT * " +
+                    "FROM proj.pontos_taxi " +
+                    "WHERE 1 = 1 " +
+                    "ORDER BY DESCRICAO_PONTO ASC" ,
+            nativeQuery = true
+    )
+    List<PontoTaxi> buscarTodos(Pageable pageable);
+
     PontoTaxi findByIdPontoTaxi(Long idPontoTaxi);
 
     void deletePontoTaxiByIdPontoTaxi(Long idPontoTaxi);
@@ -25,6 +36,7 @@ public interface PontosTaxiRepository extends JpaRepository<PontoTaxi, Long> {
     )
     List<PontoTaxi> listarTodosPontosTaxiFiltros(String numeroPonto, String descricaoPonto,
                                                  String fatorRotatividade, String referenciaPonto,
-                                                 String numeroVagas, String modalidade);
+                                                 String numeroVagas, String modalidade,
+                                                 Pageable pageable);
 }
 

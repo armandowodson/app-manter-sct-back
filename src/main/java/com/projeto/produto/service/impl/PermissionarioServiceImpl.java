@@ -49,7 +49,6 @@ public class PermissionarioServiceImpl {
         Permissionario permissionario = converterPermissionarioDTOToPermissionario(
                 permissionarioRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 1
         );
-        permissionario.setDataCriacao(LocalDate.now());
         permissionario = permissionarioRepository.save(permissionario);
 
         //Auditoria
@@ -233,7 +232,13 @@ public class PermissionarioServiceImpl {
 
         permissionario.setRgPermissionario(permissionarioRequestDTO.getRgPermissionario());
         permissionario.setOrgaoEmissor(permissionarioRequestDTO.getOrgaoEmissor());
-        permissionario.setNaturezaPessoa(permissionarioRequestDTO.getNaturezaPessoa().equals("FÍSICA") ? "1" : "2");
+
+        if(tipo == 1){
+            permissionario.setNaturezaPessoa(permissionarioRequestDTO.getNaturezaPessoa());
+        }else{
+            permissionario.setNaturezaPessoa(permissionarioRequestDTO.getNaturezaPessoa().equals("FÍSICA") ? "1" : "2");
+        }
+
         permissionario.setUfPermissionario(permissionarioRequestDTO.getUfPermissionario());
         permissionario.setBairroPermissionario(permissionarioRequestDTO.getBairroPermissionario());
         permissionario.setEnderecoPermissionario(permissionarioRequestDTO.getEnderecoPermissionario());
@@ -241,7 +246,7 @@ public class PermissionarioServiceImpl {
         permissionario.setCnhPermissionario(permissionarioRequestDTO.getCnhPermissionario());
 
         if(tipo == 1){
-            permissionario.setCategoriaCnhPermissionario(converterIdCategoriaCnh(permissionarioRequestDTO.getCategoriaCnhPermissionario()));
+            permissionario.setCategoriaCnhPermissionario(permissionarioRequestDTO.getCategoriaCnhPermissionario());
         }else{
             permissionario.setCategoriaCnhPermissionario(converterNomeCategoriaCnh(permissionarioRequestDTO.getCategoriaCnhPermissionario()));
         }
@@ -258,7 +263,7 @@ public class PermissionarioServiceImpl {
         if(Objects.nonNull(foto))
             permissionario.setFoto(foto.getBytes());
 
-        if(Objects.nonNull(permissionarioRequestDTO.getDataCriacao()))
+        if(Objects.nonNull(permissionarioRequestDTO.getDataCriacao()) && !permissionarioRequestDTO.getDataCriacao().isEmpty())
             permissionario.setDataCriacao(LocalDate.parse(permissionarioRequestDTO.getDataCriacao()));
         else
             permissionario.setDataCriacao(LocalDate.now());

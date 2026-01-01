@@ -1,20 +1,19 @@
 package com.projeto.produto.service.impl;
 
-import com.projeto.produto.api.model.ProdutoDTO;
 import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.entity.PontoTaxi;
-import com.projeto.produto.entity.Produto;
 import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.PontosTaxiRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,9 +59,11 @@ public class PontosTaxiServiceImpl {
         return converterPontoTaxiToPontoTaxiDTO(pontoTaxi);
     }
 
-    public List<PontoTaxiDTO> listarTodosPontosTaxi() {
-        List<PontoTaxi> listaPontosTaxi = pontosTaxiRepository.findAll(Sort.by(Sort.Direction.ASC, "descricaoPonto"));
-        return converterEntityToDTO(listaPontosTaxi);
+    public Page<PontoTaxiDTO> listarTodosPontosTaxi(PageRequest pageRequest) {
+        List<PontoTaxi> listaPontosTaxi = pontosTaxiRepository.buscarTodos(pageRequest);
+        Integer countLista = pontosTaxiRepository.buscarTodos(null).size();
+        List<PontoTaxiDTO> pontosTaxiDTOList = converterEntityToDTO(listaPontosTaxi);
+        return new PageImpl<>(pontosTaxiDTOList, pageRequest, countLista);
     }
 
     public PontoTaxiDTO buscarPontoTaxiId(Long idPontoTaxi) {
@@ -74,16 +75,22 @@ public class PontosTaxiServiceImpl {
         return pontoTaxiDTO;
     }
 
-    public List<PontoTaxiDTO> listarTodosPontosTaxiFiltros(String numeroPonto, String descricaoPonto,
+    public Page<PontoTaxiDTO> listarTodosPontosTaxiFiltros(String numeroPonto, String descricaoPonto,
                                                            String fatorRotatividade, String numeroVagas,
-                                                           String referenciaPonto, String modalidade) {
+                                                           String referenciaPonto, String modalidade,
+                                                           PageRequest pageRequest) {
+
         List<PontoTaxi> listaPontosTaxi = pontosTaxiRepository.listarTodosPontosTaxiFiltros(
-                numeroPonto,
-                descricaoPonto != null ? descricaoPonto.toUpperCase() : descricaoPonto,
-                fatorRotatividade,
-                referenciaPonto != null ? referenciaPonto.toUpperCase() : referenciaPonto,
-                numeroVagas, modalidade
+                numeroPonto,   descricaoPonto != null ? descricaoPonto.toUpperCase() : descricaoPonto,
+                fatorRotatividade,  referenciaPonto != null ? referenciaPonto.toUpperCase() : referenciaPonto,
+                numeroVagas, modalidade,  pageRequest
         );
+
+        Integer countRegistros = pontosTaxiRepository.listarTodosPontosTaxiFiltros(
+                numeroPonto,   descricaoPonto != null ? descricaoPonto.toUpperCase() : descricaoPonto,
+                fatorRotatividade,  referenciaPonto != null ? referenciaPonto.toUpperCase() : referenciaPonto,
+                numeroVagas, modalidade,  null
+        ).size();
 
         List<PontoTaxiDTO> listaPontoTaxiDTO = new ArrayList<>();
         if (!listaPontosTaxi.isEmpty()){
@@ -93,7 +100,7 @@ public class PontosTaxiServiceImpl {
             }
         }
 
-        return listaPontoTaxiDTO;
+        return new PageImpl<>(listaPontoTaxiDTO, pageRequest, countRegistros);
     }
 
     @Transactional

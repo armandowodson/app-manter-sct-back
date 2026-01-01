@@ -1,0 +1,62 @@
+package com.projeto.produto.controller;
+
+import com.projeto.produto.dto.PermissaoDTO;
+import com.projeto.produto.service.impl.PermissaoServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/permissao")
+public class PermissaoController {
+    @Autowired
+    public PermissaoServiceImpl service;
+
+    @GetMapping("/buscar-todos")
+    public Page<PermissaoDTO> listarTodosPermissao(@RequestParam(required = true) Integer pageIndex, @RequestParam(required = true) Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<PermissaoDTO> pontos = service.listarTodosPermissao(pageRequest);
+        return pontos;
+    }
+
+    @GetMapping("/buscar/{idPermissao}")
+    public ResponseEntity<PermissaoDTO> buscarPermissaoId(@PathVariable Long idPermissao) {
+        return ResponseEntity.ok(service.buscarPermissaoId(idPermissao));
+    }
+
+    @GetMapping("/buscar-filtros")
+    public Page<PermissaoDTO> buscarPermissaoFiltros( @RequestParam(required = false) String numeroPermissao,
+                                                      @RequestParam(required = false) String numeroAlvara,
+                                                      @RequestParam(required = false) String anoAlvara,
+                                                      @RequestParam(required = false) String statusPermissao,
+                                                      @RequestParam(required = false) String periodoInicialStatus,
+                                                      @RequestParam(required = false) String periodoFinalStatus,
+                                                      @RequestParam(required = true) Integer pageIndex,
+                                                      @RequestParam(required = true) Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<PermissaoDTO> pontos = service.listarTodasPermissoesFiltros(
+                numeroPermissao, numeroAlvara, anoAlvara,
+                statusPermissao, periodoInicialStatus, periodoFinalStatus, pageRequest
+        );
+
+        return pontos;
+    }
+
+    @PostMapping("/inserir")
+    public ResponseEntity<PermissaoDTO> inserirPermissao(@RequestBody PermissaoDTO permissaoDTO) {
+        return ResponseEntity.ok(service.inserirPermissao(permissaoDTO));
+    }
+
+    @PostMapping("/alterar")
+    public ResponseEntity<PermissaoDTO> atualizarPermissao(@RequestBody PermissaoDTO permissaoDTO) {
+        return ResponseEntity.ok(service.atualizarPermissao(permissaoDTO));
+    }
+
+    @DeleteMapping("/excluir/{idPermissao}/usuario/{usuario}")
+    public ResponseEntity<Void> excluirPermissao(@PathVariable Long idPermissao, @PathVariable String usuario) {
+        return service.excluirPermissao(idPermissao, usuario);
+    }
+
+}

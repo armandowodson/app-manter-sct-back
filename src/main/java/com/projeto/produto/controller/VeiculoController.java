@@ -1,10 +1,13 @@
 package com.projeto.produto.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.dto.VeiculoRequestDTO;
 import com.projeto.produto.dto.VeiculoResponseDTO;
 import com.projeto.produto.service.impl.VeiculoServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,22 +22,44 @@ public class VeiculoController {
     public VeiculoServiceImpl service;
 
     @GetMapping("/buscar-todos")
-    public ResponseEntity<List<VeiculoResponseDTO>> listarTodosVeiculos() {
-        return ResponseEntity.ok(service.listarTodosVeiculos());
+    public Page<VeiculoResponseDTO> listarTodosVeiculos(@RequestParam(required = true) Integer pageIndex, @RequestParam(required = true) Integer pageSize) {
+        try{
+            PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+            Page<VeiculoResponseDTO> veiculoResponseDTOPage = service.listarTodosVeiculos(pageRequest);
+            return veiculoResponseDTOPage;
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar todos os Veículos cadastrados!");
+        }
+
     }
 
     @GetMapping("/buscar/{idVeiculo}")
     public ResponseEntity<VeiculoResponseDTO> buscarVeiculoId(@PathVariable Long idVeiculo) {
-        return ResponseEntity.ok(service.buscarVeiculoId(idVeiculo));
+        try {
+            return ResponseEntity.ok(service.buscarVeiculoId(idVeiculo));
+        }catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar o Veículo pelo ID!");
+        }
     }
 
     @GetMapping("/buscar-filtros")
-    public ResponseEntity<List<VeiculoResponseDTO>> buscarVeiculosFiltros(@RequestParam(required = false) String numeroPermissao,
-                                                                          @RequestParam(required = false) String placa,
-                                                                          @RequestParam(required = false) String renavam,
-                                                                          @RequestParam(required = false) String numeroTaximetro,
-                                                                          @RequestParam(required = false) String anoFabricacao) {
-        return ResponseEntity.ok(service.listarTodosVeiculosFiltros(numeroPermissao, placa, renavam, numeroTaximetro, anoFabricacao));
+    public Page<VeiculoResponseDTO> buscarVeiculosFiltros(@RequestParam(required = false) String numeroPermissao,
+                                                          @RequestParam(required = false) String placa,
+                                                          @RequestParam(required = false) String renavam,
+                                                          @RequestParam(required = false) String numeroTaximetro,
+                                                          @RequestParam(required = false) String anoFabricacao,
+                                                          @RequestParam(required = true) Integer pageIndex,
+                                                          @RequestParam(required = true) Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        try{
+            Page<VeiculoResponseDTO> veiculos = service.listarTodosVeiculosFiltros(
+                    numeroPermissao, placa, renavam, numeroTaximetro, anoFabricacao, pageRequest
+            );
+
+            return veiculos;
+        }catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar os Veículos com os filtros informados!");
+        }
     }
 
     @PostMapping("/inserir")

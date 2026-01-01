@@ -1,13 +1,24 @@
 package com.projeto.produto.repository;
 
 import com.projeto.produto.entity.Permissionario;
+import com.projeto.produto.entity.PontoTaxi;
 import com.projeto.produto.entity.Veiculo;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 public interface VeiculoRepository extends JpaRepository<Veiculo,Integer> {
+    @Query(
+            value = "SELECT * " +
+                    "FROM proj.veiculo " +
+                    "WHERE 1 = 1 " +
+                    "ORDER BY PLACA ASC" ,
+            nativeQuery = true
+    )
+    List<Veiculo> buscarTodos(Pageable pageable);
+
     Veiculo findVeiculoByIdVeiculo(Long idVeiculo);
 
     Veiculo findVeiculoByPermissionario(Permissionario permissionario);
@@ -24,7 +35,8 @@ public interface VeiculoRepository extends JpaRepository<Veiculo,Integer> {
             nativeQuery = true
     )
     List<Veiculo> listarTodosVeiculosFiltros(String numeroPermissao, String placa, String renavam,
-                                                 String numeroTaximetro, String anoFabricacao);
+                                                 String numeroTaximetro, String anoFabricacao,
+                                                 Pageable pageable);
 
     void deleteVeiculoByIdVeiculo(Long idVeiculo);
 }

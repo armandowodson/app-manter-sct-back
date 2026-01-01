@@ -1,13 +1,18 @@
 package com.projeto.produto.service.impl;
 
+import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.dto.VeiculoRequestDTO;
 import com.projeto.produto.dto.VeiculoResponseDTO;
 import com.projeto.produto.entity.Auditoria;
+import com.projeto.produto.entity.PontoTaxi;
 import com.projeto.produto.entity.Veiculo;
 import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.PermissionarioRepository;
 import com.projeto.produto.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -49,12 +54,17 @@ public class VeiculoServiceImpl {
         if(Objects.isNull(veiculoRequestDTO.getUsuario()) || veiculoRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
-        Veiculo veiculo = converterVeiculoDTOToVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria);
-        veiculo.setDataCriacao(LocalDate.now());
-        veiculo = veiculoRepository.save(veiculo);
+        Veiculo veiculo = new Veiculo();
+        try{
+            veiculo = converterVeiculoDTOToVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria);
+            veiculo.setDataCriacao(LocalDate.now());
+            veiculo = veiculoRepository.save(veiculo);
 
-        //Auditoria
-        salvarAuditoria("VEÍCULO TÁXI", "INCLUSÃO", veiculoRequestDTO.getUsuario());
+            //Auditoria
+            salvarAuditoria("VEÍCULO TÁXI", "INCLUSÃO", veiculoRequestDTO.getUsuario());
+        }catch (Exception e){
+            throw new RuntimeException("Não foi possível inserir os dados do Veículo!");
+        }
 
         return converterVeiculoToVeiculoDTO(veiculo);
     }
@@ -73,17 +83,24 @@ public class VeiculoServiceImpl {
         if(Objects.isNull(veiculoRequestDTO.getUsuario()) || veiculoRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
-        Veiculo veiculo = converterVeiculoDTOToVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria);
+        Veiculo veiculo = new Veiculo();
+        try{
+            veiculo = converterVeiculoDTOToVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria);
 
-        //Auditoria
-        salvarAuditoria("VEÍCULO TÁXI", "ALTERAÇÃO", veiculoRequestDTO.getUsuario());
+            //Auditoria
+            salvarAuditoria("VEÍCULO TÁXI", "ALTERAÇÃO", veiculoRequestDTO.getUsuario());
+        }catch (Exception e){
+            throw new RuntimeException("Não foi possível atualizar os dados do Veículo!");
+        }
 
         return converterVeiculoToVeiculoDTO(veiculoRepository.save(veiculo));
     }
 
-    public List<VeiculoResponseDTO> listarTodosVeiculos() {
-        List<Veiculo> listaVeiculos = veiculoRepository.findAll(Sort.by(Sort.Direction.ASC, "placa"));
-        return converterEntityToDTO(listaVeiculos);
+    public Page<VeiculoResponseDTO> listarTodosVeiculos(PageRequest pageRequest) {
+        List<Veiculo> veiculoList = veiculoRepository.buscarTodos(pageRequest);
+        Integer countLista = veiculoRepository.buscarTodos(null).size();
+        List<VeiculoResponseDTO> veiculoResponseDTOList = converterEntityToDTO(veiculoList);
+        return new PageImpl<>(veiculoResponseDTOList, pageRequest, countLista);
     }
 
     public VeiculoResponseDTO buscarVeiculoId(Long idVeiculo) {
@@ -95,12 +112,16 @@ public class VeiculoServiceImpl {
         return veiculoResponseDTO;
     }
 
-    public List<VeiculoResponseDTO> listarTodosVeiculosFiltros(String numeroPermissao, String placa,
+    public Page<VeiculoResponseDTO> listarTodosVeiculosFiltros(String numeroPermissao, String placa,
                                                                String renavam, String numeroTaximetro,
-                                                               String anoFabricacao) {
+                                                               String anoFabricacao, PageRequest pageRequest) {
         List<Veiculo> listaVeiculos = veiculoRepository.listarTodosVeiculosFiltros(
-                numeroPermissao,  placa, renavam, numeroTaximetro, anoFabricacao
+                numeroPermissao,  placa, renavam, numeroTaximetro, anoFabricacao, pageRequest
         );
+
+        Integer countRegistros = veiculoRepository.listarTodosVeiculosFiltros(
+                numeroPermissao,  placa, renavam, numeroTaximetro, anoFabricacao, null
+        ).size();
 
         List<VeiculoResponseDTO> listaVeiculoResponseDTO = new ArrayList<>();
         if (!listaVeiculos.isEmpty()){
@@ -110,7 +131,7 @@ public class VeiculoServiceImpl {
             }
         }
 
-        return listaVeiculoResponseDTO;
+        return new PageImpl<>(listaVeiculoResponseDTO, pageRequest, countRegistros);
     }
 
     @Transactional
@@ -126,7 +147,7 @@ public class VeiculoServiceImpl {
 
             return ResponseEntity.noContent().build();
         }catch (Exception e){
-            throw new RuntimeException("Erro ao Excluir o Veículo!!!");
+            throw new RuntimeException("Não foi possível excluir o Veículo!!!");
         }
     }
 
@@ -232,7 +253,7 @@ public class VeiculoServiceImpl {
         veiculo.setCertificadoAfericao(veiculoRequestDTO.getCertificadoAfericao());
         veiculo.setObservacao(veiculoRequestDTO.getObservacao());
 
-        if(Objects.nonNull(veiculoRequestDTO.getDataCriacao()))
+        if(Objects.nonNull(veiculoRequestDTO.getDataCriacao()) && !veiculoRequestDTO.getDataCriacao().isEmpty())
             veiculo.setDataCriacao(LocalDate.parse(veiculoRequestDTO.getDataCriacao()));
         else
             veiculo.setDataCriacao(LocalDate.now());

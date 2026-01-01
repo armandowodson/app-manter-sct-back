@@ -1,8 +1,11 @@
 package com.projeto.produto.controller;
 
+import com.projeto.produto.dto.AuditoriaDTO;
 import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.service.impl.PontosTaxiServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +18,10 @@ public class PontoTaxiController {
     public PontosTaxiServiceImpl service;
 
     @GetMapping("/buscar-todos")
-    public ResponseEntity<List<PontoTaxiDTO>> listarTodosPontosTaxi() {
-        return ResponseEntity.ok(service.listarTodosPontosTaxi());
+    public Page<PontoTaxiDTO> listarTodosPontosTaxi(@RequestParam(required = true) Integer pageIndex, @RequestParam(required = true) Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<PontoTaxiDTO> pontos = service.listarTodosPontosTaxi(pageRequest);
+        return pontos;
     }
 
     @GetMapping("/buscar/{idPontoTaxi}")
@@ -25,14 +30,21 @@ public class PontoTaxiController {
     }
 
     @GetMapping("/buscar-filtros")
-    public ResponseEntity<List<PontoTaxiDTO>> buscarPontosTaxiFiltros(@RequestParam(required = false) String numeroPonto,
-                                                                      @RequestParam(required = false) String descricaoPonto,
-                                                                      @RequestParam(required = false) String fatorRotatividade,
-                                                                      @RequestParam(required = false) String numeroVagas,
-                                                                      @RequestParam(required = false) String referenciaPonto,
-                                                                      @RequestParam(required = false) String modalidade) {
-        return ResponseEntity.ok(service.listarTodosPontosTaxiFiltros(numeroPonto, descricaoPonto, fatorRotatividade,
-                                                                      numeroVagas, referenciaPonto, modalidade));
+    public Page<PontoTaxiDTO> buscarPontosTaxiFiltros(@RequestParam(required = false) String numeroPonto,
+                                                      @RequestParam(required = false) String descricaoPonto,
+                                                      @RequestParam(required = false) String fatorRotatividade,
+                                                      @RequestParam(required = false) String numeroVagas,
+                                                      @RequestParam(required = false) String referenciaPonto,
+                                                      @RequestParam(required = false) String modalidade,
+                                                      @RequestParam(required = true) Integer pageIndex,
+                                                      @RequestParam(required = true) Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<PontoTaxiDTO> pontos = service.listarTodosPontosTaxiFiltros(
+                numeroPonto, descricaoPonto, fatorRotatividade,
+                numeroVagas, referenciaPonto, modalidade, pageRequest
+        );
+
+        return pontos;
     }
 
     @PostMapping("/inserir")
