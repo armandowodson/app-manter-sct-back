@@ -1,8 +1,10 @@
 package com.projeto.produto.service.impl;
 
 import com.projeto.produto.dto.PermissaoDTO;
+import com.projeto.produto.dto.PermissionarioResponseDTO;
 import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.entity.Permissao;
+import com.projeto.produto.entity.Permissionario;
 import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.PermissaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +62,10 @@ public class PermissaoServiceImpl {
         if(Objects.isNull(permissaoDTO.getUsuario()) || permissaoDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
+        Permissao permissaoExiste = permissaoRepository.findByNumeroPermissao(permissaoDTO.getNumeroPermissao());
+        if(Objects.nonNull(permissaoExiste) && Objects.nonNull(permissaoExiste.getIdPermissao()))
+            throw new RuntimeException("Já existe o Nº de Permissão: " + permissaoExiste.getIdPermissao() + " informado!" );
+
         Permissao permissao = converterPermissaoDTOToPermissao(permissaoDTO, 2);
         permissao = permissaoRepository.save(permissao);
         //Auditoria
@@ -111,11 +117,35 @@ public class PermissaoServiceImpl {
         return new PageImpl<>(listaPermissaoDTO, pageRequest, countRegistros);
     }
 
+    public List<PermissaoDTO> listarPermissoesDisponiveis(String numeroPermissao) {
+        List<PermissaoDTO> listaPermissaoDTO = new ArrayList<>();
+        List<Permissao> listaPermissao = permissaoRepository.listarPermissaoDisponiveis();
+        if(Objects.nonNull(numeroPermissao)){
+            Permissao permissao = permissaoRepository.findPermissaoByNumeroPermissao(numeroPermissao);
+            PermissaoDTO permissaoDTORetornado = converterPermissaoToPermissaoDTO(permissao);
+            listaPermissaoDTO.add(permissaoDTORetornado);
+        }
+
+        if (!listaPermissao.isEmpty()){
+            for (Permissao permissaoDisponivel : listaPermissao) {
+                PermissaoDTO permissaoDTORetornado = converterPermissaoToPermissaoDTO(permissaoDisponivel);
+                listaPermissaoDTO.add(permissaoDTORetornado);
+            }
+        }
+
+        return listaPermissaoDTO;
+    }
+
     @Transactional
     public ResponseEntity<Void> excluirPermissao(Long idPermissao, String usuario) {
         try{
             if(Objects.isNull(usuario) || usuario.isEmpty())
                 throw new RuntimeException("Usuário vazio ou não identificado!");
+
+            Permissao permissao = permissaoRepository.findPermissaoByIdPermissao(idPermissao);
+            if(permissaoRepository.verificarPermissoaExistente(permissao.getNumeroPermissao()) > 0)
+                throw new RuntimeException("Não é possível realizar a exclusão. A Permissão de Nº " + permissao.getNumeroPermissao() +
+                        " está sendo utilizada por um Permissionário!");
 
             permissaoRepository.deleteById(idPermissao);
 

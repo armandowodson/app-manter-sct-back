@@ -2,6 +2,7 @@ package com.projeto.produto.service.impl;
 
 import com.projeto.produto.dto.DefensorRequestDTO;
 import com.projeto.produto.dto.DefensorResponseDTO;
+import com.projeto.produto.dto.VeiculoResponseDTO;
 import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.entity.Defensor;
 import com.projeto.produto.entity.Veiculo;
@@ -9,6 +10,9 @@ import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.DefensorRepository;
 import com.projeto.produto.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -46,13 +50,18 @@ public class DefensorServiceImpl {
         if(Objects.isNull(defensorRequestDTO.getUsuario()) || defensorRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
-        Defensor defensor = converterDefensorDTOToDefensor(
-                defensorRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 1
-        );
-        defensor = defensorRepository.save(defensor);
+        Defensor defensor = new Defensor();
+        try {
+            defensor = converterDefensorDTOToDefensor(
+                    defensorRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 1
+            );
+            defensor = defensorRepository.save(defensor);
 
-        //Auditoria
-        salvarAuditoria("DEFENSOR TÁXI", "INCLUSÃO", defensorRequestDTO.getUsuario());
+            //Auditoria
+            salvarAuditoria("DEFENSOR TÁXI", "INCLUSÃO", defensorRequestDTO.getUsuario());
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível inserir os dados do Defensor!");
+        }
 
         return converterDefensorToDefensorDTO(defensor);
     }
@@ -71,21 +80,28 @@ public class DefensorServiceImpl {
         if(Objects.isNull(defensorRequestDTO.getUsuario()) || defensorRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
-        Defensor defensor = converterDefensorDTOToDefensor(
-                defensorRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 2
-        );
+        Defensor defensor = new Defensor();
+        try{
+            defensor = converterDefensorDTOToDefensor(
+                    defensorRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 2
+            );
 
-        defensor = defensorRepository.save(defensor);
+            defensor = defensorRepository.save(defensor);
 
-        //Auditoria
-        salvarAuditoria("DEFENSOR TÁXI", "ALTERAÇÃO", defensorRequestDTO.getUsuario());
+            //Auditoria
+            salvarAuditoria("DEFENSOR TÁXI", "ALTERAÇÃO", defensorRequestDTO.getUsuario());
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível alterar os dados do Defensor!");
+        }
 
         return converterDefensorToDefensorDTO(defensorRepository.save(defensor));
     }
 
-    public List<DefensorResponseDTO> listarTodosDefensors() {
-        List<Defensor> listaDefensor = defensorRepository.findAll(Sort.by(Sort.Direction.ASC, "nomeDefensor"));
-        return converterEntityToDTO(listaDefensor);
+    public Page<DefensorResponseDTO> listarTodosDefensors(PageRequest pageRequest) {
+        List<Defensor> defensorList = defensorRepository.buscarTodos(pageRequest);
+        Integer countLista = defensorRepository.buscarTodos(null).size();
+        List<DefensorResponseDTO> defensorResponseDTOList = converterEntityToDTO(defensorList);
+        return new PageImpl<>(defensorResponseDTOList, pageRequest, countLista);
     }
 
     public DefensorResponseDTO buscarDefensorId(Long idDefensor) {
@@ -97,16 +113,18 @@ public class DefensorServiceImpl {
         return defensorResponseDTO;
     }
 
-    public List<DefensorResponseDTO> listarTodosDefensorFiltros(String numeroPermissao, String nomeDefensor,
-                                                                           String cpfDefensor, String cnpjEmpresa,
-                                                                           String cnhDefensor) {
+    public Page<DefensorResponseDTO> listarTodosDefensorFiltros(   String numeroPermissao, String nomeDefensor,
+                                                                   String cpfDefensor, String cnpjEmpresa,
+                                                                   String cnhDefensor, PageRequest pageRequest) {
         List<Defensor> listaDefensor = defensorRepository.listarTodosDefensorsFiltros(
-                numeroPermissao,
-                nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
-                cpfDefensor,
-                cnpjEmpresa,
-                cnhDefensor
+                numeroPermissao,  nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
+                cpfDefensor, cnpjEmpresa, cnhDefensor, pageRequest
         );
+
+        Integer countRegistros = defensorRepository.listarTodosDefensorsFiltros(
+                numeroPermissao,  nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
+                cpfDefensor, cnpjEmpresa, cnhDefensor, null
+        ).size();
 
         List<DefensorResponseDTO> listaDefensorResponseDTO = new ArrayList<>();
         if (!listaDefensor.isEmpty()){
@@ -116,10 +134,10 @@ public class DefensorServiceImpl {
             }
         }
 
-        return listaDefensorResponseDTO;
+        return new PageImpl<>(listaDefensorResponseDTO, pageRequest, countRegistros);
     }
 
-    public List<DefensorResponseDTO> listarDefensorsDisponiveis(Long idDefensor) {
+    public List<DefensorResponseDTO> listarDefensoresDisponiveis(Long idDefensor) {
         List<DefensorResponseDTO> listaDefensorResponseDTO = new ArrayList<>();
         List<Defensor> listaDefensor = defensorRepository.listarDefensorsDisponiveis();
         if(Objects.nonNull(idDefensor)){

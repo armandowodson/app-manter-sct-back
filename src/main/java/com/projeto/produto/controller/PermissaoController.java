@@ -1,12 +1,15 @@
 package com.projeto.produto.controller;
 
 import com.projeto.produto.dto.PermissaoDTO;
+import com.projeto.produto.dto.PermissionarioResponseDTO;
 import com.projeto.produto.service.impl.PermissaoServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/permissao")
@@ -36,12 +39,22 @@ public class PermissaoController {
                                                       @RequestParam(required = true) Integer pageIndex,
                                                       @RequestParam(required = true) Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
-        Page<PermissaoDTO> pontos = service.listarTodasPermissoesFiltros(
+        Page<PermissaoDTO> permissoes = service.listarTodasPermissoesFiltros(
                 numeroPermissao, numeroAlvara, anoAlvara,
                 statusPermissao, periodoInicialStatus, periodoFinalStatus, pageRequest
         );
 
-        return pontos;
+        return permissoes;
+    }
+
+    @GetMapping("/buscar-disponiveis")
+    public ResponseEntity<List<PermissaoDTO>> buscarPermissoesDisponiveis() {
+        return ResponseEntity.ok(service.listarPermissoesDisponiveis(null));
+    }
+
+    @GetMapping("/buscar-disponiveis/{numeroPermissao}")
+    public ResponseEntity<List<PermissaoDTO>> buscarPermissoesDisponiveisAlteracao(@PathVariable String numeroPermissao) {
+        return ResponseEntity.ok(service.listarPermissoesDisponiveis(numeroPermissao));
     }
 
     @PostMapping("/inserir")

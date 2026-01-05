@@ -1,7 +1,6 @@
 package com.projeto.produto.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.dto.VeiculoRequestDTO;
 import com.projeto.produto.dto.VeiculoResponseDTO;
 import com.projeto.produto.service.impl.VeiculoServiceImpl;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/veiculo")
@@ -37,7 +35,7 @@ public class VeiculoController {
     public ResponseEntity<VeiculoResponseDTO> buscarVeiculoId(@PathVariable Long idVeiculo) {
         try {
             return ResponseEntity.ok(service.buscarVeiculoId(idVeiculo));
-        }catch (Exception e){
+        } catch (Exception e){
             throw new RuntimeException("Não foi possível consultar o Veículo pelo ID!");
         }
     }
@@ -57,7 +55,7 @@ public class VeiculoController {
             );
 
             return veiculos;
-        }catch (Exception e){
+        } catch (Exception e){
             throw new RuntimeException("Não foi possível consultar os Veículos com os filtros informados!");
         }
     }

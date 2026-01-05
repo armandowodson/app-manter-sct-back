@@ -3,8 +3,11 @@ package com.projeto.produto.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projeto.produto.dto.PermissionarioRequestDTO;
 import com.projeto.produto.dto.PermissionarioResponseDTO;
+import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.service.impl.PermissionarioServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,24 +22,44 @@ public class PermissionarioController {
     public PermissionarioServiceImpl service;
 
     @GetMapping("/buscar-todos")
-    public ResponseEntity<List<PermissionarioResponseDTO>> listarTodosPermissionarios() {
-        return ResponseEntity.ok(service.listarTodosPermissionarios());
+    public Page<PermissionarioResponseDTO> listarTodosPermissionarios(@RequestParam(required = true) Integer pageIndex, @RequestParam(required = true) Integer pageSize) {
+        try {
+            PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+            Page<PermissionarioResponseDTO> permissionarios = service.listarTodosPermissionarios(pageRequest);
+            return permissionarios;
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar todos os Permissionários cadastrados!");
+        }
     }
 
     @GetMapping("/buscar/{idPermissionario}")
     public ResponseEntity<PermissionarioResponseDTO> buscarPermissionarioId(@PathVariable Long idPermissionario) {
-        return ResponseEntity.ok(service.buscarPermissionarioId(idPermissionario));
+        try{
+            return ResponseEntity.ok(service.buscarPermissionarioId(idPermissionario));
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar o Permissionário pelo ID!");
+        }
     }
 
     @GetMapping("/buscar-filtros")
-    public ResponseEntity<List<PermissionarioResponseDTO>> buscarPermissionariosFiltros(@RequestParam(required = false) String numeroPermissao,
+    public Page<PermissionarioResponseDTO> buscarPermissionariosFiltros(@RequestParam(required = false) String numeroPermissao,
                                                                                        @RequestParam(required = false) String nomePermissionario,
                                                                                        @RequestParam(required = false) String cpfPermissionario,
                                                                                        @RequestParam(required = false) String cnpjEmpresa,
-                                                                                       @RequestParam(required = false) String cnhPermissionario) {
-        return ResponseEntity.ok(service.listarTodosPermissionarioFiltros(
-                numeroPermissao, nomePermissionario, cpfPermissionario, cnpjEmpresa, cnhPermissionario
-        ));
+                                                                                       @RequestParam(required = false) String cnhPermissionario,
+                                                                                       @RequestParam(required = true) Integer pageIndex,
+                                                                                       @RequestParam(required = true) Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        try{
+            Page<PermissionarioResponseDTO> permissionarios = service.listarTodosPermissionarioFiltros(
+                    numeroPermissao, nomePermissionario, cpfPermissionario, cnpjEmpresa,
+                    cnhPermissionario, pageRequest
+            );
+
+            return permissionarios;
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar os Permissionários com os filtros informados!");
+        }
     }
 
     @GetMapping("/buscar-disponiveis")

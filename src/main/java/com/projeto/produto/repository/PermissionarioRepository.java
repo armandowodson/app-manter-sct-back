@@ -1,12 +1,23 @@
 package com.projeto.produto.repository;
 
 import com.projeto.produto.entity.Permissionario;
+import com.projeto.produto.entity.PontoTaxi;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 public interface PermissionarioRepository extends JpaRepository<Permissionario, Integer> {
+    @Query(
+            value = "SELECT * " +
+                    "FROM proj.permissionario " +
+                    "WHERE 1 = 1 " +
+                    "ORDER BY NOME_PERMISSIONARIO ASC" ,
+            nativeQuery = true
+    )
+    List<Permissionario> buscarTodos(Pageable pageable);
+
     Permissionario findPermissionarioByIdPermissionario(Long idPermissionario);
 
     @Query(
@@ -22,7 +33,7 @@ public interface PermissionarioRepository extends JpaRepository<Permissionario, 
     )
     List<Permissionario> listarTodosPermissionariosFiltros(
             String numeroPermissao, String nomePermissionario, String cpfPermissionario,
-            String cnpjEmpresa, String cnhPermissionario
+            String cnpjEmpresa, String cnhPermissionario, Pageable pageable
     );
 
     @Query(

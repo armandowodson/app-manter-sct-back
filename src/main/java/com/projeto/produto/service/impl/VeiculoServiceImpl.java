@@ -62,7 +62,7 @@ public class VeiculoServiceImpl {
 
             //Auditoria
             salvarAuditoria("VEÍCULO TÁXI", "INCLUSÃO", veiculoRequestDTO.getUsuario());
-        }catch (Exception e){
+        } catch (Exception e){
             throw new RuntimeException("Não foi possível inserir os dados do Veículo!");
         }
 

@@ -5,6 +5,8 @@ import com.projeto.produto.dto.DefensorRequestDTO;
 import com.projeto.produto.dto.DefensorResponseDTO;
 import com.projeto.produto.service.impl.DefensorServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,34 +21,53 @@ public class DefensorController {
     public DefensorServiceImpl service;
 
     @GetMapping("/buscar-todos")
-    public ResponseEntity<List<DefensorResponseDTO>> listarTodosDefensors() {
-        return ResponseEntity.ok(service.listarTodosDefensors());
+    public Page<DefensorResponseDTO> listarTodosDefensors(@RequestParam(required = true) Integer pageIndex, @RequestParam(required = true) Integer pageSize) {
+        try{
+            PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+            Page<DefensorResponseDTO> defensorResponseDTOPage = service.listarTodosDefensors(pageRequest);
+            return defensorResponseDTOPage;
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar todos os Defensores cadastrados!");
+        }
     }
 
     @GetMapping("/buscar/{idDefensor}")
     public ResponseEntity<DefensorResponseDTO> buscarDefensorId(@PathVariable Long idDefensor) {
-        return ResponseEntity.ok(service.buscarDefensorId(idDefensor));
+        try{
+            return ResponseEntity.ok(service.buscarDefensorId(idDefensor));
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar o Defensor pelo ID!");
+        }
     }
 
     @GetMapping("/buscar-filtros")
-    public ResponseEntity<List<DefensorResponseDTO>> buscarDefensorsFiltros(@RequestParam(required = false) String numeroPermissao,
-                                                                                       @RequestParam(required = false) String nomeDefensor,
-                                                                                       @RequestParam(required = false) String cpfDefensor,
-                                                                                       @RequestParam(required = false) String cnpjEmpresa,
-                                                                                       @RequestParam(required = false) String cnhDefensor) {
-        return ResponseEntity.ok(service.listarTodosDefensorFiltros(
-                numeroPermissao, nomeDefensor, cpfDefensor, cnpjEmpresa, cnhDefensor
-        ));
+    public Page<DefensorResponseDTO> buscarDefensorsFiltros(   @RequestParam(required = false) String numeroPermissao,
+                                                               @RequestParam(required = false) String nomeDefensor,
+                                                               @RequestParam(required = false) String cpfDefensor,
+                                                               @RequestParam(required = false) String cnpjEmpresa,
+                                                               @RequestParam(required = false) String cnhDefensor,
+                                                               @RequestParam(required = true) Integer pageIndex,
+                                                               @RequestParam(required = true) Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        try{
+            Page<DefensorResponseDTO> defensores = service.listarTodosDefensorFiltros(
+                    numeroPermissao, nomeDefensor, cpfDefensor, cnpjEmpresa, cnhDefensor, pageRequest
+            );
+
+            return defensores;
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar os Defensores com os filtros informados!");
+        }
     }
 
     @GetMapping("/buscar-disponiveis")
-    public ResponseEntity<List<DefensorResponseDTO>> buscarDefensorsDisponiveis() {
-        return ResponseEntity.ok(service.listarDefensorsDisponiveis(null));
+    public ResponseEntity<List<DefensorResponseDTO>> buscarDefensoresDisponiveis() {
+        return ResponseEntity.ok(service.listarDefensoresDisponiveis(null));
     }
 
     @GetMapping("/buscar-disponiveis/{idDefensor}")
-    public ResponseEntity<List<DefensorResponseDTO>> buscarDefensorsDisponiveisAlteracao(@PathVariable Long idDefensor) {
-        return ResponseEntity.ok(service.listarDefensorsDisponiveis(idDefensor));
+    public ResponseEntity<List<DefensorResponseDTO>> buscarDefensoresDisponiveisAlteracao(@PathVariable Long idDefensor) {
+        return ResponseEntity.ok(service.listarDefensoresDisponiveis(idDefensor));
     }
 
     @PostMapping("/inserir")

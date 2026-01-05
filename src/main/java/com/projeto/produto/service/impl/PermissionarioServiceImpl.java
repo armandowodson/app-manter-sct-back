@@ -2,13 +2,18 @@ package com.projeto.produto.service.impl;
 
 import com.projeto.produto.dto.PermissionarioRequestDTO;
 import com.projeto.produto.dto.PermissionarioResponseDTO;
+import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.entity.Permissionario;
+import com.projeto.produto.entity.PontoTaxi;
 import com.projeto.produto.entity.Veiculo;
 import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.PermissionarioRepository;
 import com.projeto.produto.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -46,13 +51,18 @@ public class PermissionarioServiceImpl {
         if(Objects.isNull(permissionarioRequestDTO.getUsuario()) || permissionarioRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
-        Permissionario permissionario = converterPermissionarioDTOToPermissionario(
-                permissionarioRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 1
-        );
-        permissionario = permissionarioRepository.save(permissionario);
+        Permissionario permissionario = new Permissionario();
+        try{
+            permissionario = converterPermissionarioDTOToPermissionario(
+                    permissionarioRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 1
+            );
+            permissionario = permissionarioRepository.save(permissionario);
 
-        //Auditoria
-        salvarAuditoria("PERMISSIONÁRIO TÁXI", "INCLUSÃO", permissionarioRequestDTO.getUsuario());
+            //Auditoria
+            salvarAuditoria("PERMISSIONÁRIO TÁXI", "INCLUSÃO", permissionarioRequestDTO.getUsuario());
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível inserir os dados do Permissionário!");
+        }
 
         return converterPermissionarioToPermissionarioDTO(permissionario);
     }
@@ -71,21 +81,28 @@ public class PermissionarioServiceImpl {
         if(Objects.isNull(permissionarioRequestDTO.getUsuario()) || permissionarioRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
-        Permissionario permissionario = converterPermissionarioDTOToPermissionario(
-                permissionarioRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 2
-        );
+        Permissionario permissionario = new Permissionario();
+        try{
+            permissionario = converterPermissionarioDTOToPermissionario(
+                    permissionarioRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 2
+            );
 
-        permissionario = permissionarioRepository.save(permissionario);
+            permissionario = permissionarioRepository.save(permissionario);
 
-        //Auditoria
-        salvarAuditoria("PERMISSIONÁRIO TÁXI", "ALTERAÇÃO", permissionarioRequestDTO.getUsuario());
+            //Auditoria
+            salvarAuditoria("PERMISSIONÁRIO TÁXI", "ALTERAÇÃO", permissionarioRequestDTO.getUsuario());
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível alterar os dados do Permissionário!");
+        }
 
         return converterPermissionarioToPermissionarioDTO(permissionarioRepository.save(permissionario));
     }
 
-    public List<PermissionarioResponseDTO> listarTodosPermissionarios() {
-        List<Permissionario> listaPermissionario = permissionarioRepository.findAll(Sort.by(Sort.Direction.ASC, "nomePermissionario"));
-        return converterEntityToDTO(listaPermissionario);
+    public Page<PermissionarioResponseDTO> listarTodosPermissionarios(PageRequest pageRequest) {
+        List<Permissionario> permissionarioList = permissionarioRepository.buscarTodos(pageRequest);
+        Integer countLista = permissionarioRepository.buscarTodos(null).size();
+        List<PermissionarioResponseDTO> permissionarioResponseDTOList = converterEntityToDTO(permissionarioList);
+        return new PageImpl<>(permissionarioResponseDTOList, pageRequest, countLista);
     }
 
     public PermissionarioResponseDTO buscarPermissionarioId(Long idPermissionario) {
@@ -97,16 +114,18 @@ public class PermissionarioServiceImpl {
         return permissionarioResponseDTO;
     }
 
-    public List<PermissionarioResponseDTO> listarTodosPermissionarioFiltros(String numeroPermissao, String nomePermissionario,
+    public Page<PermissionarioResponseDTO> listarTodosPermissionarioFiltros(String numeroPermissao, String nomePermissionario,
                                                                            String cpfPermissionario, String cnpjEmpresa,
-                                                                           String cnhPermissionario) {
+                                                                           String cnhPermissionario, PageRequest pageRequest) {
         List<Permissionario> listaPermissionario = permissionarioRepository.listarTodosPermissionariosFiltros(
-                numeroPermissao,
-                nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
-                cpfPermissionario,
-                cnpjEmpresa,
-                cnhPermissionario
+                numeroPermissao, nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
+                cpfPermissionario, cnpjEmpresa, cnhPermissionario, pageRequest
         );
+
+        Integer countRegistros = permissionarioRepository.listarTodosPermissionariosFiltros(
+                numeroPermissao, nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
+                cpfPermissionario, cnpjEmpresa, cnhPermissionario, null
+        ).size();
 
         List<PermissionarioResponseDTO> listaPermissionarioResponseDTO = new ArrayList<>();
         if (!listaPermissionario.isEmpty()){
@@ -116,7 +135,7 @@ public class PermissionarioServiceImpl {
             }
         }
 
-        return listaPermissionarioResponseDTO;
+        return new PageImpl<>(listaPermissionarioResponseDTO, pageRequest, countRegistros);
     }
 
     public List<PermissionarioResponseDTO> listarPermissionariosDisponiveis(Long idPermissionario) {

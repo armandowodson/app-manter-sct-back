@@ -1,6 +1,5 @@
 package com.projeto.produto.controller;
 
-import com.projeto.produto.dto.AuditoriaDTO;
 import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.service.impl.PontosTaxiServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/ponto-taxi")
@@ -19,14 +16,22 @@ public class PontoTaxiController {
 
     @GetMapping("/buscar-todos")
     public Page<PontoTaxiDTO> listarTodosPontosTaxi(@RequestParam(required = true) Integer pageIndex, @RequestParam(required = true) Integer pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
-        Page<PontoTaxiDTO> pontos = service.listarTodosPontosTaxi(pageRequest);
-        return pontos;
+        try{
+            PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+            Page<PontoTaxiDTO> pontos = service.listarTodosPontosTaxi(pageRequest);
+            return pontos;
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar todos os Pontos de Estacionamentos de Táxi cadastrados!");
+        }
     }
 
     @GetMapping("/buscar/{idPontoTaxi}")
     public ResponseEntity<PontoTaxiDTO> buscarPontoTaxiId(@PathVariable Long idPontoTaxi) {
-        return ResponseEntity.ok(service.buscarPontoTaxiId(idPontoTaxi));
+        try{
+            return ResponseEntity.ok(service.buscarPontoTaxiId(idPontoTaxi));
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar o Ponto de Estacionamento de Táxi pelo ID!");
+        }
     }
 
     @GetMapping("/buscar-filtros")
@@ -39,12 +44,17 @@ public class PontoTaxiController {
                                                       @RequestParam(required = true) Integer pageIndex,
                                                       @RequestParam(required = true) Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
-        Page<PontoTaxiDTO> pontos = service.listarTodosPontosTaxiFiltros(
-                numeroPonto, descricaoPonto, fatorRotatividade,
-                numeroVagas, referenciaPonto, modalidade, pageRequest
-        );
+        try{
+            Page<PontoTaxiDTO> pontos = service.listarTodosPontosTaxiFiltros(
+                    numeroPonto, descricaoPonto, fatorRotatividade,
+                    numeroVagas, referenciaPonto, modalidade, pageRequest
+            );
 
-        return pontos;
+            return pontos;
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar os Pontos de Estacionamentos de Táxi com os filtros informados!");
+        }
+
     }
 
     @PostMapping("/inserir")

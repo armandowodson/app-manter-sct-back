@@ -1,12 +1,22 @@
 package com.projeto.produto.repository;
 
 import com.projeto.produto.entity.Defensor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 public interface DefensorRepository extends JpaRepository<Defensor, Integer> {
+    @Query(
+            value = "SELECT * " +
+                    "FROM proj.defensor " +
+                    "WHERE 1 = 1 " +
+                    "ORDER BY NOME_DEFENSOR ASC" ,
+            nativeQuery = true
+    )
+    List<Defensor> buscarTodos(Pageable pageable);
+
     Defensor findDefensorByIdDefensor(Long idDefensor);
 
     @Query(
@@ -22,7 +32,7 @@ public interface DefensorRepository extends JpaRepository<Defensor, Integer> {
     )
     List<Defensor> listarTodosDefensorsFiltros(
             String numeroPermissao, String nomeDefensor, String cpfDefensor,
-            String cnpjEmpresa, String cnhDefensor
+            String cnpjEmpresa, String cnhDefensor, Pageable pageable
     );
 
     @Query(

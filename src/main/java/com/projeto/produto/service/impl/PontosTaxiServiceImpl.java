@@ -32,15 +32,22 @@ public class PontosTaxiServiceImpl {
         if (Objects.isNull(pontoTaxiDTO.getDescricaoPonto()) || Objects.isNull(pontoTaxiDTO.getNumeroPonto())) {
             throw new RuntimeException("Dados inválidos para o Ponto de Estacionamento de Táxi!");
         }
+
         if(Objects.isNull(pontoTaxiDTO.getUsuario()) || pontoTaxiDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
-        PontoTaxi pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO);
-        pontoTaxi.setDataCriacao(LocalDate.now());
-        pontoTaxi = pontosTaxiRepository.save(pontoTaxi);
+        PontoTaxi pontoTaxi = new PontoTaxi();
+        try{
+            pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO);
+            pontoTaxi.setDataCriacao(LocalDate.now());
+            pontoTaxi = pontosTaxiRepository.save(pontoTaxi);
 
-        //Auditoria
-        salvarAuditoria("PONTO DE ESTACIONAMENTO DE TÁXI", "INCLUSÃO", pontoTaxiDTO.getUsuario());
+            //Auditoria
+            salvarAuditoria("PONTO DE ESTACIONAMENTO DE TÁXI", "INCLUSÃO", pontoTaxiDTO.getUsuario());
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível inserir os dados do Ponto de Estacionamento de Táxi!");
+        }
+
         return converterPontoTaxiToPontoTaxiDTO(pontoTaxi);
     }
 
@@ -49,13 +56,20 @@ public class PontosTaxiServiceImpl {
         if (Objects.isNull(pontoTaxiDTO.getDescricaoPonto()) || Objects.isNull(pontoTaxiDTO.getNumeroPonto())) {
             throw new RuntimeException("Dados inválidos para o Ponto de Estacionamento de Táxi!");
         }
+
         if(Objects.isNull(pontoTaxiDTO.getUsuario()) || pontoTaxiDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
-        PontoTaxi pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO);
-        pontoTaxi = pontosTaxiRepository.save(pontoTaxi);
-        //Auditoria
-        salvarAuditoria("PONTO DE ESTACIONAMENTO DE TÁXI", "ALTERAÇÃO", pontoTaxiDTO.getUsuario());
+        PontoTaxi pontoTaxi = new PontoTaxi();
+        try{
+            pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO);
+            pontoTaxi = pontosTaxiRepository.save(pontoTaxi);
+            //Auditoria
+            salvarAuditoria("PONTO DE ESTACIONAMENTO DE TÁXI", "ALTERAÇÃO", pontoTaxiDTO.getUsuario());
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível alterar os dados do Ponto de Estacionamento de Táxi!");
+        }
+
         return converterPontoTaxiToPontoTaxiDTO(pontoTaxi);
     }
 

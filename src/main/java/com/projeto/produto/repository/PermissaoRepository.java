@@ -9,6 +9,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface PermissaoRepository extends JpaRepository<Permissao, Long> {
+    Permissao findPermissaoByIdPermissao(Long idPermissao);
+    Permissao findPermissaoByNumeroPermissao(String numeroPermissao);
+
+    Permissao findByNumeroPermissao(String numeroPermissao);
 
     @Query(
             value = "SELECT * " +
@@ -35,5 +39,21 @@ public interface PermissaoRepository extends JpaRepository<Permissao, Long> {
                                                  String anoAlvara, String statusPermissao,
                                                  LocalDate periodoInicial, LocalDate periodoFinal,
                                                  Pageable pageable);
+
+    @Query(
+            value = "SELECT * " +
+                    "FROM proj.permissao " +
+                    "WHERE NUMERO_PERMISSAO NOT IN (SELECT NUMERO_PERMISSAO FROM PROJ.PERMISSIONARIO) ",
+            nativeQuery = true
+    )
+    List<Permissao> listarPermissaoDisponiveis();
+
+    @Query(
+            value = "SELECT count(0) " +
+                    "FROM proj.permissionario " +
+                    "WHERE NUMERO_PERMISSAO = :numeroPermissao " ,
+            nativeQuery = true
+    )
+    Integer verificarPermissoaExistente(String numeroPermissao);
 }
 
