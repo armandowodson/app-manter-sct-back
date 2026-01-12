@@ -73,22 +73,24 @@ public class DefensorController {
     @PostMapping("/inserir")
     public ResponseEntity<DefensorResponseDTO> inserirDefensor(
             @RequestParam("defensor") String defensor,
+            @RequestParam("certificadoCondutor") MultipartFile certificadoCondutor,
             @RequestParam("certidaoNegativaCriminal") MultipartFile certidaoNegativaCriminal,
             @RequestParam("certidaoNegativaMunicipal") MultipartFile certidaoNegativaMunicipal,
             @RequestParam("foto") MultipartFile foto
     ) throws IOException {
         DefensorRequestDTO defensorDTO = new ObjectMapper().readValue(defensor, DefensorRequestDTO.class);
-        return ResponseEntity.ok(service.inserirDefensor(defensorDTO, certidaoNegativaCriminal,
+        return ResponseEntity.ok(service.inserirDefensor(defensorDTO, certificadoCondutor, certidaoNegativaCriminal,
                 certidaoNegativaMunicipal, foto));
     }
 
     @PostMapping("/alterar")
     public ResponseEntity<DefensorResponseDTO> atualizarDefensor(@RequestParam("defensor") String defensor,
-                                                                             @RequestParam(value = "certidaoNegativaCriminal", required = false) MultipartFile certidaoNegativaCriminal,
-                                                                             @RequestParam(value = "certidaoNegativaCriminal", required = false) MultipartFile certidaoNegativaMunicipal,
-                                                                             @RequestParam(value = "certidaoNegativaCriminal", required = false) MultipartFile foto) throws IOException {
+                                                                 @RequestParam(value = "certificadoCondutor", required = false) MultipartFile certificadoCondutor,
+                                                                 @RequestParam(value = "certidaoNegativaCriminal", required = false) MultipartFile certidaoNegativaCriminal,
+                                                                 @RequestParam(value = "certidaoNegativaMunicipal", required = false) MultipartFile certidaoNegativaMunicipal,
+                                                                 @RequestParam(value = "foto", required = false) MultipartFile foto) throws IOException {
         DefensorRequestDTO defensorDTO = new ObjectMapper().readValue(defensor, DefensorRequestDTO.class);
-        return ResponseEntity.ok(service.atualizarDefensor(defensorDTO, certidaoNegativaCriminal,
+        return ResponseEntity.ok(service.atualizarDefensor(defensorDTO, certidaoNegativaCriminal, certificadoCondutor,
                 certidaoNegativaMunicipal, foto));
     }
 

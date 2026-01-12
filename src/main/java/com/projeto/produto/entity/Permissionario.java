@@ -30,6 +30,8 @@ public class Permissionario {
     private String naturezaPessoa;
     @Column(name = "UF_PERMISSIONARIO")
     private String ufPermissionario;
+    @Column(name = "CIDADE_PERMISSIONARIO")
+    private String cidadePermissionario;
     @Column(name = "BAIRRO_PERMISSIONARIO")
     private String bairroPermissionario;
     @Column(name = "ENDERECO_PERMISSIONARIO")
@@ -49,6 +51,9 @@ public class Permissionario {
     @Column(name = "NUMERO_CERTIFICADO_CONDUTOR")
     private String numeroCertificadoCondutor;
     @Lob
+    @Column(name = "CERTIFICADO_CONDUTOR")
+    private byte[] certificadoCondutor;
+    @Lob
     @Column(name = "CERTIDAO_NEGATIVA_CRIMINAL")
     private byte[] certidaoNegativaCriminal;
     @Lob
@@ -59,5 +64,11 @@ public class Permissionario {
     private byte[] foto;
     @Column(name = "DATA_CRIACAO")
     private LocalDate dataCriacao;
+    @Column(name = "STATUS")
+    private String status;
+    @Column(name = "APLICATIVO_ALTERNATIVO")
+    private String aplicativoAlternativo;
+    @Column(name = "OBSERVACAO")
+    private String observacao;
 
 }

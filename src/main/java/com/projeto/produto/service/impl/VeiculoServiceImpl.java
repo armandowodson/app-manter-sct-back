@@ -8,6 +8,7 @@ import com.projeto.produto.entity.PontoTaxi;
 import com.projeto.produto.entity.Veiculo;
 import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.PermissionarioRepository;
+import com.projeto.produto.repository.PontosTaxiRepository;
 import com.projeto.produto.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,16 +40,19 @@ public class VeiculoServiceImpl {
     @Autowired
     private PermissionarioRepository permissionarioRepository;
 
+    @Autowired
+    private PontosTaxiRepository pontosTaxiRepository;
+
     @Transactional
     public VeiculoResponseDTO inserirVeiculo(VeiculoRequestDTO veiculoRequestDTO,
                                              MultipartFile crlv,
-                                             MultipartFile comprovanteVistoria) throws IOException {
+                                             MultipartFile comprovanteVistoria) {
         if (Objects.isNull(veiculoRequestDTO.getMarca()) || Objects.isNull(veiculoRequestDTO.getModelo()) ||
                 Objects.isNull(veiculoRequestDTO.getModelo()) || Objects.isNull(veiculoRequestDTO.getAnoModelo()) ||
                 Objects.isNull(veiculoRequestDTO.getCor()) || Objects.isNull(veiculoRequestDTO.getPlaca()) ||
                 Objects.isNull(veiculoRequestDTO.getChassi()) || Objects.isNull(veiculoRequestDTO.getRenavam()) ||
-                Objects.isNull(crlv) || Objects.isNull(comprovanteVistoria) ||
-                Objects.isNull(veiculoRequestDTO.getIdPermissionario()) || Objects.isNull(veiculoRequestDTO.getNumeroPermissao())) {
+                Objects.isNull(crlv) || Objects.isNull(comprovanteVistoria) || Objects.isNull(veiculoRequestDTO.getIdPermissionario()) ||
+                Objects.isNull(veiculoRequestDTO.getNumeroPermissao()) || Objects.isNull(veiculoRequestDTO.getIdPontoTaxi())) {
             throw new RuntimeException("Dados inválidos para o Veículo!");
         }
         if(Objects.isNull(veiculoRequestDTO.getUsuario()) || veiculoRequestDTO.getUsuario().isEmpty())
@@ -72,14 +76,16 @@ public class VeiculoServiceImpl {
     @Transactional
     public VeiculoResponseDTO atualizarVeiculo(VeiculoRequestDTO veiculoRequestDTO,
                                                MultipartFile crlv,
-                                               MultipartFile comprovanteVistoria) throws IOException {
+                                               MultipartFile comprovanteVistoria) {
         if (Objects.isNull(veiculoRequestDTO.getMarca()) || Objects.isNull(veiculoRequestDTO.getModelo()) ||
                 Objects.isNull(veiculoRequestDTO.getModelo()) || Objects.isNull(veiculoRequestDTO.getAnoModelo()) ||
                 Objects.isNull(veiculoRequestDTO.getCor()) || Objects.isNull(veiculoRequestDTO.getPlaca()) ||
                 Objects.isNull(veiculoRequestDTO.getChassi()) || Objects.isNull(veiculoRequestDTO.getRenavam()) ||
-                Objects.isNull(veiculoRequestDTO.getIdPermissionario()) || Objects.isNull(veiculoRequestDTO.getNumeroPermissao())) {
+                Objects.isNull(crlv) || Objects.isNull(comprovanteVistoria) || Objects.isNull(veiculoRequestDTO.getIdPermissionario()) ||
+                Objects.isNull(veiculoRequestDTO.getNumeroPermissao()) || Objects.isNull(veiculoRequestDTO.getIdPontoTaxi())) {
             throw new RuntimeException("Dados inválidos para o Veículo!");
         }
+
         if(Objects.isNull(veiculoRequestDTO.getUsuario()) || veiculoRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
@@ -140,7 +146,9 @@ public class VeiculoServiceImpl {
             if(Objects.isNull(usuario) || usuario.isEmpty())
                 throw new RuntimeException("Usuário vazio ou não identificado!");
 
-            veiculoRepository.deleteVeiculoByIdVeiculo(idVeiculo);
+            Veiculo veiculo = veiculoRepository.findVeiculoByIdVeiculo(idVeiculo);
+            veiculo.setStatus("INATVIO");
+            veiculoRepository.save(veiculo);
 
             //Auditoria
             salvarAuditoria("VEÍCULO TÁXI", "EXCLUSÃO", usuario);
@@ -169,6 +177,7 @@ public class VeiculoServiceImpl {
 
         veiculoResponseDTO.setIdPermissionario(veiculo.getPermissionario().getIdPermissionario());
         veiculoResponseDTO.setNumeroPermissao(veiculo.getNumeroPermissao());
+        veiculoResponseDTO.setIdPontoTaxi(veiculo.getPontoTaxi().getIdPontoTaxi());
         veiculoResponseDTO.setPlaca(veiculo.getPlaca());
         veiculoResponseDTO.setRenavam(veiculo.getRenavam());
         veiculoResponseDTO.setChassi(veiculo.getChassi());
@@ -191,6 +200,7 @@ public class VeiculoServiceImpl {
         veiculoResponseDTO.setCertificadoAfericao(veiculo.getCertificadoAfericao());
         veiculoResponseDTO.setObservacao(veiculo.getObservacao());
         veiculoResponseDTO.setDataCriacao(veiculo.getDataCriacao().toString());
+        veiculoResponseDTO.setStatus(veiculo.getStatus());
 
         return veiculoResponseDTO;
     }
@@ -204,6 +214,7 @@ public class VeiculoServiceImpl {
         }
 
         veiculo.setPermissionario(permissionarioRepository.findPermissionarioByIdPermissionario(veiculoRequestDTO.getIdPermissionario()));
+        veiculo.setPontoTaxi(pontosTaxiRepository.findByIdPontoTaxi(veiculoRequestDTO.getIdPontoTaxi()));
         veiculo.setNumeroPermissao(veiculoRequestDTO.getNumeroPermissao());
         veiculo.setPlaca(veiculoRequestDTO.getPlaca());
         veiculo.setRenavam(veiculoRequestDTO.getRenavam());
@@ -257,6 +268,8 @@ public class VeiculoServiceImpl {
             veiculo.setDataCriacao(LocalDate.parse(veiculoRequestDTO.getDataCriacao()));
         else
             veiculo.setDataCriacao(LocalDate.now());
+
+        veiculo.setStatus("ATIVO");
 
         return  veiculo;
     }

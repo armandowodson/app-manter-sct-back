@@ -3,6 +3,7 @@ package com.projeto.produto.service.impl;
 import com.projeto.produto.dto.PermissaoDTO;
 import com.projeto.produto.dto.PermissionarioResponseDTO;
 import com.projeto.produto.entity.Auditoria;
+import com.projeto.produto.entity.Defensor;
 import com.projeto.produto.entity.Permissao;
 import com.projeto.produto.entity.Permissionario;
 import com.projeto.produto.repository.AuditoriaRepository;
@@ -147,7 +148,8 @@ public class PermissaoServiceImpl {
                 throw new RuntimeException("Não é possível realizar a exclusão. A Permissão de Nº " + permissao.getNumeroPermissao() +
                         " está sendo utilizada por um Permissionário!");
 
-            permissaoRepository.deleteById(idPermissao);
+            permissao.setStatus("INATIVO");
+            permissaoRepository.save(permissao);
 
             //Auditoria
             salvarAuditoria("PERMISSÃO", "EXCLUSÃO", usuario);
@@ -198,6 +200,9 @@ public class PermissaoServiceImpl {
             String formattedDate = permissao.getDataValidadePenalidade().plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC).format(formatter);
             permissaoDTO.setDataValidadePenalidade(formattedDate);
         }
+        permissaoDTO.setModalidade(permissao.getModalidade());
+        permissaoDTO.setAutorizacaoTrafego(permissao.getAutorizacaoTrafego());
+
         permissaoDTO.setDataCriacao(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataCriacao()));
 
         return  permissaoDTO;
@@ -284,10 +289,19 @@ public class PermissaoServiceImpl {
                 }
         }
 
+        if(tipo == 1){
+            permissao.setModalidade(permissaoDTO.getModalidade());
+        }else{
+            permissao.setModalidade(converterNomeModalidadePermissao(permissaoDTO.getModalidade()));
+        }
+
         if(Objects.nonNull(permissaoDTO.getDataCriacao()) && !permissaoDTO.getDataCriacao().isEmpty())
             permissao.setDataCriacao(LocalDate.parse(permissaoDTO.getDataCriacao()));
         else
             permissao.setDataCriacao(LocalDate.now());
+
+        permissao.setAutorizacaoTrafego(permissaoDTO.getAutorizacaoTrafego());
+        permissao.setStatus("ATIVO");
 
         return  permissao;
     }
@@ -318,7 +332,7 @@ public class PermissaoServiceImpl {
 
     public String converterNomeStatusPermissao(String status){
         switch (status){
-            case "ATIVA":
+            case "EM USO":
                 return "1";
             case "SUSPENSA":
                 return "2";
@@ -346,6 +360,19 @@ public class PermissaoServiceImpl {
             case "SUSPENSÃO":
                 return "2";
             case "CASSAÇÃO DO REGISTRO DE CONDUTOR":
+                return "3";
+        }
+
+        return "";
+    }
+
+    public String converterNomeModalidadePermissao(String modalidade){
+        switch (modalidade){
+            case "FIXO":
+                return "1";
+            case "ROTATIVO":
+                return "2";
+            case "FIXO-ROTATIVO":
                 return "3";
         }
 

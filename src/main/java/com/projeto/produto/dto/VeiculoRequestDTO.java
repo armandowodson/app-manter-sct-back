@@ -8,6 +8,7 @@ import lombok.Setter;
 public class VeiculoRequestDTO {
     private Long idVeiculo;
     private Long idPermissionario;
+    private Long idPontoTaxi;
     private String numeroPermissao;
     private String placa;
     private String renavam;

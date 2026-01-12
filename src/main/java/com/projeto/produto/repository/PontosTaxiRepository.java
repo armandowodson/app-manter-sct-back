@@ -1,6 +1,7 @@
 package com.projeto.produto.repository;
 
 import com.projeto.produto.entity.Auditoria;
+import com.projeto.produto.entity.Permissionario;
 import com.projeto.produto.entity.PontoTaxi;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,5 +39,13 @@ public interface PontosTaxiRepository extends JpaRepository<PontoTaxi, Long> {
                                                  String fatorRotatividade, String referenciaPonto,
                                                  String numeroVagas, String modalidade,
                                                  Pageable pageable);
+
+    @Query(
+            value = "SELECT * " +
+                    "FROM proj.pontos_taxi " +
+                    "order by descricao_ponto ",
+            nativeQuery = true
+    )
+    List<PontoTaxi> listarPontosTaxiDisponiveis();
 }
 

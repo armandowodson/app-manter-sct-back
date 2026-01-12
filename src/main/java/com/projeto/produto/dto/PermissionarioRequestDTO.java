@@ -15,6 +15,7 @@ public class PermissionarioRequestDTO {
     private String orgaoEmissor;
     private String naturezaPessoa;
     private String ufPermissionario;
+    private String cidadePermissionario;
     private String bairroPermissionario;
     private String enderecoPermissionario;
     private String celularPermissionario;
@@ -26,5 +27,7 @@ public class PermissionarioRequestDTO {
     private String numeroCertificadoCondutor;
     private String dataCriacao;
     private String usuario;
+    private String aplicativoAlternativo;
+    private String observacao;
 
 }

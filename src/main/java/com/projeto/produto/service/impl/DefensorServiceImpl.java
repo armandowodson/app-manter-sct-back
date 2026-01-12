@@ -9,6 +9,8 @@ import com.projeto.produto.entity.Veiculo;
 import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.DefensorRepository;
 import com.projeto.produto.repository.VeiculoRepository;
+import com.projeto.produto.utils.ValidaCNPJ;
+import com.projeto.produto.utils.ValidaCPF;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,24 +38,33 @@ public class DefensorServiceImpl {
     @Autowired
     private VeiculoRepository veiculoRepository;
 
+
     @Transactional
     public DefensorResponseDTO inserirDefensor(    DefensorRequestDTO defensorRequestDTO,
-                                                               MultipartFile certidaoNegativaCriminal,
-                                                               MultipartFile certidaoNegativaMunicipal,
-                                                               MultipartFile foto) throws IOException {
+                                                   MultipartFile certificadoCondutor,
+                                                   MultipartFile certidaoNegativaCriminal,
+                                                   MultipartFile certidaoNegativaMunicipal,
+                                                   MultipartFile foto) throws IOException {
         if (Objects.isNull(defensorRequestDTO.getNomeDefensor()) || Objects.isNull(defensorRequestDTO.getCpfDefensor()) ||
                 Objects.isNull(defensorRequestDTO.getRgDefensor()) || Objects.isNull(defensorRequestDTO.getCnhDefensor()) ||
                 Objects.isNull(defensorRequestDTO.getEnderecoDefensor()) || Objects.isNull(defensorRequestDTO.getCelularDefensor()) ||
                 Objects.isNull(defensorRequestDTO.getNumeroPermissao())) {
             throw new RuntimeException("Dados inválidos para o Defensor!");
         }
+
+        if(!ValidaCPF.isCPF(defensorRequestDTO.getCpfDefensor()))
+            throw new RuntimeException("O CPF " + defensorRequestDTO.getCpfDefensor() + " é inválido!");
+
+        if(Objects.nonNull(defensorRequestDTO.getCnpjEmpresa()) && !ValidaCNPJ.isCNPJ(defensorRequestDTO.getCnpjEmpresa()))
+            throw new RuntimeException("O CNPJ " + defensorRequestDTO.getCnpjEmpresa() + " é inválido!");
+
         if(Objects.isNull(defensorRequestDTO.getUsuario()) || defensorRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
         Defensor defensor = new Defensor();
         try {
             defensor = converterDefensorDTOToDefensor(
-                    defensorRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 1
+                    defensorRequestDTO, certificadoCondutor, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 1
             );
             defensor = defensorRepository.save(defensor);
 
@@ -68,22 +79,30 @@ public class DefensorServiceImpl {
 
     @Transactional
     public DefensorResponseDTO atualizarDefensor(DefensorRequestDTO defensorRequestDTO,
-                                                             MultipartFile certidaoNegativaCriminal,
-                                                             MultipartFile certidaoNegativaMunicipal,
-                                                             MultipartFile foto) throws IOException {
+                                                 MultipartFile certificadoCondutor,
+                                                 MultipartFile certidaoNegativaCriminal,
+                                                 MultipartFile certidaoNegativaMunicipal,
+                                                 MultipartFile foto) throws IOException {
         if (Objects.isNull(defensorRequestDTO.getNomeDefensor()) || Objects.isNull(defensorRequestDTO.getCpfDefensor()) ||
                 Objects.isNull(defensorRequestDTO.getRgDefensor()) || Objects.isNull(defensorRequestDTO.getCnhDefensor()) ||
                 Objects.isNull(defensorRequestDTO.getEnderecoDefensor()) || Objects.isNull(defensorRequestDTO.getCelularDefensor()) ||
                 Objects.isNull(defensorRequestDTO.getNumeroPermissao())) {
             throw new RuntimeException("Dados inválidos para o Defensor!");
         }
+
+        if(!ValidaCPF.isCPF(defensorRequestDTO.getCpfDefensor()))
+            throw new RuntimeException("O CPF " + defensorRequestDTO.getCpfDefensor() + " é inválido!");
+
+        if(Objects.nonNull(defensorRequestDTO.getCnpjEmpresa()) && !ValidaCNPJ.isCNPJ(defensorRequestDTO.getCnpjEmpresa()))
+            throw new RuntimeException("O CNPJ " + defensorRequestDTO.getCnpjEmpresa() + " é inválido!");
+
         if(Objects.isNull(defensorRequestDTO.getUsuario()) || defensorRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
         Defensor defensor = new Defensor();
         try{
             defensor = converterDefensorDTOToDefensor(
-                    defensorRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 2
+                    defensorRequestDTO, certificadoCondutor, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 2
             );
 
             defensor = defensorRepository.save(defensor);
@@ -163,7 +182,9 @@ public class DefensorServiceImpl {
             if(Objects.isNull(usuario) || usuario.isEmpty())
                 throw new RuntimeException("Usuário vazio ou não identificado!");
 
-            defensorRepository.deleteDefensorByIdDefensor(idDefensor);
+            Defensor defensor = defensorRepository.findDefensorByIdDefensor(idDefensor);
+            defensor.setStatus("INATIVO");
+            defensorRepository.save(defensor);
 
             //Auditoria
             salvarAuditoria("DEFENSOR TÁXI", "EXCLUSÃO", usuario);
@@ -200,6 +221,7 @@ public class DefensorServiceImpl {
         defensorResponseDTO.setCnhDefensor(defensor.getCnhDefensor());
         defensorResponseDTO.setCategoriaCnhDefensor(converterIdCategoriaCnh(defensor.getCategoriaCnhDefensor()));
         defensorResponseDTO.setUfDefensor(defensor.getUfDefensor());
+        defensorResponseDTO.setCidadeDefensor(defensor.getCidadeDefensor());
         defensorResponseDTO.setBairroDefensor(defensor.getBairroDefensor());
         defensorResponseDTO.setEnderecoDefensor(defensor.getEnderecoDefensor());
         defensorResponseDTO.setCelularDefensor(defensor.getCelularDefensor());
@@ -207,18 +229,21 @@ public class DefensorServiceImpl {
         defensorResponseDTO.setNumeroQuitacaoEleitoral(defensor.getNumeroQuitacaoEleitoral());
         defensorResponseDTO.setNumeroInscricaoInss(defensor.getNumeroInscricaoInss());
         defensorResponseDTO.setNumeroCertificadoCondutor(defensor.getNumeroCertificadoCondutor());
+        defensorResponseDTO.setCertificadoCondutor(defensor.getCertificadoCondutor());
         defensorResponseDTO.setCertidaoNegativaCriminal(defensor.getCertidaoNegativaCriminal());
         defensorResponseDTO.setCertidaoNegativaMunicipal(defensor.getCertidaoNegativaMunicipal());
         defensorResponseDTO.setFoto(defensor.getFoto());
         defensorResponseDTO.setDataCriacao(defensor.getDataCriacao().toString());
+        defensorResponseDTO.setStatus(defensor.getStatus());
 
         return defensorResponseDTO;
     }
 
     public Defensor converterDefensorDTOToDefensor(DefensorRequestDTO defensorRequestDTO,
-                                                                     MultipartFile certidaoNegativaCriminal,
-                                                                     MultipartFile certidaoNegativaMunicipal,
-                                                                     MultipartFile foto, Integer tipo) throws IOException {
+                                                   MultipartFile certificadoCondutor,
+                                                   MultipartFile certidaoNegativaCriminal,
+                                                   MultipartFile certidaoNegativaMunicipal,
+                                                   MultipartFile foto, Integer tipo) throws IOException {
         Defensor defensor = new Defensor();
         if (defensorRequestDTO.getIdDefensor() != null && defensorRequestDTO.getIdDefensor() != 0){
             defensor = defensorRepository.findDefensorByIdDefensor(defensorRequestDTO.getIdDefensor());
@@ -252,6 +277,7 @@ public class DefensorServiceImpl {
         }
 
         defensor.setUfDefensor(defensorRequestDTO.getUfDefensor());
+        defensor.setCidadeDefensor(defensorRequestDTO.getCidadeDefensor());
         defensor.setBairroDefensor(defensorRequestDTO.getBairroDefensor());
         defensor.setEnderecoDefensor(defensorRequestDTO.getEnderecoDefensor());
         defensor.setCelularDefensor(defensorRequestDTO.getCelularDefensor());
@@ -268,6 +294,8 @@ public class DefensorServiceImpl {
         defensor.setNumeroCertificadoCondutor(defensorRequestDTO.getNumeroCertificadoCondutor());
         defensor.setNumeroInscricaoInss(defensorRequestDTO.getNumeroInscricaoInss());
 
+        if(Objects.nonNull(certificadoCondutor))
+            defensor.setCertificadoCondutor(certificadoCondutor.getBytes());
         if(Objects.nonNull(certidaoNegativaCriminal))
             defensor.setCertidaoNegativaCriminal(certidaoNegativaCriminal.getBytes());
         if(Objects.nonNull(certidaoNegativaMunicipal))
@@ -279,6 +307,8 @@ public class DefensorServiceImpl {
             defensor.setDataCriacao(LocalDate.parse(defensorRequestDTO.getDataCriacao()));
         else
             defensor.setDataCriacao(LocalDate.now());
+
+        defensor.setStatus("ATIVO");
 
         return  defensor;
     }

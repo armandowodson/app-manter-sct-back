@@ -10,6 +10,8 @@ import com.projeto.produto.entity.Veiculo;
 import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.PermissionarioRepository;
 import com.projeto.produto.repository.VeiculoRepository;
+import com.projeto.produto.utils.ValidaCNPJ;
+import com.projeto.produto.utils.ValidaCPF;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -39,6 +41,7 @@ public class PermissionarioServiceImpl {
 
     @Transactional
     public PermissionarioResponseDTO inserirPermissionario(    PermissionarioRequestDTO permissionarioRequestDTO,
+                                                               MultipartFile certificadoCondutor,
                                                                MultipartFile certidaoNegativaCriminal,
                                                                MultipartFile certidaoNegativaMunicipal,
                                                                MultipartFile foto) throws IOException {
@@ -48,13 +51,20 @@ public class PermissionarioServiceImpl {
                 Objects.isNull(permissionarioRequestDTO.getNumeroPermissao())) {
             throw new RuntimeException("Dados inválidos para o Permissionário/Proprietário!");
         }
+
+        if(!ValidaCPF.isCPF(permissionarioRequestDTO.getCpfPermissionario()))
+            throw new RuntimeException("O CPF " + permissionarioRequestDTO.getCpfPermissionario() + " é inválido!");
+
+        if(Objects.nonNull(permissionarioRequestDTO.getCnpjEmpresa()) && !ValidaCNPJ.isCNPJ(permissionarioRequestDTO.getCnpjEmpresa()))
+            throw new RuntimeException("O CNPJ " + permissionarioRequestDTO.getCnpjEmpresa() + " é inválido!");
+
         if(Objects.isNull(permissionarioRequestDTO.getUsuario()) || permissionarioRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
         Permissionario permissionario = new Permissionario();
         try{
             permissionario = converterPermissionarioDTOToPermissionario(
-                    permissionarioRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 1
+                    permissionarioRequestDTO, certificadoCondutor, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 1
             );
             permissionario = permissionarioRepository.save(permissionario);
 
@@ -69,6 +79,7 @@ public class PermissionarioServiceImpl {
 
     @Transactional
     public PermissionarioResponseDTO atualizarPermissionario(PermissionarioRequestDTO permissionarioRequestDTO,
+                                                             MultipartFile certificadoCondutor,
                                                              MultipartFile certidaoNegativaCriminal,
                                                              MultipartFile certidaoNegativaMunicipal,
                                                              MultipartFile foto) throws IOException {
@@ -78,13 +89,20 @@ public class PermissionarioServiceImpl {
                 Objects.isNull(permissionarioRequestDTO.getNumeroPermissao())) {
             throw new RuntimeException("Dados inválidos para o Permissionário/Proprietário!");
         }
+
+        if(!ValidaCPF.isCPF(permissionarioRequestDTO.getCpfPermissionario()))
+            throw new RuntimeException("O CPF " + permissionarioRequestDTO.getCpfPermissionario() + " é inválido!");
+
+        if(Objects.nonNull(permissionarioRequestDTO.getCnpjEmpresa()) && !ValidaCNPJ.isCNPJ(permissionarioRequestDTO.getCnpjEmpresa()))
+            throw new RuntimeException("O CNPJ " + permissionarioRequestDTO.getCnpjEmpresa() + " é inválido!");
+
         if(Objects.isNull(permissionarioRequestDTO.getUsuario()) || permissionarioRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
         Permissionario permissionario = new Permissionario();
         try{
             permissionario = converterPermissionarioDTOToPermissionario(
-                    permissionarioRequestDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 2
+                    permissionarioRequestDTO, certificadoCondutor, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 2
             );
 
             permissionario = permissionarioRepository.save(permissionario);
@@ -170,7 +188,9 @@ public class PermissionarioServiceImpl {
                 msgErro = "Existe um Veículo associado a este Permissionário";
                 throw new Exception();
             }
-            permissionarioRepository.deletePermissionarioByIdPermissionario(idPermissionario);
+
+            permissionario.setStatus("INATIVO");
+            permissionarioRepository.save(permissionario);
 
             //Auditoria
             salvarAuditoria("PERMISSIONÁRIO TÁXI", "EXCLUSÃO", usuario);
@@ -207,6 +227,7 @@ public class PermissionarioServiceImpl {
         permissionarioResponseDTO.setCnhPermissionario(permissionario.getCnhPermissionario());
         permissionarioResponseDTO.setCategoriaCnhPermissionario(converterIdCategoriaCnh(permissionario.getCategoriaCnhPermissionario()));
         permissionarioResponseDTO.setUfPermissionario(permissionario.getUfPermissionario());
+        permissionarioResponseDTO.setCidadePermissionario(permissionario.getCidadePermissionario());
         permissionarioResponseDTO.setBairroPermissionario(permissionario.getBairroPermissionario());
         permissionarioResponseDTO.setEnderecoPermissionario(permissionario.getEnderecoPermissionario());
         permissionarioResponseDTO.setCelularPermissionario(permissionario.getCelularPermissionario());
@@ -218,11 +239,15 @@ public class PermissionarioServiceImpl {
         permissionarioResponseDTO.setCertidaoNegativaMunicipal(permissionario.getCertidaoNegativaMunicipal());
         permissionarioResponseDTO.setFoto(permissionario.getFoto());
         permissionarioResponseDTO.setDataCriacao(permissionario.getDataCriacao().toString());
+        permissionarioResponseDTO.setStatus(permissionario.getStatus());
+        permissionarioResponseDTO.setAplicativoAlternativo(permissionario.getAplicativoAlternativo().equals("1") ? "SIM" : "NÃO");
+        permissionarioResponseDTO.setObservacao(permissionario.getObservacao());
 
         return permissionarioResponseDTO;
     }
 
     public Permissionario converterPermissionarioDTOToPermissionario(PermissionarioRequestDTO permissionarioRequestDTO,
+                                                                     MultipartFile certificadoCondutor,
                                                                      MultipartFile certidaoNegativaCriminal,
                                                                      MultipartFile certidaoNegativaMunicipal,
                                                                      MultipartFile foto, Integer tipo) throws IOException {
@@ -259,6 +284,7 @@ public class PermissionarioServiceImpl {
         }
 
         permissionario.setUfPermissionario(permissionarioRequestDTO.getUfPermissionario());
+        permissionario.setCidadePermissionario(permissionarioRequestDTO.getCidadePermissionario());
         permissionario.setBairroPermissionario(permissionarioRequestDTO.getBairroPermissionario());
         permissionario.setEnderecoPermissionario(permissionarioRequestDTO.getEnderecoPermissionario());
         permissionario.setCelularPermissionario(permissionarioRequestDTO.getCelularPermissionario());
@@ -275,6 +301,8 @@ public class PermissionarioServiceImpl {
         permissionario.setNumeroCertificadoCondutor(permissionarioRequestDTO.getNumeroCertificadoCondutor());
         permissionario.setNumeroInscricaoInss(permissionarioRequestDTO.getNumeroInscricaoInss());
 
+        if(Objects.nonNull(certificadoCondutor))
+            permissionario.setCertificadoCondutor(certificadoCondutor.getBytes());
         if(Objects.nonNull(certidaoNegativaCriminal))
             permissionario.setCertidaoNegativaCriminal(certidaoNegativaCriminal.getBytes());
         if(Objects.nonNull(certidaoNegativaMunicipal))
@@ -286,6 +314,16 @@ public class PermissionarioServiceImpl {
             permissionario.setDataCriacao(LocalDate.parse(permissionarioRequestDTO.getDataCriacao()));
         else
             permissionario.setDataCriacao(LocalDate.now());
+
+        permissionario.setStatus("ATIVO");
+
+        if(tipo == 1){
+            permissionario.setAplicativoAlternativo(permissionarioRequestDTO.getAplicativoAlternativo());
+        }else{
+            permissionario.setAplicativoAlternativo(permissionarioRequestDTO.getAplicativoAlternativo().equals("SIM") ? "1" : "2");
+        }
+
+        permissionario.setObservacao(permissionarioRequestDTO.getObservacao());
 
         return  permissionario;
     }

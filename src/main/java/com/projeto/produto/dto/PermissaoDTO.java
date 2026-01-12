@@ -18,6 +18,8 @@ public class PermissaoDTO {
     private String dataValidadePermissaoOriginal;
     private String penalidade;
     private String dataValidadePenalidade;
+    private String modalidade;
+    private String autorizacaoTrafego;
     private String usuario;
     private String dataCriacao;
 }

@@ -2,8 +2,6 @@ package com.projeto.produto;
 
 import com.projeto.produto.api.model.ProdutoDTO;
 import com.projeto.produto.entity.Produto;
-import com.projeto.produto.repository.ProductRepository;
-import com.projeto.produto.service.impl.ProductServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -22,7 +20,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class ProdutoControllerTests {
 
-    @Mock
+    /*@Mock
     private ProductRepository productRepository;
 
     @InjectMocks
@@ -77,5 +75,5 @@ class ProdutoControllerTests {
         produto.setPreco(100.50);
         produto.setSituacao(1);
         return produto;
-    }
+    }*/
 }

@@ -1,5 +1,6 @@
 package com.projeto.produto.controller;
 
+import com.projeto.produto.dto.PermissionarioResponseDTO;
 import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.service.impl.PontosTaxiServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/ponto-taxi")
@@ -55,6 +58,11 @@ public class PontoTaxiController {
             throw new RuntimeException("Não foi possível consultar os Pontos de Estacionamentos de Táxi com os filtros informados!");
         }
 
+    }
+
+    @GetMapping("/buscar-disponiveis")
+    public ResponseEntity<List<PontoTaxiDTO>> buscarPontosTaxiDisponiveis() {
+        return ResponseEntity.ok(service.listarPontosTaxiDisponiveis());
     }
 
     @PostMapping("/inserir")

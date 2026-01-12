@@ -30,6 +30,8 @@ public class Defensor {
     private String naturezaPessoa;
     @Column(name = "UF_DEFENSOR")
     private String ufDefensor;
+    @Column(name = "CIDADE_DEFENSOR")
+    private String cidadeDefensor;
     @Column(name = "BAIRRO_DEFENSOR")
     private String bairroDefensor;
     @Column(name = "ENDERECO_DEFENSOR")
@@ -49,6 +51,9 @@ public class Defensor {
     @Column(name = "NUMERO_CERTIFICADO_CONDUTOR")
     private String numeroCertificadoCondutor;
     @Lob
+    @Column(name = "CERTIFICADO_CONDUTOR")
+    private byte[] certificadoCondutor;
+    @Lob
     @Column(name = "CERTIDAO_NEGATIVA_CRIMINAL")
     private byte[] certidaoNegativaCriminal;
     @Lob
@@ -59,5 +64,7 @@ public class Defensor {
     private byte[] foto;
     @Column(name = "DATA_CRIACAO")
     private LocalDate dataCriacao;
+    @Column(name = "STATUS")
+    private String status;
 
 }

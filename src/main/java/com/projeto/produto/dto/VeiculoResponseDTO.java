@@ -8,6 +8,7 @@ import lombok.Setter;
 public class VeiculoResponseDTO {
     private Long idVeiculo;
     private Long idPermissionario;
+    private Long idPontoTaxi;
     private String numeroPermissao;
     private String placa;
     private String renavam;
@@ -31,6 +32,6 @@ public class VeiculoResponseDTO {
     private String tipoVeiculo;
     private String observacao;
     private String dataCriacao;
-
+    private String status;
 
 }

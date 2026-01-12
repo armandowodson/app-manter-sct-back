@@ -19,6 +19,9 @@ public class Veiculo {
     private Permissionario permissionario;
     @Column(name = "NUMERO_PERMISSAO")
     private String numeroPermissao;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_PONTOS_TAXI")
+    private PontoTaxi pontoTaxi;
     @Column(name = "PLACA")
     private String placa;
     @Column(name = "RENAVAM")
@@ -65,5 +68,7 @@ public class Veiculo {
     private String observacao;
     @Column(name = "DATA_CRIACAO")
     private LocalDate dataCriacao;
+    @Column(name = "STATUS")
+    private String status;
 
 }

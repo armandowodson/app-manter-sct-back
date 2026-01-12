@@ -24,8 +24,8 @@ public class PontoTaxi {
     private String referenciaPonto;
     @Column(name = "NUMERO_VAGAS")
     private String numeroVagas;
-    @Column(name = "MODALIDADE")
-    private String modalidade;
     @Column(name = "DATA_CRIACAO")
     private LocalDate dataCriacao;
+    @Column(name = "STATUS")
+    private String status;
 }

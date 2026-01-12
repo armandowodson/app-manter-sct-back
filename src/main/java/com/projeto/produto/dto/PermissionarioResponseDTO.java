@@ -15,6 +15,7 @@ public class PermissionarioResponseDTO {
     private String orgaoEmissor;
     private String naturezaPessoa;
     private String ufPermissionario;
+    private String cidadePermissionario;
     private String bairroPermissionario;
     private String enderecoPermissionario;
     private String celularPermissionario;
@@ -24,9 +25,13 @@ public class PermissionarioResponseDTO {
     private String numeroQuitacaoEleitoral;
     private String numeroInscricaoInss;
     private String numeroCertificadoCondutor;
+    private byte[] certificadoCondutor;
     private byte[] certidaoNegativaCriminal;
     private byte[] certidaoNegativaMunicipal;
     private byte[] foto;
     private String dataCriacao;
+    private String status;
+    private String aplicativoAlternativo;
+    private String observacao;
 
 }

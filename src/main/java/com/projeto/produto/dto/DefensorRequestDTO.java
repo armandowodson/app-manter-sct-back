@@ -15,6 +15,7 @@ public class DefensorRequestDTO {
     private String orgaoEmissor;
     private String naturezaPessoa;
     private String ufDefensor;
+    private String cidadeDefensor;
     private String bairroDefensor;
     private String enderecoDefensor;
     private String celularDefensor;

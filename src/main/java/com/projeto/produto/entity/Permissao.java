@@ -38,6 +38,12 @@ public class Permissao {
     private String penalidade;
     @Column(name = "DATA_VALIDADE_PENALIDADE")
     private LocalDate dataValidadePenalidade;
+    @Column(name = "MODALIDADE")
+    private String modalidade;
+    @Column(name = "NUMERO_AUTORIZACAO_TRAFEGO")
+    private String autorizacaoTrafego;
     @Column(name = "DATA_CRIACAO")
     private LocalDate dataCriacao;
+    @Column(name = "STATUS")
+    private String status;
 }

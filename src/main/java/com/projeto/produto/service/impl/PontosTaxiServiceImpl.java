@@ -1,7 +1,9 @@
 package com.projeto.produto.service.impl;
 
+import com.projeto.produto.dto.PermissionarioResponseDTO;
 import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.entity.Auditoria;
+import com.projeto.produto.entity.Permissionario;
 import com.projeto.produto.entity.PontoTaxi;
 import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.PontosTaxiRepository;
@@ -117,13 +119,29 @@ public class PontosTaxiServiceImpl {
         return new PageImpl<>(listaPontoTaxiDTO, pageRequest, countRegistros);
     }
 
+    public List<PontoTaxiDTO> listarPontosTaxiDisponiveis() {
+        List<PontoTaxiDTO> listaPontoTaxiDTO = new ArrayList<>();
+        List<PontoTaxi> listaPontoTaxi = pontosTaxiRepository.listarPontosTaxiDisponiveis();
+
+        if (!listaPontoTaxi.isEmpty()){
+            for (PontoTaxi pontoTaxiDisponivel : listaPontoTaxi) {
+                PontoTaxiDTO pontoTaxiDTORetornado = converterPontoTaxiToPontoTaxiDTO(pontoTaxiDisponivel);
+                listaPontoTaxiDTO.add(pontoTaxiDTORetornado);
+            }
+        }
+
+        return listaPontoTaxiDTO;
+    }
+
     @Transactional
     public ResponseEntity<Void> excluirPontoTaxi(Long idPontoTaxi, String usuario) {
         try{
             if(Objects.isNull(usuario) || usuario.isEmpty())
                 throw new RuntimeException("Usuário vazio ou não identificado!");
 
-            pontosTaxiRepository.deletePontoTaxiByIdPontoTaxi(idPontoTaxi);
+            PontoTaxi pontoTaxi = pontosTaxiRepository.findByIdPontoTaxi(idPontoTaxi);
+            pontoTaxi.setStatus("INATIVO");
+            pontosTaxiRepository.save(pontoTaxi);
 
             //Auditoria
             salvarAuditoria("PONTO DE ESTACIONAMENTO DE TÁXI", "EXCLUSÃO", usuario);
@@ -154,8 +172,8 @@ public class PontosTaxiServiceImpl {
         pontoTaxiDTO.setReferenciaPonto(pontoTaxi.getReferenciaPonto());
         pontoTaxiDTO.setFatorRotatividade(pontoTaxi.getFatorRotatividade());
         pontoTaxiDTO.setNumeroVagas(pontoTaxi.getNumeroVagas());
-        pontoTaxiDTO.setModalidade(pontoTaxi.getModalidade());
         pontoTaxiDTO.setDataCriacao(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(pontoTaxi.getDataCriacao()));
+        pontoTaxiDTO.setStatus(pontoTaxi.getStatus());
 
         return  pontoTaxiDTO;
     }
@@ -170,7 +188,7 @@ public class PontosTaxiServiceImpl {
         pontoTaxi.setReferenciaPonto(pontoTaxiDTO.getReferenciaPonto());
         pontoTaxi.setFatorRotatividade(pontoTaxiDTO.getFatorRotatividade());
         pontoTaxi.setNumeroVagas(pontoTaxiDTO.getNumeroVagas());
-        pontoTaxi.setModalidade(pontoTaxiDTO.getModalidade());
+        pontoTaxi.setStatus("ATIVO");
 
         return  pontoTaxi;
     }

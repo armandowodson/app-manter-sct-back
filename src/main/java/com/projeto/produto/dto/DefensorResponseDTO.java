@@ -15,6 +15,7 @@ public class DefensorResponseDTO {
     private String orgaoEmissor;
     private String naturezaPessoa;
     private String ufDefensor;
+    private String cidadeDefensor;
     private String bairroDefensor;
     private String enderecoDefensor;
     private String celularDefensor;
@@ -24,9 +25,11 @@ public class DefensorResponseDTO {
     private String numeroQuitacaoEleitoral;
     private String numeroInscricaoInss;
     private String numeroCertificadoCondutor;
+    private byte[] certificadoCondutor;
     private byte[] certidaoNegativaCriminal;
     private byte[] certidaoNegativaMunicipal;
     private byte[] foto;
     private String dataCriacao;
+    private String status;
 
 }

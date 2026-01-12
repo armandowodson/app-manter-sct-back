@@ -43,12 +43,12 @@ public class PermissionarioController {
 
     @GetMapping("/buscar-filtros")
     public Page<PermissionarioResponseDTO> buscarPermissionariosFiltros(@RequestParam(required = false) String numeroPermissao,
-                                                                                       @RequestParam(required = false) String nomePermissionario,
-                                                                                       @RequestParam(required = false) String cpfPermissionario,
-                                                                                       @RequestParam(required = false) String cnpjEmpresa,
-                                                                                       @RequestParam(required = false) String cnhPermissionario,
-                                                                                       @RequestParam(required = true) Integer pageIndex,
-                                                                                       @RequestParam(required = true) Integer pageSize) {
+                                                                        @RequestParam(required = false) String nomePermissionario,
+                                                                        @RequestParam(required = false) String cpfPermissionario,
+                                                                        @RequestParam(required = false) String cnpjEmpresa,
+                                                                        @RequestParam(required = false) String cnhPermissionario,
+                                                                        @RequestParam(required = true) Integer pageIndex,
+                                                                        @RequestParam(required = true) Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
         try{
             Page<PermissionarioResponseDTO> permissionarios = service.listarTodosPermissionarioFiltros(
@@ -75,22 +75,24 @@ public class PermissionarioController {
     @PostMapping("/inserir")
     public ResponseEntity<PermissionarioResponseDTO> inserirPermissionario(
             @RequestParam("permissionario") String permissionario,
+            @RequestParam("certificadoCondutor") MultipartFile certificadoCondutor,
             @RequestParam("certidaoNegativaCriminal") MultipartFile certidaoNegativaCriminal,
             @RequestParam("certidaoNegativaMunicipal") MultipartFile certidaoNegativaMunicipal,
             @RequestParam("foto") MultipartFile foto
     ) throws IOException {
         PermissionarioRequestDTO permissionarioDTO = new ObjectMapper().readValue(permissionario, PermissionarioRequestDTO.class);
-        return ResponseEntity.ok(service.inserirPermissionario(permissionarioDTO, certidaoNegativaCriminal,
+        return ResponseEntity.ok(service.inserirPermissionario(permissionarioDTO, certidaoNegativaCriminal, certificadoCondutor,
                 certidaoNegativaMunicipal, foto));
     }
 
     @PostMapping("/alterar")
     public ResponseEntity<PermissionarioResponseDTO> atualizarPermissionario(@RequestParam("permissionario") String permissionario,
+                                                                             @RequestParam("certificadoCondutor") MultipartFile certificadoCondutor,
                                                                              @RequestParam(value = "certidaoNegativaCriminal", required = false) MultipartFile certidaoNegativaCriminal,
-                                                                             @RequestParam(value = "certidaoNegativaCriminal", required = false) MultipartFile certidaoNegativaMunicipal,
-                                                                             @RequestParam(value = "certidaoNegativaCriminal", required = false) MultipartFile foto) throws IOException {
+                                                                             @RequestParam(value = "certidaoNegativaMunicipal", required = false) MultipartFile certidaoNegativaMunicipal,
+                                                                             @RequestParam(value = "foto", required = false) MultipartFile foto) throws IOException {
         PermissionarioRequestDTO permissionarioDTO = new ObjectMapper().readValue(permissionario, PermissionarioRequestDTO.class);
-        return ResponseEntity.ok(service.atualizarPermissionario(permissionarioDTO, certidaoNegativaCriminal,
+        return ResponseEntity.ok(service.atualizarPermissionario(permissionarioDTO, certificadoCondutor, certidaoNegativaCriminal,
                 certidaoNegativaMunicipal, foto));
     }
 
