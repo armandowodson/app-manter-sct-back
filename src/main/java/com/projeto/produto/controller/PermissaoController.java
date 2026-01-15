@@ -19,9 +19,13 @@ public class PermissaoController {
 
     @GetMapping("/buscar-todos")
     public Page<PermissaoDTO> listarTodosPermissao(@RequestParam(required = true) Integer pageIndex, @RequestParam(required = true) Integer pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
-        Page<PermissaoDTO> pontos = service.listarTodosPermissao(pageRequest);
-        return pontos;
+        try{
+            PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+            Page<PermissaoDTO> permissoes = service.listarTodosPermissao(pageRequest);
+            return permissoes;
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar todas as Permissões cadastradas!");
+        }
     }
 
     @GetMapping("/buscar/{idPermissao}")
@@ -39,12 +43,16 @@ public class PermissaoController {
                                                       @RequestParam(required = true) Integer pageIndex,
                                                       @RequestParam(required = true) Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
-        Page<PermissaoDTO> permissoes = service.listarTodasPermissoesFiltros(
-                numeroPermissao, numeroAlvara, anoAlvara,
-                statusPermissao, periodoInicialStatus, periodoFinalStatus, pageRequest
-        );
+        try {
+            Page<PermissaoDTO> permissoes = service.listarTodasPermissoesFiltros(
+                    numeroPermissao, numeroAlvara, anoAlvara,
+                    statusPermissao, periodoInicialStatus, periodoFinalStatus, pageRequest
+            );
 
-        return permissoes;
+            return permissoes;
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar as Permissões com os filtros informados!");
+        }
     }
 
     @GetMapping("/buscar-disponiveis")

@@ -60,6 +60,15 @@ public class VeiculoController {
         }
     }
 
+    @GetMapping("/buscar-veiculo")
+    public VeiculoResponseDTO buscarVeiculoPlaca(@RequestParam(required = true) String placa) {
+        try{
+            return service.buscarVeiculoPlaca(placa);
+        } catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
     @PostMapping("/inserir")
     public ResponseEntity<VeiculoResponseDTO> inserirVeiculo(@RequestParam("veiculo") String veiculo,
                                                              @RequestParam("crlv") MultipartFile crlv,

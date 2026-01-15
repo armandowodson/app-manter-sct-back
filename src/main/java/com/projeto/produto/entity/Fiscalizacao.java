@@ -11,11 +11,12 @@ import java.time.LocalDate;
 @Data
 public class Fiscalizacao {
     @Id
-    @Column(name = "ID_LOGIN")
+    @Column(name = "ID_FISCALIZACAO")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_fiscalizacao")
     private Long idFiscalizacao;
-    @Column(name = "ID_VEICULO")
-    private Long idVeiculo;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_VEICULO")
+    private Veiculo veiculo;
     @Column(name = "DATA_FISCALIZACAO")
     private LocalDate dataFiscalizacao;
     @Column(name = "MOTIVO_INFRACAO")

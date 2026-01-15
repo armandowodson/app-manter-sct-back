@@ -140,6 +140,29 @@ public class VeiculoServiceImpl {
         return new PageImpl<>(listaVeiculoResponseDTO, pageRequest, countRegistros);
     }
 
+    public VeiculoResponseDTO buscarVeiculoPlaca(String placa){
+        List<Veiculo> veiculoList = veiculoRepository.buscarVeiculoPlaca(placa);
+
+        if(Objects.isNull(veiculoList) || veiculoList.isEmpty())
+            throw new RuntimeException("Não foi possível localizar o veículo com a placa " + placa + " informada!");
+
+        switch (veiculoList.get(0).getCor()){
+            case "1":
+                veiculoList.get(0).setCor("BRANCO");
+                break;
+            case "2":
+                veiculoList.get(0).setCor("PRATA");
+                break;
+            case "3":
+                veiculoList.get(0).setCor("CINZA");
+                break;
+            default:
+                veiculoList.get(0).setCor("");
+        }
+
+        return converterVeiculoToVeiculoDTO(veiculoList.get(0));
+    }
+
     @Transactional
     public ResponseEntity<Void> excluirVeiculo(Long idVeiculo, String usuario) {
         try{
@@ -178,7 +201,7 @@ public class VeiculoServiceImpl {
         veiculoResponseDTO.setIdPermissionario(veiculo.getPermissionario().getIdPermissionario());
         veiculoResponseDTO.setNumeroPermissao(veiculo.getNumeroPermissao());
         veiculoResponseDTO.setIdPontoTaxi(veiculo.getPontoTaxi().getIdPontoTaxi());
-        veiculoResponseDTO.setPlaca(veiculo.getPlaca());
+        veiculoResponseDTO.setPlaca(veiculo.getPlaca().toUpperCase());
         veiculoResponseDTO.setRenavam(veiculo.getRenavam());
         veiculoResponseDTO.setChassi(veiculo.getChassi());
         veiculoResponseDTO.setAnoFabricacao(veiculo.getAnoFabricacao());
@@ -216,7 +239,7 @@ public class VeiculoServiceImpl {
         veiculo.setPermissionario(permissionarioRepository.findPermissionarioByIdPermissionario(veiculoRequestDTO.getIdPermissionario()));
         veiculo.setPontoTaxi(pontosTaxiRepository.findByIdPontoTaxi(veiculoRequestDTO.getIdPontoTaxi()));
         veiculo.setNumeroPermissao(veiculoRequestDTO.getNumeroPermissao());
-        veiculo.setPlaca(veiculoRequestDTO.getPlaca());
+        veiculo.setPlaca(veiculoRequestDTO.getPlaca().toUpperCase());
         veiculo.setRenavam(veiculoRequestDTO.getRenavam());
         veiculo.setChassi(veiculoRequestDTO.getChassi());
         veiculo.setAnoFabricacao(veiculoRequestDTO.getAnoFabricacao());

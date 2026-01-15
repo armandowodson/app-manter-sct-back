@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -37,8 +38,9 @@ public class PermissaoServiceImpl {
     public PermissaoDTO inserirPermissao(PermissaoDTO permissaoDTO) {
         if (Objects.isNull(permissaoDTO.getNumeroPermissao()) || Objects.isNull(permissaoDTO.getNumeroAlvara()) ||
                 Objects.isNull(permissaoDTO.getAnoAlvara()) || Objects.isNull(permissaoDTO.getCategoriaPermissao()) ||
-                Objects.isNull(permissaoDTO.getStatusPermissao()) || Objects.isNull(permissaoDTO.getDataValidadePermissao())) {
-            throw new RuntimeException("Dados inválidos para a Permissão!");
+                Objects.isNull(permissaoDTO.getStatusPermissao()) || Objects.isNull(permissaoDTO.getDataValidadePermissao()) ||
+                Objects.isNull(permissaoDTO.getPeriodoInicialStatus()) || Objects.isNull(permissaoDTO.getPeriodoFinalStatus())) {
+            throw new RuntimeException("Campos inválidos/vazios para a Permissão!");
         }
 
         if(Objects.isNull(permissaoDTO.getUsuario()) || permissaoDTO.getUsuario().isEmpty())
@@ -57,7 +59,7 @@ public class PermissaoServiceImpl {
         if (Objects.isNull(permissaoDTO.getNumeroPermissao()) || Objects.isNull(permissaoDTO.getNumeroAlvara()) ||
                 Objects.isNull(permissaoDTO.getAnoAlvara()) || Objects.isNull(permissaoDTO.getCategoriaPermissao()) ||
                 Objects.isNull(permissaoDTO.getStatusPermissao()) || Objects.isNull(permissaoDTO.getDataValidadePermissao())) {
-            throw new RuntimeException("Dados inválidos para a Permissão!");
+            throw new RuntimeException("Campos inválidos/vazios para a Permissão!");
         }
 
         if(Objects.isNull(permissaoDTO.getUsuario()) || permissaoDTO.getUsuario().isEmpty())
@@ -95,16 +97,44 @@ public class PermissaoServiceImpl {
                                                            String periodoInicial, String periodoFinal,
                                                            PageRequest pageRequest) {
 
+        LocalDate localDateInicial = null;
+        if(Objects.nonNull(periodoInicial) && !periodoInicial.isEmpty()){
+            String data = periodoInicial;
+            Integer indexChar = data.indexOf('(');
+            if(indexChar > 0){
+                data = data.substring(0, indexChar);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss 'GMT'Z", Locale.ENGLISH);
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(data.trim(), formatter);
+                localDateInicial = zonedDateTime.toLocalDate();
+            }
+        }else{
+            localDateInicial = LocalDate.parse("2026-01-01");
+        }
+
+        LocalDate localDateFinal = null;
+        if(Objects.nonNull(periodoFinal) && !periodoFinal.isEmpty()){
+            String data = periodoFinal;
+            Integer indexChar = data.indexOf('(');
+            if(indexChar > 0){
+                data = data.substring(0, indexChar);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss 'GMT'Z", Locale.ENGLISH);
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(data.trim(), formatter);
+                localDateFinal = zonedDateTime.toLocalDate();
+            }
+        }else{
+            localDateFinal = LocalDate.parse("2099-01-01");
+        }
+
         List<Permissao> listaPermissao = permissaoRepository.listarTodasPermissoesFiltros(
                 numeroPermissao, numeroAlvara,  anoAlvara,  statusPermissao,
-                periodoInicial != null ? LocalDate.parse(periodoInicial) : null,
-                periodoFinal != null ? LocalDate.parse(periodoFinal) : null,  pageRequest
+                localDateInicial != null ? localDateInicial : null,
+                localDateFinal != null ? localDateFinal : null,  pageRequest
         );
 
         Integer countRegistros = permissaoRepository.listarTodasPermissoesFiltros(
                 numeroPermissao, numeroAlvara,  anoAlvara,  statusPermissao,
-                periodoInicial != null ? LocalDate.parse(periodoInicial) : null,
-                periodoFinal != null ? LocalDate.parse(periodoFinal) : null,  pageRequest
+                localDateInicial != null ? localDateInicial : null,
+                localDateFinal != null ? localDateFinal : null,  null
         ).size();
 
         List<PermissaoDTO> listaPermissaoDTO = new ArrayList<>();

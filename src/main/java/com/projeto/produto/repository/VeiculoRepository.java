@@ -38,6 +38,12 @@ public interface VeiculoRepository extends JpaRepository<Veiculo,Integer> {
                                                  String numeroTaximetro, String anoFabricacao,
                                                  Pageable pageable);
 
-    void deleteVeiculoByIdVeiculo(Long idVeiculo);
+    @Query(
+            value = "SELECT * " +
+                    "FROM proj.veiculo " +
+                    "WHERE PLACA = :placa ",
+            nativeQuery = true
+    )
+    List<Veiculo> buscarVeiculoPlaca(String placa);
 }
 

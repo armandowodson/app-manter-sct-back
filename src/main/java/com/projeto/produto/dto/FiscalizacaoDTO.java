@@ -8,6 +8,7 @@ import lombok.Setter;
 public class FiscalizacaoDTO {
     private Long idFiscalizacao;
     private String dataFiscalizacao;
+    private String dataFiscalizacaoOriginal;
     private Long idVeiculo;
     private String placa;
     private String marca;
@@ -21,10 +22,12 @@ public class FiscalizacaoDTO {
     private String tipoInfracao;
     private String grupoMultas;
     private String prazoRegularizacao;
+    private String prazoRegularizacaoOriginal;
     private String naturezaInfracao;
     private String modalidade;
     private String penalidade;
     private String observacao;
     private String dataCriacao;
     private String usuario;
+    private String status;
 }

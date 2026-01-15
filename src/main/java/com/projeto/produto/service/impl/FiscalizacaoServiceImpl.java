@@ -3,9 +3,9 @@ package com.projeto.produto.service.impl;
 import com.projeto.produto.dto.FiscalizacaoDTO;
 import com.projeto.produto.dto.FiscalizacaoDTO;
 import com.projeto.produto.entity.Auditoria;
-import com.projeto.produto.entity.Defensor;
+import com.projeto.produto.entity.Fiscalizacao;
 import com.projeto.produto.repository.AuditoriaRepository;
-import com.projeto.produto.repository.DefensorRepository;
+import com.projeto.produto.repository.FiscalizacaoRepository;
 import com.projeto.produto.repository.FiscalizacaoRepository;
 import com.projeto.produto.repository.VeiculoRepository;
 import com.projeto.produto.utils.ValidaCNPJ;
@@ -21,8 +21,12 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 @Service
@@ -31,140 +35,134 @@ public class FiscalizacaoServiceImpl {
     private FiscalizacaoRepository fiscalizacaoRepository;
 
     @Autowired
+    private VeiculoRepository veiculoRepository;
+
+    @Autowired
     private AuditoriaRepository auditoriaRepository;
 
-    /*@Transactional
-    public FiscalizacaoDTO inserirDefensor(FiscalizacaoDTO fiscalizacaoDTO) throws IOException {
+    @Transactional
+    public FiscalizacaoDTO inserirFiscalizacao(FiscalizacaoDTO fiscalizacaoDTO) {
         
         if (Objects.isNull(fiscalizacaoDTO.getIdVeiculo()) || Objects.isNull(fiscalizacaoDTO.getIdPermissionario()) ||
                 Objects.isNull(fiscalizacaoDTO.getDataFiscalizacao()) || Objects.isNull(fiscalizacaoDTO.getMotivoInfracao()) ||
                 Objects.isNull(fiscalizacaoDTO.getPrazoRegularizacao()) || Objects.isNull(fiscalizacaoDTO.getTipoInfracao()) ||
                 Objects.isNull(fiscalizacaoDTO.getNumeroPermissao()) || Objects.isNull(fiscalizacaoDTO.getGrupoMultas()) ||
-                Objects.isNull(fiscalizacaoDTO.getNaturezaInfracao())) {
-            throw new RuntimeException("Dados inválidos para o Defensor!");
+                Objects.isNull(fiscalizacaoDTO.getNaturezaInfracao()) || Objects.isNull(fiscalizacaoDTO.getModalidade()) ||
+                Objects.isNull(fiscalizacaoDTO.getPenalidade())) {
+            throw new RuntimeException("Dados inválidos para a Fiscalizacao!");
         }
 
         if(Objects.isNull(fiscalizacaoDTO.getUsuario()) || fiscalizacaoDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
-        Defensor defensor = new Defensor();
+        Fiscalizacao fiscalizacao = new Fiscalizacao();
         try {
-            defensor = converterDefensorDTOToDefensor(
-                    fiscalizacaoDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 1
-            );
-            defensor = defensorRepository.save(defensor);
+            fiscalizacao = converterFiscalizacaoDTOToFiscalizacao(fiscalizacaoDTO, 1);
+            fiscalizacao = fiscalizacaoRepository.save(fiscalizacao);
 
             //Auditoria
-            salvarAuditoria("DEFENSOR TÁXI", "INCLUSÃO", fiscalizacaoDTO.getUsuario());
+            salvarAuditoria("FISCALIZAÇÃO TÁXI", "INCLUSÃO", fiscalizacaoDTO.getUsuario());
         } catch (Exception e){
-            throw new RuntimeException("Não foi possível inserir os dados do Defensor!");
+            throw new RuntimeException("Não foi possível inserir os dados do Fiscalização!");
         }
 
-        return converterDefensorToDefensorDTO(defensor);
+        return converterFiscalizacaoToFiscalizacaoDTO(fiscalizacao);
     }
 
     @Transactional
-    public FiscalizacaoDTO atualizarDefensor(FiscalizacaoDTO fiscalizacaoDTO,
-                                                             MultipartFile certidaoNegativaCriminal,
-                                                             MultipartFile certidaoNegativaMunicipal,
-                                                             MultipartFile foto) throws IOException {
-        if (Objects.isNull(fiscalizacaoDTO.getNomeDefensor()) || Objects.isNull(fiscalizacaoDTO.getCpfDefensor()) ||
-                Objects.isNull(fiscalizacaoDTO.getRgDefensor()) || Objects.isNull(fiscalizacaoDTO.getCnhDefensor()) ||
-                Objects.isNull(fiscalizacaoDTO.getEnderecoDefensor()) || Objects.isNull(fiscalizacaoDTO.getCelularDefensor()) ||
-                Objects.isNull(fiscalizacaoDTO.getNumeroPermissao())) {
-            throw new RuntimeException("Dados inválidos para o Defensor!");
+    public FiscalizacaoDTO atualizarFiscalizacao(FiscalizacaoDTO fiscalizacaoDTO) {
+        if (Objects.isNull(fiscalizacaoDTO.getIdVeiculo()) || Objects.isNull(fiscalizacaoDTO.getIdPermissionario()) ||
+                Objects.isNull(fiscalizacaoDTO.getDataFiscalizacao()) || Objects.isNull(fiscalizacaoDTO.getMotivoInfracao()) ||
+                Objects.isNull(fiscalizacaoDTO.getPrazoRegularizacao()) || Objects.isNull(fiscalizacaoDTO.getTipoInfracao()) ||
+                Objects.isNull(fiscalizacaoDTO.getNumeroPermissao()) || Objects.isNull(fiscalizacaoDTO.getGrupoMultas()) ||
+                Objects.isNull(fiscalizacaoDTO.getNaturezaInfracao()) || Objects.isNull(fiscalizacaoDTO.getModalidade()) ||
+                Objects.isNull(fiscalizacaoDTO.getPenalidade())) {
+            throw new RuntimeException("Dados inválidos para a Fiscalização!");
         }
 
         if(Objects.isNull(fiscalizacaoDTO.getUsuario()) || fiscalizacaoDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário vazio ou não identificado!");
 
-        Defensor defensor = new Defensor();
+        Fiscalizacao fiscalizacao = new Fiscalizacao();
         try{
-            defensor = converterDefensorDTOToDefensor(
-                    fiscalizacaoDTO, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 2
-            );
+            fiscalizacao = converterFiscalizacaoDTOToFiscalizacao(fiscalizacaoDTO, 2);
 
-            defensor = defensorRepository.save(defensor);
+            fiscalizacao = fiscalizacaoRepository.save(fiscalizacao);
 
             //Auditoria
-            salvarAuditoria("DEFENSOR TÁXI", "ALTERAÇÃO", fiscalizacaoDTO.getUsuario());
+            salvarAuditoria("FISCALIZAÇÃO", "ALTERAÇÃO", fiscalizacaoDTO.getUsuario());
         } catch (Exception e){
-            throw new RuntimeException("Não foi possível alterar os dados do Defensor!");
+            throw new RuntimeException("Não foi possível alterar os dados da Fiscalização!");
         }
 
-        return converterDefensorToDefensorDTO(defensorRepository.save(defensor));
+        return converterFiscalizacaoToFiscalizacaoDTO(fiscalizacaoRepository.save(fiscalizacao));
     }
 
-    public Page<FiscalizacaoDTO> listarTodosDefensors(PageRequest pageRequest) {
-        List<Defensor> defensorList = defensorRepository.buscarTodos(pageRequest);
-        Integer countLista = defensorRepository.buscarTodos(null).size();
-        List<FiscalizacaoDTO> defensorResponseDTOList = converterEntityToDTO(defensorList);
-        return new PageImpl<>(defensorResponseDTOList, pageRequest, countLista);
+    public Page<FiscalizacaoDTO> listarTodasFiscalizacoes(PageRequest pageRequest) {
+        List<Fiscalizacao> fiscalizacaoList = fiscalizacaoRepository.buscarTodas(pageRequest);
+        Integer countLista = fiscalizacaoRepository.buscarTodas(null).size();
+        List<FiscalizacaoDTO> fiscalizacaoResponseDTOList = converterEntityToDTO(fiscalizacaoList);
+        return new PageImpl<>(fiscalizacaoResponseDTOList, pageRequest, countLista);
     }
 
-    public FiscalizacaoDTO buscarDefensorId(Long idDefensor) {
-        Defensor defensor = defensorRepository.findDefensorByIdDefensor(idDefensor);
-        FiscalizacaoDTO defensorResponseDTO = new FiscalizacaoDTO();
-        if (defensor != null){
-            defensorResponseDTO = converterDefensorToDefensorDTO(defensor);
+    public FiscalizacaoDTO buscarFiscalizacaoId(Long idFiscalizacao) {
+        Fiscalizacao fiscalizacao = fiscalizacaoRepository.findFiscalizacaoByIdFiscalizacao(idFiscalizacao);
+        FiscalizacaoDTO fiscalizacaoResponseDTO = new FiscalizacaoDTO();
+        if (fiscalizacao != null){
+            fiscalizacaoResponseDTO = converterFiscalizacaoToFiscalizacaoDTO(fiscalizacao);
         }
-        return defensorResponseDTO;
+        return fiscalizacaoResponseDTO;
     }
 
-    public Page<FiscalizacaoDTO> listarTodosDefensorFiltros(   String numeroPermissao, String nomeDefensor,
-                                                                   String cpfDefensor, String cnpjEmpresa,
-                                                                   String cnhDefensor, PageRequest pageRequest) {
-        List<Defensor> listaDefensor = defensorRepository.listarTodosDefensorsFiltros(
-                numeroPermissao,  nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
-                cpfDefensor, cnpjEmpresa, cnhDefensor, pageRequest
+    public Page<FiscalizacaoDTO> listarTodosFiscalizacaoFiltros(   String placa, String nomePermissionario,
+                                                                   String dataFiscalizacao, String motivoInfracao,
+                                                                   String penalidade, PageRequest pageRequest) {
+        LocalDate localDate = LocalDate.now();
+        if(Objects.nonNull(dataFiscalizacao) && !dataFiscalizacao.isEmpty()){
+            String data = dataFiscalizacao;
+            Integer indexChar = data.indexOf('(');
+            if(indexChar > 0){
+                data = data.substring(0, indexChar);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss 'GMT'Z", Locale.ENGLISH);
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(data.trim(), formatter);
+                localDate = zonedDateTime.toLocalDate();
+            }
+        }else{
+            localDate = LocalDate.parse("2026-01-01");
+        }
+
+        List<Fiscalizacao> listaFiscalizacao = fiscalizacaoRepository.listarTodasFiscalizacoesFiltros(
+                placa, nomePermissionario, motivoInfracao, penalidade, localDate, pageRequest
         );
 
-        Integer countRegistros = defensorRepository.listarTodosDefensorsFiltros(
-                numeroPermissao,  nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
-                cpfDefensor, cnpjEmpresa, cnhDefensor, null
+        Integer countRegistros = fiscalizacaoRepository.listarTodasFiscalizacoesFiltros(
+                placa, nomePermissionario, motivoInfracao, penalidade, localDate,null
         ).size();
 
         List<FiscalizacaoDTO> listaFiscalizacaoDTO = new ArrayList<>();
-        if (!listaDefensor.isEmpty()){
-            for (Defensor defensor : listaDefensor) {
-                FiscalizacaoDTO defensorResponseDTORetornado = converterDefensorToDefensorDTO(defensor);
-                listaFiscalizacaoDTO.add(defensorResponseDTORetornado);
+        if (!listaFiscalizacao.isEmpty()){
+            for (Fiscalizacao fiscalizacao : listaFiscalizacao) {
+                FiscalizacaoDTO fiscalizacaoResponseDTORetornado = converterFiscalizacaoToFiscalizacaoDTO(fiscalizacao);
+                listaFiscalizacaoDTO.add(fiscalizacaoResponseDTORetornado);
             }
         }
 
         return new PageImpl<>(listaFiscalizacaoDTO, pageRequest, countRegistros);
     }
 
-    public List<FiscalizacaoDTO> listarDefensoresDisponiveis(Long idDefensor) {
-        List<FiscalizacaoDTO> listaFiscalizacaoDTO = new ArrayList<>();
-        List<Defensor> listaDefensor = defensorRepository.listarDefensorsDisponiveis();
-        if(Objects.nonNull(idDefensor)){
-            Defensor defensor = defensorRepository.findDefensorByIdDefensor(idDefensor);
-            FiscalizacaoDTO defensorResponseDTORetornado = converterDefensorToDefensorDTO(defensor);
-            listaFiscalizacaoDTO.add(defensorResponseDTORetornado);
-        }
-
-        if (!listaDefensor.isEmpty()){
-            for (Defensor defensorDisponivel : listaDefensor) {
-                FiscalizacaoDTO defensorResponseDTORetornado = converterDefensorToDefensorDTO(defensorDisponivel);
-                listaFiscalizacaoDTO.add(defensorResponseDTORetornado);
-            }
-        }
-
-        return listaFiscalizacaoDTO;
-    }
-
     @Transactional
-    public ResponseEntity<Void> excluirDefensor(Long idDefensor, String usuario) {
-        String msgErro = "Erro ao Excluir o Defensor!!";
+    public ResponseEntity<Void> excluirFiscalizacao(Long idFiscalizacao, String usuario) {
+        String msgErro = "Erro ao Excluir a Fiscalização!!";
         try{
             if(Objects.isNull(usuario) || usuario.isEmpty())
                 throw new RuntimeException("Usuário vazio ou não identificado!");
 
-            defensorRepository.deleteDefensorByIdDefensor(idDefensor);
+            Fiscalizacao fiscalizacao = fiscalizacaoRepository.findFiscalizacaoByIdFiscalizacao(idFiscalizacao);
+            fiscalizacao.setStatus("INATIVO");
+            fiscalizacaoRepository.save(fiscalizacao);
 
             //Auditoria
-            salvarAuditoria("DEFENSOR TÁXI", "EXCLUSÃO", usuario);
+            salvarAuditoria("FISCALIZAÇÃO", "EXCLUSÃO", usuario);
 
             return ResponseEntity.noContent().build();
         }catch (Exception e){
@@ -172,113 +170,133 @@ public class FiscalizacaoServiceImpl {
         }
     }
 
-    public List<FiscalizacaoDTO> converterEntityToDTO(List<Defensor> listaDefensor){
+    public List<FiscalizacaoDTO> converterEntityToDTO(List<Fiscalizacao> listaFiscalizacao){
         List<FiscalizacaoDTO> listaFiscalizacaoDTO = new ArrayList<>();
-        for(Defensor defensor : listaDefensor){
-            FiscalizacaoDTO defensorResponseDTO = converterDefensorToDefensorDTO(defensor);
-            listaFiscalizacaoDTO.add(defensorResponseDTO);
+        for(Fiscalizacao fiscalizacao : listaFiscalizacao){
+            FiscalizacaoDTO fiscalizacaoResponseDTO = converterFiscalizacaoToFiscalizacaoDTO(fiscalizacao);
+            listaFiscalizacaoDTO.add(fiscalizacaoResponseDTO);
         }
 
         return listaFiscalizacaoDTO;
     }
 
-    public FiscalizacaoDTO converterDefensorToDefensorDTO(Defensor defensor){
-        FiscalizacaoDTO defensorResponseDTO = new FiscalizacaoDTO();
-        if (defensor.getIdDefensor() != null){
-            defensorResponseDTO.setIdDefensor(defensor.getIdDefensor());
+    public FiscalizacaoDTO converterFiscalizacaoToFiscalizacaoDTO(Fiscalizacao fiscalizacao){
+        FiscalizacaoDTO fiscalizacaoResponseDTO = new FiscalizacaoDTO();
+        if (fiscalizacao.getIdFiscalizacao() != null){
+            fiscalizacaoResponseDTO.setIdFiscalizacao(fiscalizacao.getIdFiscalizacao());
         }
 
-        defensorResponseDTO.setNumeroPermissao(defensor.getNumeroPermissao());
-        defensorResponseDTO.setNomeDefensor(defensor.getNomeDefensor());
-        defensorResponseDTO.setCpfDefensor(defensor.getCpfDefensor());
-        defensorResponseDTO.setCnpjEmpresa((defensor.getCnpjEmpresa() != null && !defensor.getCnpjEmpresa().equals("null")) ? defensor.getCnpjEmpresa() : "");
-        defensorResponseDTO.setRgDefensor(defensor.getRgDefensor());
-        defensorResponseDTO.setOrgaoEmissor(defensor.getOrgaoEmissor());
-        defensorResponseDTO.setNaturezaPessoa(defensor.getNaturezaPessoa().equals("1") ? "FÍSICA" : "JURÍDICA");
-        defensorResponseDTO.setCnhDefensor(defensor.getCnhDefensor());
-        defensorResponseDTO.setCategoriaCnhDefensor(converterIdCategoriaCnh(defensor.getCategoriaCnhDefensor()));
-        defensorResponseDTO.setUfDefensor(defensor.getUfDefensor());
-        defensorResponseDTO.setBairroDefensor(defensor.getBairroDefensor());
-        defensorResponseDTO.setEnderecoDefensor(defensor.getEnderecoDefensor());
-        defensorResponseDTO.setCelularDefensor(defensor.getCelularDefensor());
-        defensorResponseDTO.setNumeroQuitacaoMilitar(defensor.getNumeroQuitacaoMilitar());
-        defensorResponseDTO.setNumeroQuitacaoEleitoral(defensor.getNumeroQuitacaoEleitoral());
-        defensorResponseDTO.setNumeroInscricaoInss(defensor.getNumeroInscricaoInss());
-        defensorResponseDTO.setNumeroCertificadoCondutor(defensor.getNumeroCertificadoCondutor());
-        defensorResponseDTO.setCertidaoNegativaCriminal(defensor.getCertidaoNegativaCriminal());
-        defensorResponseDTO.setCertidaoNegativaMunicipal(defensor.getCertidaoNegativaMunicipal());
-        defensorResponseDTO.setFoto(defensor.getFoto());
-        defensorResponseDTO.setDataCriacao(defensor.getDataCriacao().toString());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
-        return defensorResponseDTO;
+        String formattedDate = fiscalizacao.getDataFiscalizacao().plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC).format(formatter);
+        fiscalizacaoResponseDTO.setDataFiscalizacao(formattedDate);
+        formattedDate = fiscalizacao.getDataFiscalizacao().atStartOfDay().atOffset(ZoneOffset.UTC).format(formatter);
+        fiscalizacaoResponseDTO.setDataFiscalizacaoOriginal(formattedDate);
+
+        fiscalizacaoResponseDTO.setIdVeiculo(fiscalizacao.getVeiculo().getIdVeiculo());
+        fiscalizacaoResponseDTO.setDataCriacao(fiscalizacao.getDataCriacao().toString());
+        fiscalizacaoResponseDTO.setPlaca(fiscalizacao.getVeiculo().getPlaca());
+        fiscalizacaoResponseDTO.setMarca(fiscalizacao.getVeiculo().getMarca());
+        fiscalizacaoResponseDTO.setModelo(fiscalizacao.getVeiculo().getModelo());
+        fiscalizacaoResponseDTO.setCor(converterIdCor(fiscalizacao.getVeiculo().getCor()));
+        fiscalizacaoResponseDTO.setIdPermissionario(fiscalizacao.getVeiculo().getPermissionario().getIdPermissionario().toString());
+        fiscalizacaoResponseDTO.setNumeroPermissao(fiscalizacao.getVeiculo().getNumeroPermissao());
+        fiscalizacaoResponseDTO.setNomePermissionario(fiscalizacao.getVeiculo().getPermissionario().getNomePermissionario());
+        fiscalizacaoResponseDTO.setCnhPermissionario(fiscalizacao.getVeiculo().getPermissionario().getCnhPermissionario());
+        fiscalizacaoResponseDTO.setMotivoInfracao(converterIdMotivoInfracao(fiscalizacao.getMotivoInfracao()));
+        fiscalizacaoResponseDTO.setTipoInfracao(converterIdTipoInfracao(fiscalizacao.getTipoInfracao()));
+        fiscalizacaoResponseDTO.setGrupoMultas(fiscalizacao.getGrupoMultas());
+
+        formattedDate = fiscalizacao.getPrazoRegularizacao().plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC).format(formatter);
+        fiscalizacaoResponseDTO.setPrazoRegularizacao(formattedDate);
+        formattedDate = fiscalizacao.getPrazoRegularizacao().atStartOfDay().atOffset(ZoneOffset.UTC).format(formatter);
+        fiscalizacaoResponseDTO.setPrazoRegularizacaoOriginal(formattedDate);
+
+        fiscalizacaoResponseDTO.setNaturezaInfracao(converterIdNaturezaInfracao(fiscalizacao.getNaturezaInfracao()));
+        fiscalizacaoResponseDTO.setModalidade(converterIdModalidadeInfracao(fiscalizacao.getModalidade()));
+        fiscalizacaoResponseDTO.setPenalidade(converterIdPenalidadeInfracao(fiscalizacao.getPenalidade()));
+        fiscalizacaoResponseDTO.setObservacao(fiscalizacao.getObservacao());
+        fiscalizacaoResponseDTO.setDataCriacao(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(fiscalizacao.getDataCriacao()));
+        fiscalizacaoResponseDTO.setStatus(fiscalizacao.getStatus());
+
+        return fiscalizacaoResponseDTO;
     }
 
-    public Defensor converterDefensorDTOToDefensor(FiscalizacaoDTO fiscalizacaoDTO,
-                                                                     MultipartFile certidaoNegativaCriminal,
-                                                                     MultipartFile certidaoNegativaMunicipal,
-                                                                     MultipartFile foto, Integer tipo) throws IOException {
-        Defensor defensor = new Defensor();
-        if (fiscalizacaoDTO.getIdDefensor() != null && fiscalizacaoDTO.getIdDefensor() != 0){
-            defensor = defensorRepository.findDefensorByIdDefensor(fiscalizacaoDTO.getIdDefensor());
+    public Fiscalizacao converterFiscalizacaoDTOToFiscalizacao(FiscalizacaoDTO fiscalizacaoDTO, Integer tipo) throws IOException {
+        Fiscalizacao fiscalizacao = new Fiscalizacao();
+        if (fiscalizacaoDTO.getIdFiscalizacao() != null && fiscalizacaoDTO.getIdFiscalizacao() != 0){
+            fiscalizacao = fiscalizacaoRepository.findFiscalizacaoByIdFiscalizacao(fiscalizacaoDTO.getIdFiscalizacao());
         }
 
-        defensor.setNumeroPermissao(fiscalizacaoDTO.getNumeroPermissao());
-        defensor.setNomeDefensor(fiscalizacaoDTO.getNomeDefensor());
+        fiscalizacao.setVeiculo(veiculoRepository.findVeiculoByIdVeiculo(fiscalizacaoDTO.getIdVeiculo()));
 
-        if(Objects.nonNull(fiscalizacaoDTO.getCpfDefensor()) && !fiscalizacaoDTO.getCpfDefensor().isEmpty()){
-            fiscalizacaoDTO.setCpfDefensor(
-                    fiscalizacaoDTO.getCpfDefensor().replace(".", "").replace("-", "").replace("/", "")
-            );
-            defensor.setCpfDefensor(fiscalizacaoDTO.getCpfDefensor());
+        if(Objects.nonNull(fiscalizacaoDTO.getDataFiscalizacao()) && !fiscalizacaoDTO.getDataFiscalizacao().isEmpty()){
+            String data = fiscalizacaoDTO.getDataFiscalizacao();
+            Integer indexChar = data.indexOf('T');
+            if(indexChar > 0){
+                data = data.substring(0, indexChar);
+                if(tipo == 1){
+                    fiscalizacao.setDataFiscalizacao(LocalDate.parse(data));
+                }else{
+                    fiscalizacao.setDataFiscalizacao(LocalDate.parse(data).minusDays(1));
+                }
+            }
         }
-
-        if(Objects.nonNull(fiscalizacaoDTO.getCnpjEmpresa()) && !fiscalizacaoDTO.getCnpjEmpresa().isEmpty() &&
-                !fiscalizacaoDTO.getCnpjEmpresa().equals("null")){
-            fiscalizacaoDTO.setCnpjEmpresa(
-                    fiscalizacaoDTO.getCnpjEmpresa().replace(".", "").replace("-", "").replace("/", "")
-            );
-            defensor.setCnpjEmpresa(fiscalizacaoDTO.getCnpjEmpresa());
-        }
-
-        defensor.setRgDefensor(fiscalizacaoDTO.getRgDefensor());
-        defensor.setOrgaoEmissor(fiscalizacaoDTO.getOrgaoEmissor());
 
         if(tipo == 1){
-            defensor.setNaturezaPessoa(fiscalizacaoDTO.getNaturezaPessoa());
+            fiscalizacao.setMotivoInfracao(fiscalizacaoDTO.getMotivoInfracao());
         }else{
-            defensor.setNaturezaPessoa(fiscalizacaoDTO.getNaturezaPessoa().equals("FÍSICA") ? "1" : "2");
+            fiscalizacao.setMotivoInfracao(converterNomeMotivoInfracao(fiscalizacaoDTO.getMotivoInfracao()));
         }
-
-        defensor.setUfDefensor(fiscalizacaoDTO.getUfDefensor());
-        defensor.setBairroDefensor(fiscalizacaoDTO.getBairroDefensor());
-        defensor.setEnderecoDefensor(fiscalizacaoDTO.getEnderecoDefensor());
-        defensor.setCelularDefensor(fiscalizacaoDTO.getCelularDefensor());
-        defensor.setCnhDefensor(fiscalizacaoDTO.getCnhDefensor());
 
         if(tipo == 1){
-            defensor.setCategoriaCnhDefensor(fiscalizacaoDTO.getCategoriaCnhDefensor());
+            fiscalizacao.setTipoInfracao(fiscalizacaoDTO.getTipoInfracao());
         }else{
-            defensor.setCategoriaCnhDefensor(converterNomeCategoriaCnh(fiscalizacaoDTO.getCategoriaCnhDefensor()));
+            fiscalizacao.setTipoInfracao(converterNomeTipoInfracao(fiscalizacaoDTO.getTipoInfracao()));
         }
 
-        defensor.setNumeroQuitacaoMilitar(fiscalizacaoDTO.getNumeroQuitacaoMilitar());
-        defensor.setNumeroQuitacaoEleitoral(fiscalizacaoDTO.getNumeroQuitacaoEleitoral());
-        defensor.setNumeroCertificadoCondutor(fiscalizacaoDTO.getNumeroCertificadoCondutor());
-        defensor.setNumeroInscricaoInss(fiscalizacaoDTO.getNumeroInscricaoInss());
+        fiscalizacao.setGrupoMultas(fiscalizacaoDTO.getGrupoMultas());
 
-        if(Objects.nonNull(certidaoNegativaCriminal))
-            defensor.setCertidaoNegativaCriminal(certidaoNegativaCriminal.getBytes());
-        if(Objects.nonNull(certidaoNegativaMunicipal))
-            defensor.setCertidaoNegativaMunicipal(certidaoNegativaMunicipal.getBytes());
-        if(Objects.nonNull(foto))
-            defensor.setFoto(foto.getBytes());
+        if(Objects.nonNull(fiscalizacaoDTO.getPrazoRegularizacao()) && !fiscalizacaoDTO.getPrazoRegularizacao().isEmpty()){
+            String data = fiscalizacaoDTO.getPrazoRegularizacao();
+            Integer indexChar = data.indexOf('T');
+            if(indexChar > 0){
+                data = data.substring(0, indexChar);
+                if(tipo == 1){
+                    fiscalizacao.setPrazoRegularizacao(LocalDate.parse(data));
+                }else{
+                    fiscalizacao.setPrazoRegularizacao(LocalDate.parse(data).minusDays(1));
+                }
+            }
+        }
+
+        if(tipo == 1){
+            fiscalizacao.setNaturezaInfracao(fiscalizacaoDTO.getNaturezaInfracao());
+        }else{
+            fiscalizacao.setNaturezaInfracao(converterNomeNaturezaInfracao(fiscalizacaoDTO.getNaturezaInfracao()));
+        }
+
+        if(tipo == 1){
+            fiscalizacao.setModalidade(fiscalizacaoDTO.getModalidade());
+        }else{
+            fiscalizacao.setModalidade(converterNomeModalidadeInfracao(fiscalizacaoDTO.getModalidade()));
+        }
+
+        if(tipo == 1){
+            fiscalizacao.setPenalidade(fiscalizacaoDTO.getPenalidade());
+        }else{
+            fiscalizacao.setPenalidade(converterNomePenalidadeInfracao(fiscalizacaoDTO.getPenalidade()));
+        }
 
         if(Objects.nonNull(fiscalizacaoDTO.getDataCriacao()) && !fiscalizacaoDTO.getDataCriacao().isEmpty())
-            defensor.setDataCriacao(LocalDate.parse(fiscalizacaoDTO.getDataCriacao()));
+            fiscalizacao.setDataCriacao(LocalDate.parse(fiscalizacaoDTO.getDataCriacao()));
         else
-            defensor.setDataCriacao(LocalDate.now());
+            fiscalizacao.setDataCriacao(LocalDate.now());
 
-        return  defensor;
+        fiscalizacao.setObservacao(fiscalizacaoDTO.getObservacao());
+        fiscalizacao.setStatus("ATIVO");
+
+        return  fiscalizacao;
     }
 
     public void salvarAuditoria(String modulo, String operacao, String usuario){
@@ -290,35 +308,144 @@ public class FiscalizacaoServiceImpl {
         auditoriaRepository.save(auditoria);
     }
 
-    public String converterIdCategoriaCnh(String categoria){
-        switch (categoria){
+    public String converterIdMotivoInfracao(String motivo){
+        switch (motivo){
             case "1":
-                return "B";
+                return "VEÍCULO IRREGULAR";
             case "2":
-                return "C";
+                return "VEÍCULO CLANDESTINO";
             case "3":
-                return "D";
-            case "4":
-                return "E";
+                return "VEÍCULO SEM TAXÍMETRO";
         }
 
         return "";
     }
 
-    public String converterNomeCategoriaCnh(String categoria){
-        switch (categoria){
-            case "B":
+    public String converterNomeMotivoInfracao(String motivo){
+        switch (motivo){
+            case "VEÍCULO IRREGULAR":
                 return "1";
-            case "C":
+            case "VEÍCULO CLANDESTINO":
                 return "2";
-            case "D":
+            case "VEÍCULO SEM TAXÍMETRO":
                 return "3";
-            case "E":
+        }
+
+        return "";
+    }
+
+    public String converterIdTipoInfracao(String tipo){
+        switch (tipo){
+            case "1":
+                return "DEVER";
+            case "2":
+                return "PROIBIÇÃO";
+        }
+
+        return "";
+    }
+
+    public String converterNomeTipoInfracao(String tipo){
+        switch (tipo){
+            case "DEVER":
+                return "1";
+            case "PROIBIÇÃO":
+                return "2";
+        }
+
+        return "";
+    }
+
+    public String converterIdNaturezaInfracao(String natureza){
+        switch (natureza){
+            case "1":
+                return "LEVE";
+            case "2":
+                return "MÉDIA";
+            case "3":
+                return "GRAVE";
+        }
+
+        return "";
+    }
+
+    public String converterNomeNaturezaInfracao(String natureza){
+        switch (natureza){
+            case "LEVE":
+                return "1";
+            case "MÉDIA":
+                return "2";
+            case "GRAVE":
+                return "3";
+        }
+
+        return "";
+    }
+
+    public String converterIdModalidadeInfracao(String modalidade){
+        switch (modalidade){
+            case "1":
+                return "PRIMÁRIA";
+            case "2":
+                return "REINCIDENTE";
+        }
+
+        return "";
+    }
+
+    public String converterNomeModalidadeInfracao(String modalidade){
+        switch (modalidade){
+            case "PRIMÁRIA":
+                return "1";
+            case "REINCIDENTE":
+                return "2";
+        }
+
+        return "";
+    }
+
+    public String converterIdPenalidadeInfracao(String modalidade){
+        switch (modalidade){
+            case "1":
+                return "ADVERTÊNCIA";
+            case "2":
+                return "MULTA";
+            case "3":
+                return "SUSPENSÃO";
+            case "4":
+                return "CASSAÇÃO";
+        }
+
+        return "";
+    }
+
+    public String converterNomePenalidadeInfracao(String modalidade){
+        switch (modalidade){
+            case "ADVERTÊNCIA":
+                return "1";
+            case "MULTA":
+                return "2";
+            case "SUSPENSÃO":
+                return "3";
+            case "CASSAÇÃO":
                 return "4";
         }
 
         return "";
-    }*/
+    }
+
+    public String converterIdCor(String cor){
+        switch (cor){
+            case "1":
+                return "BRANCO";
+            case "2":
+                return "PRATA";
+            case "3":
+                return "CINZA";
+        }
+
+        return "";
+    }
 
 }
 
