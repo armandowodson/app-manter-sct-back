@@ -1,9 +1,6 @@
 package com.projeto.produto.repository;
 
 import com.projeto.produto.entity.Fiscalizacao;
-import com.projeto.produto.entity.Permissao;
-import com.projeto.produto.entity.Veiculo;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -39,8 +36,5 @@ public interface FiscalizacaoRepository extends JpaRepository<Fiscalizacao,Integ
     List<Fiscalizacao> listarTodasFiscalizacoesFiltros(String placa, String nomePermissionario,
                                                        String motivoInfracao, String penalidade,
                                                        LocalDate dataFiscalizacao, Pageable pageable);
-    /*List<Fiscalizacao> listarTodasFiscalizacoesFiltros(String placa, String nomePermissionario,
-                                                       LocalDate dataFiscalizacao, String motivoInfracao,
-                                                       String penalidade, Pageable pageable);*/
 }
 

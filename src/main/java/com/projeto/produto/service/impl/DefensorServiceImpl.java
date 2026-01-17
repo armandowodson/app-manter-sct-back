@@ -52,10 +52,12 @@ public class DefensorServiceImpl {
             throw new RuntimeException("Dados inválidos/vazios para o Defensor!");
         }
 
-        if(Objects.nonNull(defensorRequestDTO.getCpfDefensor()) && !ValidaCPF.isCPF(defensorRequestDTO.getCpfDefensor()))
+        if(Objects.nonNull(defensorRequestDTO.getCpfDefensor()) && !defensorRequestDTO.getCpfDefensor().isEmpty() &&
+                !ValidaCPF.isCPF(defensorRequestDTO.getCpfDefensor()))
             throw new RuntimeException("O CPF " + defensorRequestDTO.getCpfDefensor() + " é inválido!");
 
-        if(Objects.nonNull(defensorRequestDTO.getCnpjEmpresa()) && !ValidaCNPJ.isCNPJ(defensorRequestDTO.getCnpjEmpresa()))
+        if(Objects.nonNull(defensorRequestDTO.getCnpjEmpresa()) && !defensorRequestDTO.getCnpjEmpresa().isEmpty() &&
+                !ValidaCNPJ.isCNPJ(defensorRequestDTO.getCnpjEmpresa()))
             throw new RuntimeException("O CNPJ " + defensorRequestDTO.getCnpjEmpresa() + " é inválido!");
 
         if(Objects.isNull(defensorRequestDTO.getUsuario()) || defensorRequestDTO.getUsuario().isEmpty())
@@ -90,10 +92,12 @@ public class DefensorServiceImpl {
             throw new RuntimeException("Dados inválidos/vazios para o Defensor!");
         }
 
-        if(!ValidaCPF.isCPF(defensorRequestDTO.getCpfDefensor()))
+        if(Objects.nonNull(defensorRequestDTO.getCpfDefensor()) && !defensorRequestDTO.getCpfDefensor().isEmpty() &&
+                !ValidaCPF.isCPF(defensorRequestDTO.getCpfDefensor()))
             throw new RuntimeException("O CPF " + defensorRequestDTO.getCpfDefensor() + " é inválido!");
 
-        if(Objects.nonNull(defensorRequestDTO.getCnpjEmpresa()) && !ValidaCNPJ.isCNPJ(defensorRequestDTO.getCnpjEmpresa()))
+        if(Objects.nonNull(defensorRequestDTO.getCnpjEmpresa()) && !defensorRequestDTO.getCnpjEmpresa().isEmpty() &&
+                !ValidaCNPJ.isCNPJ(defensorRequestDTO.getCnpjEmpresa()))
             throw new RuntimeException("O CNPJ " + defensorRequestDTO.getCnpjEmpresa() + " é inválido!");
 
         if(Objects.isNull(defensorRequestDTO.getUsuario()) || defensorRequestDTO.getUsuario().isEmpty())

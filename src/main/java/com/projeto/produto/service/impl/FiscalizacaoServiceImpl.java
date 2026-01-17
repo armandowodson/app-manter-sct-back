@@ -44,12 +44,12 @@ public class FiscalizacaoServiceImpl {
     public FiscalizacaoDTO inserirFiscalizacao(FiscalizacaoDTO fiscalizacaoDTO) {
         
         if (Objects.isNull(fiscalizacaoDTO.getIdVeiculo()) || Objects.isNull(fiscalizacaoDTO.getIdPermissionario()) ||
-                Objects.isNull(fiscalizacaoDTO.getDataFiscalizacao()) || Objects.isNull(fiscalizacaoDTO.getMotivoInfracao()) ||
-                Objects.isNull(fiscalizacaoDTO.getPrazoRegularizacao()) || Objects.isNull(fiscalizacaoDTO.getTipoInfracao()) ||
-                Objects.isNull(fiscalizacaoDTO.getNumeroPermissao()) || Objects.isNull(fiscalizacaoDTO.getGrupoMultas()) ||
-                Objects.isNull(fiscalizacaoDTO.getNaturezaInfracao()) || Objects.isNull(fiscalizacaoDTO.getModalidade()) ||
-                Objects.isNull(fiscalizacaoDTO.getPenalidade())) {
-            throw new RuntimeException("Dados inválidos para a Fiscalizacao!");
+            fiscalizacaoDTO.getDataFiscalizacao().isEmpty() || fiscalizacaoDTO.getMotivoInfracao().isEmpty() ||
+            fiscalizacaoDTO.getPrazoRegularizacao().isEmpty() || fiscalizacaoDTO.getTipoInfracao().isEmpty() ||
+            fiscalizacaoDTO.getNumeroPermissao().isEmpty() || fiscalizacaoDTO.getGrupoMultas().isEmpty() ||
+            fiscalizacaoDTO.getNaturezaInfracao().isEmpty() || fiscalizacaoDTO.getModalidade().isEmpty() ||
+            fiscalizacaoDTO.getPenalidade().isEmpty()) {
+                throw new RuntimeException("Dados inválidos/vazios para a Fiscalizacao!");
         }
 
         if(Objects.isNull(fiscalizacaoDTO.getUsuario()) || fiscalizacaoDTO.getUsuario().isEmpty())
@@ -72,12 +72,12 @@ public class FiscalizacaoServiceImpl {
     @Transactional
     public FiscalizacaoDTO atualizarFiscalizacao(FiscalizacaoDTO fiscalizacaoDTO) {
         if (Objects.isNull(fiscalizacaoDTO.getIdVeiculo()) || Objects.isNull(fiscalizacaoDTO.getIdPermissionario()) ||
-                Objects.isNull(fiscalizacaoDTO.getDataFiscalizacao()) || Objects.isNull(fiscalizacaoDTO.getMotivoInfracao()) ||
-                Objects.isNull(fiscalizacaoDTO.getPrazoRegularizacao()) || Objects.isNull(fiscalizacaoDTO.getTipoInfracao()) ||
-                Objects.isNull(fiscalizacaoDTO.getNumeroPermissao()) || Objects.isNull(fiscalizacaoDTO.getGrupoMultas()) ||
-                Objects.isNull(fiscalizacaoDTO.getNaturezaInfracao()) || Objects.isNull(fiscalizacaoDTO.getModalidade()) ||
-                Objects.isNull(fiscalizacaoDTO.getPenalidade())) {
-            throw new RuntimeException("Dados inválidos para a Fiscalização!");
+                fiscalizacaoDTO.getDataFiscalizacao().isEmpty() || fiscalizacaoDTO.getMotivoInfracao().isEmpty() ||
+                fiscalizacaoDTO.getPrazoRegularizacao().isEmpty() || fiscalizacaoDTO.getTipoInfracao().isEmpty() ||
+                fiscalizacaoDTO.getNumeroPermissao().isEmpty() || fiscalizacaoDTO.getGrupoMultas().isEmpty() ||
+                fiscalizacaoDTO.getNaturezaInfracao().isEmpty() || fiscalizacaoDTO.getModalidade().isEmpty() ||
+                fiscalizacaoDTO.getPenalidade().isEmpty()) {
+            throw new RuntimeException("Dados inválidos/vazios para a Fiscalizacao!");
         }
 
         if(Objects.isNull(fiscalizacaoDTO.getUsuario()) || fiscalizacaoDTO.getUsuario().isEmpty())

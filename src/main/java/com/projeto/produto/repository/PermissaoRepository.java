@@ -53,6 +53,7 @@ public interface PermissaoRepository extends JpaRepository<Permissao, Long> {
             value = "SELECT * " +
                     "FROM proj.permissao " +
                     "WHERE NUMERO_PERMISSAO IN (SELECT NUMERO_PERMISSAO FROM PROJ.PERMISSIONARIO) " +
+                    "AND NUMERO_PERMISSAO NOT IN (SELECT NUMERO_PERMISSAO FROM PROJ.DEFENSOR) " +
                     "AND STATUS = 'ATIVO' ",
             nativeQuery = true
     )
