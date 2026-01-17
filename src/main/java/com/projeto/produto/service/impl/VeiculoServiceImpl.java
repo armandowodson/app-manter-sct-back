@@ -47,20 +47,20 @@ public class VeiculoServiceImpl {
     public VeiculoResponseDTO inserirVeiculo(VeiculoRequestDTO veiculoRequestDTO,
                                              MultipartFile crlv,
                                              MultipartFile comprovanteVistoria) {
-        if (Objects.isNull(veiculoRequestDTO.getMarca()) || Objects.isNull(veiculoRequestDTO.getModelo()) ||
-                Objects.isNull(veiculoRequestDTO.getModelo()) || Objects.isNull(veiculoRequestDTO.getAnoModelo()) ||
-                Objects.isNull(veiculoRequestDTO.getCor()) || Objects.isNull(veiculoRequestDTO.getPlaca()) ||
-                Objects.isNull(veiculoRequestDTO.getChassi()) || Objects.isNull(veiculoRequestDTO.getRenavam()) ||
-                Objects.isNull(crlv) || Objects.isNull(comprovanteVistoria) || Objects.isNull(veiculoRequestDTO.getIdPermissionario()) ||
-                Objects.isNull(veiculoRequestDTO.getNumeroPermissao()) || Objects.isNull(veiculoRequestDTO.getIdPontoTaxi())) {
-            throw new RuntimeException("Dados inválidos para o Veículo!");
+        if (veiculoRequestDTO.getMarca().isEmpty() || veiculoRequestDTO.getModelo().isEmpty() ||
+            veiculoRequestDTO.getModelo().isEmpty() || veiculoRequestDTO.getAnoModelo().isEmpty() ||
+            veiculoRequestDTO.getCor().isEmpty() || veiculoRequestDTO.getPlaca().isEmpty() ||
+            veiculoRequestDTO.getChassi().isEmpty() || veiculoRequestDTO.getRenavam().isEmpty() ||
+            Objects.isNull(crlv) || comprovanteVistoria.isEmpty() || veiculoRequestDTO.getIdPermissionario() == 0 ||
+            veiculoRequestDTO.getNumeroPermissao().isEmpty() || veiculoRequestDTO.getIdPontoTaxi() == 0) {
+            throw new RuntimeException("Dados inválidos/vazios para o Veículo!");
         }
         if(Objects.isNull(veiculoRequestDTO.getUsuario()) || veiculoRequestDTO.getUsuario().isEmpty())
-            throw new RuntimeException("Usuário vazio ou não identificado!");
+            throw new RuntimeException("Usuário não logado ou não identificado!");
 
         Veiculo veiculo = new Veiculo();
         try{
-            veiculo = converterVeiculoDTOToVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria);
+            veiculo = converterVeiculoDTOToVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria, 1);
             veiculo.setDataCriacao(LocalDate.now());
             veiculo = veiculoRepository.save(veiculo);
 
@@ -77,21 +77,21 @@ public class VeiculoServiceImpl {
     public VeiculoResponseDTO atualizarVeiculo(VeiculoRequestDTO veiculoRequestDTO,
                                                MultipartFile crlv,
                                                MultipartFile comprovanteVistoria) {
-        if (Objects.isNull(veiculoRequestDTO.getMarca()) || Objects.isNull(veiculoRequestDTO.getModelo()) ||
-                Objects.isNull(veiculoRequestDTO.getModelo()) || Objects.isNull(veiculoRequestDTO.getAnoModelo()) ||
-                Objects.isNull(veiculoRequestDTO.getCor()) || Objects.isNull(veiculoRequestDTO.getPlaca()) ||
-                Objects.isNull(veiculoRequestDTO.getChassi()) || Objects.isNull(veiculoRequestDTO.getRenavam()) ||
-                Objects.isNull(crlv) || Objects.isNull(comprovanteVistoria) || Objects.isNull(veiculoRequestDTO.getIdPermissionario()) ||
-                Objects.isNull(veiculoRequestDTO.getNumeroPermissao()) || Objects.isNull(veiculoRequestDTO.getIdPontoTaxi())) {
-            throw new RuntimeException("Dados inválidos para o Veículo!");
+        if (veiculoRequestDTO.getMarca().isEmpty() || veiculoRequestDTO.getModelo().isEmpty() ||
+            veiculoRequestDTO.getModelo().isEmpty() || veiculoRequestDTO.getAnoModelo().isEmpty() ||
+            veiculoRequestDTO.getCor().isEmpty() || veiculoRequestDTO.getPlaca().isEmpty() ||
+            veiculoRequestDTO.getChassi().isEmpty() || veiculoRequestDTO.getRenavam().isEmpty() ||
+            veiculoRequestDTO.getIdPermissionario() == 0 || veiculoRequestDTO.getNumeroPermissao().isEmpty() ||
+            veiculoRequestDTO.getIdPontoTaxi() == 0) {
+                throw new RuntimeException("Dados inválidos/vazios para o Veículo!");
         }
 
         if(Objects.isNull(veiculoRequestDTO.getUsuario()) || veiculoRequestDTO.getUsuario().isEmpty())
-            throw new RuntimeException("Usuário vazio ou não identificado!");
+            throw new RuntimeException("Usuário não logado ou não identificado!");
 
         Veiculo veiculo = new Veiculo();
         try{
-            veiculo = converterVeiculoDTOToVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria);
+            veiculo = converterVeiculoDTOToVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria, 2);
 
             //Auditoria
             salvarAuditoria("VEÍCULO TÁXI", "ALTERAÇÃO", veiculoRequestDTO.getUsuario());
@@ -167,10 +167,10 @@ public class VeiculoServiceImpl {
     public ResponseEntity<Void> excluirVeiculo(Long idVeiculo, String usuario) {
         try{
             if(Objects.isNull(usuario) || usuario.isEmpty())
-                throw new RuntimeException("Usuário vazio ou não identificado!");
+                throw new RuntimeException("Usuário não logado ou não identificado!");
 
             Veiculo veiculo = veiculoRepository.findVeiculoByIdVeiculo(idVeiculo);
-            veiculo.setStatus("INATVIO");
+            veiculo.setStatus("INATIVO");
             veiculoRepository.save(veiculo);
 
             //Auditoria
@@ -230,7 +230,8 @@ public class VeiculoServiceImpl {
 
     public Veiculo converterVeiculoDTOToVeiculo(VeiculoRequestDTO veiculoRequestDTO,
                                                 MultipartFile crlv,
-                                                MultipartFile comprovanteVistoria) throws IOException {
+                                                MultipartFile comprovanteVistoria,
+                                                Integer tipo) throws IOException {
         Veiculo veiculo = new Veiculo();
         if (veiculoRequestDTO.getIdVeiculo() != null && veiculoRequestDTO.getIdVeiculo() != 0){
             veiculo = veiculoRepository.findVeiculoByIdVeiculo(veiculoRequestDTO.getIdVeiculo());
@@ -246,10 +247,14 @@ public class VeiculoServiceImpl {
         veiculo.setMarca(veiculoRequestDTO.getMarca());
         veiculo.setModelo(veiculoRequestDTO.getModelo());
         veiculo.setAnoModelo(veiculoRequestDTO.getAnoModelo());
-        veiculo.setCor(veiculoRequestDTO.getCor());
+
+        if(tipo == 1){
+            veiculo.setCor(veiculoRequestDTO.getCor());
+        }else{
+            veiculo.setCor(converterNomeCor(veiculoRequestDTO.getCor()));
+        }
+
         veiculo.setCombustivel(veiculoRequestDTO.getCombustivel());
-        if(Objects.nonNull(crlv))
-            veiculo.setCrlv(crlv.getBytes());
         veiculo.setNumeroTaximetro(veiculoRequestDTO.getNumeroTaximetro());
         veiculo.setAnoRenovacao(veiculoRequestDTO.getAnoRenovacao());
 
@@ -277,8 +282,11 @@ public class VeiculoServiceImpl {
             }
         }
 
+        if(Objects.nonNull(crlv))
+            veiculo.setCrlv(crlv.getBytes());
         if(Objects.nonNull(comprovanteVistoria))
             veiculo.setComprovanteVistoria(comprovanteVistoria.getBytes());
+
         veiculo.setSituacaoVeiculo(veiculoRequestDTO.getSituacaoVeiculo());
         veiculo.setTipoVeiculo(veiculoRequestDTO.getTipoVeiculo());
 
@@ -304,5 +312,65 @@ public class VeiculoServiceImpl {
         auditoria.setUsuarioOperacao(usuario);
         auditoria.setDataOperacao(LocalDate.now());
         auditoriaRepository.save(auditoria);
+    }
+
+    public String converterNomeCor(String cor){
+        switch (cor){
+            case "BRANCO":
+                return "1";
+            case "PRATA":
+                return "2";
+            case "CINZA":
+                return "3";
+        }
+
+        return "";
+    }
+
+    public String converterIdCor(String cor){
+        switch (cor){
+            case "1":
+                return "BRANCO";
+            case "2":
+                return "PRATA";
+            case "3":
+                return "CINZA";
+        }
+
+        return "";
+    }
+
+    public String converterNomeCombustive(String combustivel){
+        switch (combustivel){
+            case "GASOLINA":
+                return "1";
+            case "ÁLCOOL/ETANOL":
+                return "2";
+            case "DIESEL":
+                return "3";
+            case "GÁS NATURAL":
+                return "4";
+            case "ELETRICIDADE":
+                return "5";
+        }
+
+        return "";
+    }
+
+    public String converterIdCombustive(String combustivel){
+        switch (combustivel){
+            case "1":
+                return "GASOLINA";
+            case "2":
+                return "ÁLCOOL/ETANOL";
+            case "3":
+                return "DIESEL";
+            case "4":
+                return "GÁS NATURAL";
+            case "5":
+                return "ELETRICIDADE";
+        }
+
+        return "";
     }
 }

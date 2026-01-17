@@ -31,16 +31,20 @@ public class PontosTaxiServiceImpl {
 
     @Transactional
     public PontoTaxiDTO inserirPontoTaxi(PontoTaxiDTO pontoTaxiDTO) {
-        if (Objects.isNull(pontoTaxiDTO.getDescricaoPonto()) || Objects.isNull(pontoTaxiDTO.getNumeroPonto())) {
-            throw new RuntimeException("Dados inválidos para o Ponto de Estacionamento de Táxi!");
+        if (pontoTaxiDTO.getDescricaoPonto().isEmpty() || pontoTaxiDTO.getNumeroPonto().isEmpty()) {
+            throw new RuntimeException("Dados inválidos/vazios para o Ponto de Estacionamento de Táxi!");
         }
 
         if(Objects.isNull(pontoTaxiDTO.getUsuario()) || pontoTaxiDTO.getUsuario().isEmpty())
-            throw new RuntimeException("Usuário vazio ou não identificado!");
+            throw new RuntimeException("Usuário não logado ou não identificado!");
+
+        PontoTaxi pontoTaxiExiste = pontosTaxiRepository.findPontoTaxiByNumeroPonto(pontoTaxiDTO.getNumeroPonto());
+        if(Objects.nonNull(pontoTaxiExiste))
+            throw new RuntimeException("O Ponto de Nº " + pontoTaxiDTO.getNumeroPonto() + " já existe!");
 
         PontoTaxi pontoTaxi = new PontoTaxi();
         try{
-            pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO);
+            pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO, 1);
             pontoTaxi.setDataCriacao(LocalDate.now());
             pontoTaxi = pontosTaxiRepository.save(pontoTaxi);
 
@@ -55,16 +59,16 @@ public class PontosTaxiServiceImpl {
 
     @Transactional
     public PontoTaxiDTO atualizarPontoTaxi(PontoTaxiDTO pontoTaxiDTO) {
-        if (Objects.isNull(pontoTaxiDTO.getDescricaoPonto()) || Objects.isNull(pontoTaxiDTO.getNumeroPonto())) {
+        if (pontoTaxiDTO.getDescricaoPonto().isEmpty() || pontoTaxiDTO.getNumeroPonto().isEmpty()) {
             throw new RuntimeException("Dados inválidos para o Ponto de Estacionamento de Táxi!");
         }
 
         if(Objects.isNull(pontoTaxiDTO.getUsuario()) || pontoTaxiDTO.getUsuario().isEmpty())
-            throw new RuntimeException("Usuário vazio ou não identificado!");
+            throw new RuntimeException("Usuário não logado ou não identificado!");
 
         PontoTaxi pontoTaxi = new PontoTaxi();
         try{
-            pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO);
+            pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO, 2);
             pontoTaxi = pontosTaxiRepository.save(pontoTaxi);
             //Auditoria
             salvarAuditoria("PONTO DE ESTACIONAMENTO DE TÁXI", "ALTERAÇÃO", pontoTaxiDTO.getUsuario());
@@ -137,7 +141,7 @@ public class PontosTaxiServiceImpl {
     public ResponseEntity<Void> excluirPontoTaxi(Long idPontoTaxi, String usuario) {
         try{
             if(Objects.isNull(usuario) || usuario.isEmpty())
-                throw new RuntimeException("Usuário vazio ou não identificado!");
+                throw new RuntimeException("Usuário não logado ou não identificado!");
 
             PontoTaxi pontoTaxi = pontosTaxiRepository.findByIdPontoTaxi(idPontoTaxi);
             pontoTaxi.setStatus("INATIVO");
@@ -172,13 +176,14 @@ public class PontosTaxiServiceImpl {
         pontoTaxiDTO.setReferenciaPonto(pontoTaxi.getReferenciaPonto());
         pontoTaxiDTO.setFatorRotatividade(pontoTaxi.getFatorRotatividade());
         pontoTaxiDTO.setNumeroVagas(pontoTaxi.getNumeroVagas());
+        pontoTaxiDTO.setModalidade(pontoTaxi.getModalidade());
         pontoTaxiDTO.setDataCriacao(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(pontoTaxi.getDataCriacao()));
         pontoTaxiDTO.setStatus(pontoTaxi.getStatus());
 
         return  pontoTaxiDTO;
     }
 
-    public PontoTaxi converterPontoTaxiDTOToPontoTaxi(PontoTaxiDTO pontoTaxiDTO){
+    public PontoTaxi converterPontoTaxiDTOToPontoTaxi(PontoTaxiDTO pontoTaxiDTO, Integer tipo){
         PontoTaxi pontoTaxi = new PontoTaxi();
         if (pontoTaxiDTO.getIdPontoTaxi() != null && pontoTaxiDTO.getIdPontoTaxi() != 0){
             pontoTaxi = pontosTaxiRepository.findByIdPontoTaxi(pontoTaxiDTO.getIdPontoTaxi());
@@ -188,6 +193,13 @@ public class PontosTaxiServiceImpl {
         pontoTaxi.setReferenciaPonto(pontoTaxiDTO.getReferenciaPonto());
         pontoTaxi.setFatorRotatividade(pontoTaxiDTO.getFatorRotatividade());
         pontoTaxi.setNumeroVagas(pontoTaxiDTO.getNumeroVagas());
+
+        if(tipo == 1){
+            pontoTaxi.setModalidade(pontoTaxiDTO.getModalidade());
+        }else{
+            pontoTaxi.setModalidade(converterNomeModalidade(pontoTaxiDTO.getModalidade()));
+        }
+
         pontoTaxi.setStatus("ATIVO");
 
         return  pontoTaxi;
@@ -200,5 +212,31 @@ public class PontosTaxiServiceImpl {
         auditoria.setUsuarioOperacao(usuario);
         auditoria.setDataOperacao(LocalDate.now());
         auditoriaRepository.save(auditoria);
+    }
+
+    public String converterIdModalidadePermissao(String modalidade){
+        switch (modalidade){
+            case "1":
+                return "FIXO";
+            case "2":
+                return "ROTATIVO";
+            case "3":
+                return "FIXO-ROTATIVO";
+        }
+
+        return "";
+    }
+
+    public String converterNomeModalidade(String modalidade){
+        switch (modalidade){
+            case "FIXO":
+                return "1";
+            case "ROTATIVO":
+                return "2";
+            case "FIXO-ROTATIVO":
+                return "3";
+        }
+
+        return "";
     }
 }

@@ -45,21 +45,21 @@ public class DefensorServiceImpl {
                                                    MultipartFile certidaoNegativaCriminal,
                                                    MultipartFile certidaoNegativaMunicipal,
                                                    MultipartFile foto) throws IOException {
-        if (Objects.isNull(defensorRequestDTO.getNomeDefensor()) || Objects.isNull(defensorRequestDTO.getCpfDefensor()) ||
-                Objects.isNull(defensorRequestDTO.getRgDefensor()) || Objects.isNull(defensorRequestDTO.getCnhDefensor()) ||
-                Objects.isNull(defensorRequestDTO.getEnderecoDefensor()) || Objects.isNull(defensorRequestDTO.getCelularDefensor()) ||
-                Objects.isNull(defensorRequestDTO.getNumeroPermissao())) {
-            throw new RuntimeException("Dados inválidos para o Defensor!");
+        if (defensorRequestDTO.getNomeDefensor().isEmpty() || defensorRequestDTO.getCpfDefensor().isEmpty() ||
+            defensorRequestDTO.getRgDefensor().isEmpty() || defensorRequestDTO.getCnhDefensor().isEmpty() ||
+            defensorRequestDTO.getEnderecoDefensor().isEmpty() || defensorRequestDTO.getCelularDefensor().isEmpty() ||
+            defensorRequestDTO.getNumeroPermissao().isEmpty()) {
+            throw new RuntimeException("Dados inválidos/vazios para o Defensor!");
         }
 
-        if(!ValidaCPF.isCPF(defensorRequestDTO.getCpfDefensor()))
+        if(Objects.nonNull(defensorRequestDTO.getCpfDefensor()) && !ValidaCPF.isCPF(defensorRequestDTO.getCpfDefensor()))
             throw new RuntimeException("O CPF " + defensorRequestDTO.getCpfDefensor() + " é inválido!");
 
         if(Objects.nonNull(defensorRequestDTO.getCnpjEmpresa()) && !ValidaCNPJ.isCNPJ(defensorRequestDTO.getCnpjEmpresa()))
             throw new RuntimeException("O CNPJ " + defensorRequestDTO.getCnpjEmpresa() + " é inválido!");
 
         if(Objects.isNull(defensorRequestDTO.getUsuario()) || defensorRequestDTO.getUsuario().isEmpty())
-            throw new RuntimeException("Usuário vazio ou não identificado!");
+            throw new RuntimeException("Usuário não logado ou não identificado!");
 
         Defensor defensor = new Defensor();
         try {
@@ -83,11 +83,11 @@ public class DefensorServiceImpl {
                                                  MultipartFile certidaoNegativaCriminal,
                                                  MultipartFile certidaoNegativaMunicipal,
                                                  MultipartFile foto) throws IOException {
-        if (Objects.isNull(defensorRequestDTO.getNomeDefensor()) || Objects.isNull(defensorRequestDTO.getCpfDefensor()) ||
-                Objects.isNull(defensorRequestDTO.getRgDefensor()) || Objects.isNull(defensorRequestDTO.getCnhDefensor()) ||
-                Objects.isNull(defensorRequestDTO.getEnderecoDefensor()) || Objects.isNull(defensorRequestDTO.getCelularDefensor()) ||
-                Objects.isNull(defensorRequestDTO.getNumeroPermissao())) {
-            throw new RuntimeException("Dados inválidos para o Defensor!");
+        if (defensorRequestDTO.getNomeDefensor().isEmpty() || defensorRequestDTO.getCpfDefensor().isEmpty() ||
+                defensorRequestDTO.getRgDefensor().isEmpty() || defensorRequestDTO.getCnhDefensor().isEmpty() ||
+                defensorRequestDTO.getEnderecoDefensor().isEmpty() || defensorRequestDTO.getCelularDefensor().isEmpty() ||
+                defensorRequestDTO.getNumeroPermissao().isEmpty()) {
+            throw new RuntimeException("Dados inválidos/vazios para o Defensor!");
         }
 
         if(!ValidaCPF.isCPF(defensorRequestDTO.getCpfDefensor()))
@@ -97,7 +97,7 @@ public class DefensorServiceImpl {
             throw new RuntimeException("O CNPJ " + defensorRequestDTO.getCnpjEmpresa() + " é inválido!");
 
         if(Objects.isNull(defensorRequestDTO.getUsuario()) || defensorRequestDTO.getUsuario().isEmpty())
-            throw new RuntimeException("Usuário vazio ou não identificado!");
+            throw new RuntimeException("Usuário não logado ou não identificado!");
 
         Defensor defensor = new Defensor();
         try{
@@ -180,7 +180,7 @@ public class DefensorServiceImpl {
         String msgErro = "Erro ao Excluir o Defensor!!";
         try{
             if(Objects.isNull(usuario) || usuario.isEmpty())
-                throw new RuntimeException("Usuário vazio ou não identificado!");
+                throw new RuntimeException("Usuário não logado ou não identificado!");
 
             Defensor defensor = defensorRepository.findDefensorByIdDefensor(idDefensor);
             defensor.setStatus("INATIVO");

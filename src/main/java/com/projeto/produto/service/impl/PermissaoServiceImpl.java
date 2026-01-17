@@ -36,44 +36,54 @@ public class PermissaoServiceImpl {
 
     @Transactional
     public PermissaoDTO inserirPermissao(PermissaoDTO permissaoDTO) {
-        if (Objects.isNull(permissaoDTO.getNumeroPermissao()) || Objects.isNull(permissaoDTO.getNumeroAlvara()) ||
-                Objects.isNull(permissaoDTO.getAnoAlvara()) || Objects.isNull(permissaoDTO.getCategoriaPermissao()) ||
-                Objects.isNull(permissaoDTO.getStatusPermissao()) || Objects.isNull(permissaoDTO.getDataValidadePermissao()) ||
-                Objects.isNull(permissaoDTO.getPeriodoInicialStatus()) || Objects.isNull(permissaoDTO.getPeriodoFinalStatus())) {
-            throw new RuntimeException("Campos inválidos/vazios para a Permissão!");
+        if (permissaoDTO.getNumeroPermissao().isEmpty() || permissaoDTO.getNumeroAlvara().isEmpty() ||
+            permissaoDTO.getAnoAlvara().isEmpty() || permissaoDTO.getCategoriaPermissao().isEmpty() ||
+            permissaoDTO.getStatusPermissao().isEmpty() || permissaoDTO.getDataValidadePermissao().isEmpty() ||
+            permissaoDTO.getPeriodoInicialStatus().isEmpty() || permissaoDTO.getPeriodoFinalStatus().isEmpty()) {
+                throw new RuntimeException("Campos inválidos/vazios para a Permissão!");
         }
 
         if(Objects.isNull(permissaoDTO.getUsuario()) || permissaoDTO.getUsuario().isEmpty())
-            throw new RuntimeException("Usuário vazio ou não identificado!");
+            throw new RuntimeException("Usuário não logado ou não identificado!");
 
-        Permissao permissao = converterPermissaoDTOToPermissao(permissaoDTO, 1);
-        permissao = permissaoRepository.save(permissao);
+        Permissao permissao = new Permissao();
 
-        //Auditoria
-        salvarAuditoria("PERMISSÃO", "INCLUSÃO", permissaoDTO.getUsuario());
-        return converterPermissaoToPermissaoDTO(permissao);
+        try{
+            permissao = converterPermissaoDTOToPermissao(permissaoDTO, 1);
+            permissao = permissaoRepository.save(permissao);
+
+            //Auditoria
+            salvarAuditoria("PERMISSÃO", "INCLUSÃO", permissaoDTO.getUsuario());
+
+            return converterPermissaoToPermissaoDTO(permissao);
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível inserir os dados da Permissão!");
+        }
     }
 
     @Transactional
     public PermissaoDTO atualizarPermissao(PermissaoDTO permissaoDTO) {
-        if (Objects.isNull(permissaoDTO.getNumeroPermissao()) || Objects.isNull(permissaoDTO.getNumeroAlvara()) ||
-                Objects.isNull(permissaoDTO.getAnoAlvara()) || Objects.isNull(permissaoDTO.getCategoriaPermissao()) ||
-                Objects.isNull(permissaoDTO.getStatusPermissao()) || Objects.isNull(permissaoDTO.getDataValidadePermissao())) {
+        if (permissaoDTO.getNumeroPermissao().isEmpty() || permissaoDTO.getNumeroAlvara().isEmpty() ||
+                permissaoDTO.getAnoAlvara().isEmpty() || permissaoDTO.getCategoriaPermissao().isEmpty() ||
+                permissaoDTO.getStatusPermissao().isEmpty() || permissaoDTO.getDataValidadePermissao().isEmpty() ||
+                permissaoDTO.getPeriodoInicialStatus().isEmpty() || permissaoDTO.getPeriodoFinalStatus().isEmpty()) {
             throw new RuntimeException("Campos inválidos/vazios para a Permissão!");
         }
 
         if(Objects.isNull(permissaoDTO.getUsuario()) || permissaoDTO.getUsuario().isEmpty())
-            throw new RuntimeException("Usuário vazio ou não identificado!");
+            throw new RuntimeException("Usuário não logado ou não identificado!");
 
-        Permissao permissaoExiste = permissaoRepository.findByNumeroPermissao(permissaoDTO.getNumeroPermissao());
-        if(Objects.nonNull(permissaoExiste) && Objects.nonNull(permissaoExiste.getIdPermissao()))
-            throw new RuntimeException("Já existe o Nº de Permissão: " + permissaoExiste.getIdPermissao() + " informado!" );
+        Permissao permissao = new Permissao();
+        try{
+            permissao =  converterPermissaoDTOToPermissao(permissaoDTO, 2);
+            permissao = permissaoRepository.save(permissao);
+            //Auditoria
+            salvarAuditoria("PERMISSÃO", "ALTERAÇÃO", permissaoDTO.getUsuario());
 
-        Permissao permissao = converterPermissaoDTOToPermissao(permissaoDTO, 2);
-        permissao = permissaoRepository.save(permissao);
-        //Auditoria
-        salvarAuditoria("PERMISSÃO", "ALTERAÇÃO", permissaoDTO.getUsuario());
-        return converterPermissaoToPermissaoDTO(permissao);
+            return converterPermissaoToPermissaoDTO(permissao);
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível alterar os dados da Permissão!");
+        }
     }
 
     public Page<PermissaoDTO> listarTodosPermissao(PageRequest pageRequest) {
@@ -167,17 +177,37 @@ public class PermissaoServiceImpl {
         return listaPermissaoDTO;
     }
 
+    public List<PermissaoDTO> listarPermissoesDisponiveisDefensor(String numeroPermissao) {
+        List<PermissaoDTO> listaPermissaoDTO = new ArrayList<>();
+        List<Permissao> listaPermissao = permissaoRepository.listarPermissaoDisponiveisDefensor();
+        if(Objects.nonNull(numeroPermissao)){
+            Permissao permissao = permissaoRepository.findPermissaoByNumeroPermissao(numeroPermissao);
+            PermissaoDTO permissaoDTORetornado = converterPermissaoToPermissaoDTO(permissao);
+            listaPermissaoDTO.add(permissaoDTORetornado);
+        }
+
+        if (!listaPermissao.isEmpty()){
+            for (Permissao permissaoDisponivel : listaPermissao) {
+                PermissaoDTO permissaoDTORetornado = converterPermissaoToPermissaoDTO(permissaoDisponivel);
+                listaPermissaoDTO.add(permissaoDTORetornado);
+            }
+        }
+
+        return listaPermissaoDTO;
+    }
+
     @Transactional
     public ResponseEntity<Void> excluirPermissao(Long idPermissao, String usuario) {
         try{
             if(Objects.isNull(usuario) || usuario.isEmpty())
-                throw new RuntimeException("Usuário vazio ou não identificado!");
+                throw new RuntimeException("Usuário não logado ou não identificado!");
 
             Permissao permissao = permissaoRepository.findPermissaoByIdPermissao(idPermissao);
             if(permissaoRepository.verificarPermissoaExistente(permissao.getNumeroPermissao()) > 0)
                 throw new RuntimeException("Não é possível realizar a exclusão. A Permissão de Nº " + permissao.getNumeroPermissao() +
                         " está sendo utilizada por um Permissionário!");
 
+            permissao.setStatusPermissao("8");
             permissao.setStatus("INATIVO");
             permissaoRepository.save(permissao);
 
@@ -234,6 +264,7 @@ public class PermissaoServiceImpl {
         permissaoDTO.setAutorizacaoTrafego(permissao.getAutorizacaoTrafego());
 
         permissaoDTO.setDataCriacao(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataCriacao()));
+        permissaoDTO.setStatus(permissao.getStatus());
 
         return  permissaoDTO;
     }

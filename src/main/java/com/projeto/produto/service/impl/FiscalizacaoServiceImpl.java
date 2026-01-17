@@ -53,7 +53,7 @@ public class FiscalizacaoServiceImpl {
         }
 
         if(Objects.isNull(fiscalizacaoDTO.getUsuario()) || fiscalizacaoDTO.getUsuario().isEmpty())
-            throw new RuntimeException("Usuário vazio ou não identificado!");
+            throw new RuntimeException("Usuário não logado ou não identificado!");
 
         Fiscalizacao fiscalizacao = new Fiscalizacao();
         try {
@@ -81,7 +81,7 @@ public class FiscalizacaoServiceImpl {
         }
 
         if(Objects.isNull(fiscalizacaoDTO.getUsuario()) || fiscalizacaoDTO.getUsuario().isEmpty())
-            throw new RuntimeException("Usuário vazio ou não identificado!");
+            throw new RuntimeException("Usuário não logado ou não identificado!");
 
         Fiscalizacao fiscalizacao = new Fiscalizacao();
         try{
@@ -155,7 +155,7 @@ public class FiscalizacaoServiceImpl {
         String msgErro = "Erro ao Excluir a Fiscalização!!";
         try{
             if(Objects.isNull(usuario) || usuario.isEmpty())
-                throw new RuntimeException("Usuário vazio ou não identificado!");
+                throw new RuntimeException("Usuário não logado ou não identificado!");
 
             Fiscalizacao fiscalizacao = fiscalizacaoRepository.findFiscalizacaoByIdFiscalizacao(idFiscalizacao);
             fiscalizacao.setStatus("INATIVO");

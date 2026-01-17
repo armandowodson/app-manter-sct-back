@@ -87,7 +87,7 @@ public class PermissionarioController {
 
     @PostMapping("/alterar")
     public ResponseEntity<PermissionarioResponseDTO> atualizarPermissionario(@RequestParam("permissionario") String permissionario,
-                                                                             @RequestParam("certificadoCondutor") MultipartFile certificadoCondutor,
+                                                                             @RequestParam(value = "certificadoCondutor", required = false) MultipartFile certificadoCondutor,
                                                                              @RequestParam(value = "certidaoNegativaCriminal", required = false) MultipartFile certidaoNegativaCriminal,
                                                                              @RequestParam(value = "certidaoNegativaMunicipal", required = false) MultipartFile certidaoNegativaMunicipal,
                                                                              @RequestParam(value = "foto", required = false) MultipartFile foto) throws IOException {

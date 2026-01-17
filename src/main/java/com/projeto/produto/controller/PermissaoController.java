@@ -60,9 +60,19 @@ public class PermissaoController {
         return ResponseEntity.ok(service.listarPermissoesDisponiveis(null));
     }
 
+    @GetMapping("/buscar-disponiveis-defensor")
+    public ResponseEntity<List<PermissaoDTO>> buscarPermissoesDisponiveisDefensor() {
+        return ResponseEntity.ok(service.listarPermissoesDisponiveisDefensor(null));
+    }
+
     @GetMapping("/buscar-disponiveis/{numeroPermissao}")
     public ResponseEntity<List<PermissaoDTO>> buscarPermissoesDisponiveisAlteracao(@PathVariable String numeroPermissao) {
         return ResponseEntity.ok(service.listarPermissoesDisponiveis(numeroPermissao));
+    }
+
+    @GetMapping("/buscar-disponiveis-defensor/{numeroPermissao}")
+    public ResponseEntity<List<PermissaoDTO>> buscarPermissoesDisponiveisAlteracaoDefensor(@PathVariable String numeroPermissao) {
+        return ResponseEntity.ok(service.listarPermissoesDisponiveisDefensor(numeroPermissao));
     }
 
     @PostMapping("/inserir")

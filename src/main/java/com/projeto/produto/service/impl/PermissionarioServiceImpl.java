@@ -44,22 +44,24 @@ public class PermissionarioServiceImpl {
                                                                MultipartFile certificadoCondutor,
                                                                MultipartFile certidaoNegativaCriminal,
                                                                MultipartFile certidaoNegativaMunicipal,
-                                                               MultipartFile foto) throws IOException {
-        if (Objects.isNull(permissionarioRequestDTO.getNomePermissionario()) || Objects.isNull(permissionarioRequestDTO.getCpfPermissionario()) ||
-                Objects.isNull(permissionarioRequestDTO.getRgPermissionario()) || Objects.isNull(permissionarioRequestDTO.getCnhPermissionario()) ||
-                Objects.isNull(permissionarioRequestDTO.getEnderecoPermissionario()) || Objects.isNull(permissionarioRequestDTO.getCelularPermissionario()) ||
-                Objects.isNull(permissionarioRequestDTO.getNumeroPermissao())) {
-            throw new RuntimeException("Dados inválidos para o Permissionário/Proprietário!");
+                                                               MultipartFile foto) {
+        if (permissionarioRequestDTO.getNomePermissionario().isEmpty() || permissionarioRequestDTO.getCpfPermissionario().isEmpty() ||
+            permissionarioRequestDTO.getRgPermissionario().isEmpty() || permissionarioRequestDTO.getCnhPermissionario().isEmpty() ||
+            permissionarioRequestDTO.getEnderecoPermissionario().isEmpty() || permissionarioRequestDTO.getCelularPermissionario().isEmpty() ||
+            permissionarioRequestDTO.getNumeroPermissao().isEmpty()) {
+                throw new RuntimeException("Dados inválidos para o Permissionário/Proprietário!");
         }
 
-        if(!ValidaCPF.isCPF(permissionarioRequestDTO.getCpfPermissionario()))
+        if(Objects.nonNull(permissionarioRequestDTO.getCpfPermissionario()) && !permissionarioRequestDTO.getCpfPermissionario().isEmpty() &&
+                !ValidaCPF.isCPF(permissionarioRequestDTO.getCpfPermissionario()))
             throw new RuntimeException("O CPF " + permissionarioRequestDTO.getCpfPermissionario() + " é inválido!");
 
-        if(Objects.nonNull(permissionarioRequestDTO.getCnpjEmpresa()) && !ValidaCNPJ.isCNPJ(permissionarioRequestDTO.getCnpjEmpresa()))
+        if(Objects.nonNull(permissionarioRequestDTO.getCnpjEmpresa()) && !permissionarioRequestDTO.getCnpjEmpresa().isEmpty() &&
+                !ValidaCNPJ.isCNPJ(permissionarioRequestDTO.getCnpjEmpresa()))
             throw new RuntimeException("O CNPJ " + permissionarioRequestDTO.getCnpjEmpresa() + " é inválido!");
 
         if(Objects.isNull(permissionarioRequestDTO.getUsuario()) || permissionarioRequestDTO.getUsuario().isEmpty())
-            throw new RuntimeException("Usuário vazio ou não identificado!");
+            throw new RuntimeException("Usuário não logado ou não identificado!");
 
         Permissionario permissionario = new Permissionario();
         try{
@@ -82,22 +84,24 @@ public class PermissionarioServiceImpl {
                                                              MultipartFile certificadoCondutor,
                                                              MultipartFile certidaoNegativaCriminal,
                                                              MultipartFile certidaoNegativaMunicipal,
-                                                             MultipartFile foto) throws IOException {
-        if (Objects.isNull(permissionarioRequestDTO.getNomePermissionario()) || Objects.isNull(permissionarioRequestDTO.getCpfPermissionario()) ||
-                Objects.isNull(permissionarioRequestDTO.getRgPermissionario()) || Objects.isNull(permissionarioRequestDTO.getCnhPermissionario()) ||
-                Objects.isNull(permissionarioRequestDTO.getEnderecoPermissionario()) || Objects.isNull(permissionarioRequestDTO.getCelularPermissionario()) ||
-                Objects.isNull(permissionarioRequestDTO.getNumeroPermissao())) {
+                                                             MultipartFile foto) {
+        if (permissionarioRequestDTO.getNomePermissionario().isEmpty() || permissionarioRequestDTO.getCpfPermissionario().isEmpty() ||
+                permissionarioRequestDTO.getRgPermissionario().isEmpty() || permissionarioRequestDTO.getCnhPermissionario().isEmpty() ||
+                permissionarioRequestDTO.getEnderecoPermissionario().isEmpty() || permissionarioRequestDTO.getCelularPermissionario().isEmpty() ||
+                permissionarioRequestDTO.getNumeroPermissao().isEmpty()) {
             throw new RuntimeException("Dados inválidos para o Permissionário/Proprietário!");
         }
 
-        if(!ValidaCPF.isCPF(permissionarioRequestDTO.getCpfPermissionario()))
+        if(Objects.nonNull(permissionarioRequestDTO.getCpfPermissionario()) && !permissionarioRequestDTO.getCpfPermissionario().isEmpty() &&
+                !ValidaCPF.isCPF(permissionarioRequestDTO.getCpfPermissionario()))
             throw new RuntimeException("O CPF " + permissionarioRequestDTO.getCpfPermissionario() + " é inválido!");
 
-        if(Objects.nonNull(permissionarioRequestDTO.getCnpjEmpresa()) && !ValidaCNPJ.isCNPJ(permissionarioRequestDTO.getCnpjEmpresa()))
+        if(Objects.nonNull(permissionarioRequestDTO.getCnpjEmpresa()) && !permissionarioRequestDTO.getCnpjEmpresa().isEmpty() &&
+                !ValidaCNPJ.isCNPJ(permissionarioRequestDTO.getCnpjEmpresa()))
             throw new RuntimeException("O CNPJ " + permissionarioRequestDTO.getCnpjEmpresa() + " é inválido!");
 
         if(Objects.isNull(permissionarioRequestDTO.getUsuario()) || permissionarioRequestDTO.getUsuario().isEmpty())
-            throw new RuntimeException("Usuário vazio ou não identificado!");
+            throw new RuntimeException("Usuário não logado ou não identificado!");
 
         Permissionario permissionario = new Permissionario();
         try{
@@ -180,7 +184,7 @@ public class PermissionarioServiceImpl {
         String msgErro = "Erro ao Excluir o Permissionário!!";
         try{
             if(Objects.isNull(usuario) || usuario.isEmpty())
-                throw new RuntimeException("Usuário vazio ou não identificado!");
+                throw new RuntimeException("Usuário não logado ou não identificado!");
 
             Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(idPermissionario);
             Veiculo veiculo = veiculoRepository.findVeiculoByPermissionario(permissionario);

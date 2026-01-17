@@ -22,4 +22,5 @@ public class PermissaoDTO {
     private String autorizacaoTrafego;
     private String usuario;
     private String dataCriacao;
+    private String status;
 }

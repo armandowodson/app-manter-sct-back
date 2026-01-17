@@ -21,6 +21,8 @@ public interface PontosTaxiRepository extends JpaRepository<PontoTaxi, Long> {
 
     PontoTaxi findByIdPontoTaxi(Long idPontoTaxi);
 
+    PontoTaxi findPontoTaxiByNumeroPonto(String numeroPonto);
+
     void deletePontoTaxiByIdPontoTaxi(Long idPontoTaxi);
 
     @Query(
