@@ -22,8 +22,8 @@ public class Permissao {
     private String numeroPermissao;
     @Column(name = "NUMERO_ALVARA")
     private String numeroAlvara;
-    @Column(name = "ANO_ALVARA")
-    private String anoAlvara;
+    @Column(name = "ANO_PERMISSAO")
+    private String anoPermissao;
     @Column(name = "CATEGORIA_PERMISSAO")
     private String categoriaPermissao;
     @Column(name = "STATUS_PERMISSAO")

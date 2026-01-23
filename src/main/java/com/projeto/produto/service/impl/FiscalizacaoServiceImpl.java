@@ -3,11 +3,10 @@ package com.projeto.produto.service.impl;
 import com.projeto.produto.dto.FiscalizacaoDTO;
 import com.projeto.produto.dto.FiscalizacaoDTO;
 import com.projeto.produto.entity.Auditoria;
+import com.projeto.produto.entity.Defensor;
 import com.projeto.produto.entity.Fiscalizacao;
-import com.projeto.produto.repository.AuditoriaRepository;
+import com.projeto.produto.repository.*;
 import com.projeto.produto.repository.FiscalizacaoRepository;
-import com.projeto.produto.repository.FiscalizacaoRepository;
-import com.projeto.produto.repository.VeiculoRepository;
 import com.projeto.produto.utils.ValidaCNPJ;
 import com.projeto.produto.utils.ValidaCPF;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +38,9 @@ public class FiscalizacaoServiceImpl {
 
     @Autowired
     private AuditoriaRepository auditoriaRepository;
+
+    @Autowired
+    private DefensorRepository defensorRepository;
 
     @Transactional
     public FiscalizacaoDTO inserirFiscalizacao(FiscalizacaoDTO fiscalizacaoDTO) {
@@ -143,6 +145,11 @@ public class FiscalizacaoServiceImpl {
         if (!listaFiscalizacao.isEmpty()){
             for (Fiscalizacao fiscalizacao : listaFiscalizacao) {
                 FiscalizacaoDTO fiscalizacaoResponseDTORetornado = converterFiscalizacaoToFiscalizacaoDTO(fiscalizacao);
+                Defensor defensor = defensorRepository.findDefensorByNumeroPermissao(fiscalizacao.getVeiculo().getNumeroPermissao());
+                if(Objects.nonNull(defensor)){
+                    fiscalizacaoResponseDTORetornado.setNomeDefensor(defensor.getNomeDefensor());
+                    fiscalizacaoResponseDTORetornado.setCnhDefensor(defensor.getCnhDefensor());
+                }
                 listaFiscalizacaoDTO.add(fiscalizacaoResponseDTORetornado);
             }
         }
@@ -174,6 +181,11 @@ public class FiscalizacaoServiceImpl {
         List<FiscalizacaoDTO> listaFiscalizacaoDTO = new ArrayList<>();
         for(Fiscalizacao fiscalizacao : listaFiscalizacao){
             FiscalizacaoDTO fiscalizacaoResponseDTO = converterFiscalizacaoToFiscalizacaoDTO(fiscalizacao);
+            Defensor defensor = defensorRepository.findDefensorByNumeroPermissao(fiscalizacao.getVeiculo().getNumeroPermissao());
+            if(Objects.nonNull(defensor)){
+                fiscalizacaoResponseDTO.setNomeDefensor(defensor.getNomeDefensor());
+                fiscalizacaoResponseDTO.setCnhDefensor(defensor.getCnhDefensor());
+            }
             listaFiscalizacaoDTO.add(fiscalizacaoResponseDTO);
         }
 

@@ -9,7 +9,7 @@ public class PermissaoDTO {
     private Long idPermissao;
     private String numeroPermissao;
     private String numeroAlvara;
-    private String anoAlvara;
+    private String anoPermissao;
     private String categoriaPermissao;
     private String statusPermissao;
     private String periodoInicialStatus;

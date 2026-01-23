@@ -36,7 +36,7 @@ public class PermissaoController {
     @GetMapping("/buscar-filtros")
     public Page<PermissaoDTO> buscarPermissaoFiltros( @RequestParam(required = false) String numeroPermissao,
                                                       @RequestParam(required = false) String numeroAlvara,
-                                                      @RequestParam(required = false) String anoAlvara,
+                                                      @RequestParam(required = false) String anoPermissao,
                                                       @RequestParam(required = false) String statusPermissao,
                                                       @RequestParam(required = false) String periodoInicialStatus,
                                                       @RequestParam(required = false) String periodoFinalStatus,
@@ -45,7 +45,7 @@ public class PermissaoController {
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
         try {
             Page<PermissaoDTO> permissoes = service.listarTodasPermissoesFiltros(
-                    numeroPermissao, numeroAlvara, anoAlvara,
+                    numeroPermissao, numeroAlvara, anoPermissao,
                     statusPermissao, periodoInicialStatus, periodoFinalStatus, pageRequest
             );
 

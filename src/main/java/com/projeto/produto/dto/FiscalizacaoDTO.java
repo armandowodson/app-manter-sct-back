@@ -18,6 +18,8 @@ public class FiscalizacaoDTO {
     private String numeroPermissao;
     private String nomePermissionario;
     private String cnhPermissionario;
+    private String nomeDefensor;
+    private String cnhDefensor;
     private String motivoInfracao;
     private String tipoInfracao;
     private String grupoMultas;

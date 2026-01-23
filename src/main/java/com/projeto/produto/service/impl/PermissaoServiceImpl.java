@@ -37,7 +37,7 @@ public class PermissaoServiceImpl {
     @Transactional
     public PermissaoDTO inserirPermissao(PermissaoDTO permissaoDTO) {
         if (permissaoDTO.getNumeroPermissao().isEmpty() || permissaoDTO.getNumeroAlvara().isEmpty() ||
-            permissaoDTO.getAnoAlvara().isEmpty() || permissaoDTO.getCategoriaPermissao().isEmpty() ||
+            permissaoDTO.getAnoPermissao().isEmpty() || permissaoDTO.getCategoriaPermissao().isEmpty() ||
             permissaoDTO.getStatusPermissao().isEmpty() || permissaoDTO.getDataValidadePermissao().isEmpty() ||
             permissaoDTO.getPeriodoInicialStatus().isEmpty() || permissaoDTO.getPeriodoFinalStatus().isEmpty()) {
                 throw new RuntimeException("Campos inválidos/vazios para a Permissão!");
@@ -64,7 +64,7 @@ public class PermissaoServiceImpl {
     @Transactional
     public PermissaoDTO atualizarPermissao(PermissaoDTO permissaoDTO) {
         if (permissaoDTO.getNumeroPermissao().isEmpty() || permissaoDTO.getNumeroAlvara().isEmpty() ||
-                permissaoDTO.getAnoAlvara().isEmpty() || permissaoDTO.getCategoriaPermissao().isEmpty() ||
+                permissaoDTO.getAnoPermissao().isEmpty() || permissaoDTO.getCategoriaPermissao().isEmpty() ||
                 permissaoDTO.getStatusPermissao().isEmpty() || permissaoDTO.getDataValidadePermissao().isEmpty() ||
                 permissaoDTO.getPeriodoInicialStatus().isEmpty() || permissaoDTO.getPeriodoFinalStatus().isEmpty()) {
             throw new RuntimeException("Campos inválidos/vazios para a Permissão!");
@@ -103,7 +103,7 @@ public class PermissaoServiceImpl {
     }
 
     public Page<PermissaoDTO> listarTodasPermissoesFiltros( String numeroPermissao, String numeroAlvara,
-                                                           String anoAlvara, String statusPermissao,
+                                                           String anoPermissao, String statusPermissao,
                                                            String periodoInicial, String periodoFinal,
                                                            PageRequest pageRequest) {
 
@@ -136,13 +136,13 @@ public class PermissaoServiceImpl {
         }
 
         List<Permissao> listaPermissao = permissaoRepository.listarTodasPermissoesFiltros(
-                numeroPermissao, numeroAlvara,  anoAlvara,  statusPermissao,
+                numeroPermissao, numeroAlvara,  anoPermissao,  statusPermissao,
                 localDateInicial != null ? localDateInicial : null,
                 localDateFinal != null ? localDateFinal : null,  pageRequest
         );
 
         Integer countRegistros = permissaoRepository.listarTodasPermissoesFiltros(
-                numeroPermissao, numeroAlvara,  anoAlvara,  statusPermissao,
+                numeroPermissao, numeroAlvara,  anoPermissao,  statusPermissao,
                 localDateInicial != null ? localDateInicial : null,
                 localDateFinal != null ? localDateFinal : null,  null
         ).size();
@@ -237,7 +237,7 @@ public class PermissaoServiceImpl {
         }
         permissaoDTO.setNumeroPermissao(permissao.getNumeroPermissao());
         permissaoDTO.setNumeroAlvara(permissao.getNumeroAlvara());
-        permissaoDTO.setAnoAlvara(permissao.getAnoAlvara());
+        permissaoDTO.setAnoPermissao(permissao.getAnoPermissao());
         permissaoDTO.setCategoriaPermissao(permissao.getCategoriaPermissao());
         permissaoDTO.setStatusPermissao(permissao.getStatusPermissao());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
@@ -276,7 +276,7 @@ public class PermissaoServiceImpl {
         }
         permissao.setNumeroPermissao(permissaoDTO.getNumeroPermissao());
         permissao.setNumeroAlvara(permissaoDTO.getNumeroAlvara());
-        permissao.setAnoAlvara(permissaoDTO.getAnoAlvara());
+        permissao.setAnoPermissao(permissaoDTO.getAnoPermissao());
 
         if(tipo == 1){
             permissao.setCategoriaPermissao(permissaoDTO.getCategoriaPermissao());

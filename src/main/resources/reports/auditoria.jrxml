@@ -4,6 +4,11 @@
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Sample DB"/>
 	<parameter name="imagemPath" class="java.io.InputStream"/>
+	<parameter name="nomeModulo" class="java.lang.String"/>
+	<parameter name="usuario" class="java.lang.String"/>
+	<parameter name="operacao" class="java.lang.String"/>
+	<parameter name="dataInicio" class="java.lang.String"/>
+	<parameter name="dataFim" class="java.lang.String"/>
 	<queryString language="SQL">
 		<![CDATA[]]>
 	</queryString>
@@ -15,18 +20,25 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="119" splitType="Stretch">
+		<band height="130" splitType="Stretch">
 			<staticText>
-				<reportElement x="108" y="85" width="350" height="30" uuid="194fb156-d8a9-4b34-83d0-7782f192d0da"/>
+				<reportElement x="108" y="100" width="350" height="25" uuid="194fb156-d8a9-4b34-83d0-7782f192d0da"/>
 				<textElement textAlignment="Center">
-					<font size="14" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
-				<text><![CDATA[MUNICÍPIO DE BARREIRINHAS - MA]]></text>
+				<text><![CDATA[Município de Barreirinhas - MA]]></text>
 			</staticText>
 			<image>
 				<reportElement x="240" y="5" width="80" height="70" uuid="2e93be38-7968-440a-8e18-aa219e0bce36"/>
 				<imageExpression><![CDATA[$P{imagemPath}]]></imageExpression>
 			</image>
+			<staticText>
+				<reportElement x="40" y="75" width="480" height="25" uuid="a7be2470-924c-4cd1-b7b9-6765a7202202"/>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[SGSC - Sistema de Gerenciamento de Serviços Concedidos]]></text>
+			</staticText>
 		</band>
 	</title>
 	<pageHeader>
@@ -41,9 +53,9 @@
 		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="38" splitType="Stretch">
+		<band height="134" splitType="Stretch">
 			<staticText>
-				<reportElement x="4" y="16" width="216" height="20" uuid="2450918d-3696-4f1f-a033-868a07d50705">
+				<reportElement x="4" y="116" width="216" height="15" uuid="2450918d-3696-4f1f-a033-868a07d50705">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
@@ -52,17 +64,14 @@
 				<text><![CDATA[NOME MÓDULO]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="220" y="16" width="134" height="20" uuid="4fe447c9-42c0-4561-86da-8de925bd10d9">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
+				<reportElement x="220" y="116" width="134" height="15" uuid="4fe447c9-42c0-4561-86da-8de925bd10d9"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[USUÁRIO OPERAÇÃO]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="358" y="16" width="90" height="20" uuid="0b123b44-c5c7-4fc6-a3bf-7c800c1583ff">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<reportElement x="358" y="116" width="90" height="15" uuid="0b123b44-c5c7-4fc6-a3bf-7c800c1583ff">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
@@ -71,13 +80,75 @@
 				<text><![CDATA[OPERAÇÃO]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="450" y="16" width="103" height="20" uuid="2c7cbcc1-cfd1-403c-a2e2-7c1bcb322cba">
+				<reportElement x="450" y="116" width="103" height="15" uuid="2c7cbcc1-cfd1-403c-a2e2-7c1bcb322cba">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[DATA OPERAÇÃO]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="6" y="24" width="240" height="17" uuid="2dc5e344-72dd-4314-b03e-3e81ac3fbbfb"/>
+				<textFieldExpression><![CDATA[$P{nomeModulo}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="4" width="100" height="17" uuid="013bb842-810a-470f-a434-786ccef03305"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nome Módulo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="256" y="4" width="100" height="17" uuid="9a4c4f0b-cb78-4512-92b1-64dee170ebf2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Usuário]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="256" y="24" width="140" height="17" uuid="887039de-6611-4907-aa22-8ee432ed27af"/>
+				<textFieldExpression><![CDATA[$P{usuario}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="403" y="24" width="147" height="17" uuid="39fe5172-ca57-455e-bf75-b3be896842eb"/>
+				<textFieldExpression><![CDATA[$P{operacao}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="403" y="4" width="100" height="17" uuid="4705374d-327b-49b0-a567-9c2e71a93683"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Operação]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="6" y="65" width="147" height="17" uuid="b83838a8-e836-4537-93d8-b88b429699d0"/>
+				<textFieldExpression><![CDATA[$P{dataInicio}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="45" width="100" height="17" uuid="62d26458-73f3-40f8-aa76-8d20f23059dd"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Início]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="170" y="45" width="100" height="17" uuid="e7fd378c-bfa6-44d8-8c53-8d93db53ce7d"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Fim]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="170" y="65" width="147" height="17" uuid="0184fea9-8c03-4d89-99c2-213b8b03b0ae"/>
+				<textFieldExpression><![CDATA[$P{dataFim}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="96" width="146" height="17" uuid="53eaf47d-428c-4c7a-9866-dd61b8aff366"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Lista de Auditorias]]></text>
 			</staticText>
 		</band>
 	</columnHeader>

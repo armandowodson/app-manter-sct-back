@@ -30,13 +30,13 @@ public interface PermissaoRepository extends JpaRepository<Permissao, Long> {
                     "WHERE 1 = 1 " +
                     "AND (:numeroPermissao IS NULL OR NUMERO_PERMISSAO = :numeroPermissao) " +
                     "AND (:numeroAlvara IS NULL OR NUMERO_ALVARA = :numeroAlvara) " +
-                    "AND (:anoAlvara IS NULL OR ANO_ALVARA = :anoAlvara) " +
+                    "AND (:anoPermissao IS NULL OR ANO_PERMISSAO = :anoPermissao) " +
                     "AND (:statusPermissao IS NULL OR STATUS_PERMISSAO = :statusPermissao) " +
                     "AND PERIODO_INICIAL_STATUS >= :periodoInicial AND PERIODO_FINAL_STATUS <= :periodoFinal " ,
             nativeQuery = true
     )
     List<Permissao> listarTodasPermissoesFiltros(@Param("numeroPermissao") String numeroPermissao, @Param("numeroAlvara") String numeroAlvara,
-                                                 @Param("anoAlvara") String anoAlvara, @Param("statusPermissao") String statusPermissao,
+                                                 @Param("anoPermissao") String anoPermissao, @Param("statusPermissao") String statusPermissao,
                                                  @Param("periodoInicial") LocalDate periodoInicial, @Param("periodoFinal") LocalDate periodoFinal,
                                                  Pageable pageable);
 

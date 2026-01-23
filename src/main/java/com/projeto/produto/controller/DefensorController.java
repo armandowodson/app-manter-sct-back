@@ -40,18 +40,30 @@ public class DefensorController {
         }
     }
 
+    @GetMapping("/buscar-permissao/{numeroPermissao}")
+    public ResponseEntity<DefensorResponseDTO> buscarDefensorId(@PathVariable String numeroPermissao) {
+        try{
+            return ResponseEntity.ok(service.buscarDefensorNumeroPermissao(numeroPermissao));
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar o Defensor pelo ID!");
+        }
+    }
+
     @GetMapping("/buscar-filtros")
     public Page<DefensorResponseDTO> buscarDefensorsFiltros(   @RequestParam(required = false) String numeroPermissao,
                                                                @RequestParam(required = false) String nomeDefensor,
                                                                @RequestParam(required = false) String cpfDefensor,
                                                                @RequestParam(required = false) String cnpjEmpresa,
                                                                @RequestParam(required = false) String cnhDefensor,
+                                                               @RequestParam(required = false) String nomePermissionario,
+                                                               @RequestParam(required = false) String cpfPermissionario,
                                                                @RequestParam(required = true) Integer pageIndex,
                                                                @RequestParam(required = true) Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
         try{
             Page<DefensorResponseDTO> defensores = service.listarTodosDefensorFiltros(
-                    numeroPermissao, nomeDefensor, cpfDefensor, cnpjEmpresa, cnhDefensor, pageRequest
+                    numeroPermissao, nomeDefensor, cpfDefensor, cnpjEmpresa, cnhDefensor, nomePermissionario,
+                    cpfPermissionario, pageRequest
             );
 
             return defensores;

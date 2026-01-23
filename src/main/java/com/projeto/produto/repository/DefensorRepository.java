@@ -19,20 +19,24 @@ public interface DefensorRepository extends JpaRepository<Defensor, Integer> {
 
     Defensor findDefensorByIdDefensor(Long idDefensor);
 
+    Defensor findDefensorByNumeroPermissao(String numeroPermissao);
+
     @Query(
-            value = "SELECT * " +
-                    "FROM proj.defensor " +
-                    "WHERE 1 = 1 " +
-                    "AND (:numeroPermissao IS NULL OR NUMERO_PERMISSAO = :numeroPermissao) " +
-                    "AND (:nomeDefensor IS NULL OR UPPER(NOME_DEFENSOR) LIKE %:nomeDefensor%) " +
-                    "AND (:cpfDefensor IS NULL OR CPF_DEFENSOR = :cpfDefensor) " +
-                    "AND (:cnpjEmpresa IS NULL OR CNPJ_EMPRESA = :cnpjEmpresa) " +
-                    "AND (:cnhDefensor IS NULL OR CNH_DEFENSOR = :cnhDefensor) ",
+            value = "SELECT d.* " +
+                    "FROM proj.defensor d, proj.permissionario p " +
+                    "WHERE d.NUMERO_PERMISSAO = p.NUMERO_PERMISSAO " +
+                    "AND (:numeroPermissao IS NULL OR d.NUMERO_PERMISSAO = :numeroPermissao) " +
+                    "AND (:nomeDefensor IS NULL OR UPPER(d.NOME_DEFENSOR) LIKE %:nomeDefensor%) " +
+                    "AND (:cpfDefensor IS NULL OR d.CPF_DEFENSOR = :cpfDefensor) " +
+                    "AND (:cnpjEmpresa IS NULL OR d.CNPJ_EMPRESA = :cnpjEmpresa) " +
+                    "AND (:cnhDefensor IS NULL OR d.CNH_DEFENSOR = :cnhDefensor) " +
+                    "AND (:nomePermissionario IS NULL OR UPPER(p.NOME_PERMISSIONARIO) LIKE %:nomePermissionario%) " +
+                    "AND (:cpfPermissionario IS NULL OR p.CPF_PERMISSIONARIO = :cpfPermissionario) ",
             nativeQuery = true
     )
     List<Defensor> listarTodosDefensorsFiltros(
-            String numeroPermissao, String nomeDefensor, String cpfDefensor,
-            String cnpjEmpresa, String cnhDefensor, Pageable pageable
+            String numeroPermissao, String nomeDefensor, String cpfDefensor, String cnpjEmpresa,
+            String cnhDefensor, String nomePermissionario, String cpfPermissionario, Pageable pageable
     );
 
     @Query(

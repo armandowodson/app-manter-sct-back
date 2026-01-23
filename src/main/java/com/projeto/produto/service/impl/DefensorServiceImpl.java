@@ -136,17 +136,27 @@ public class DefensorServiceImpl {
         return defensorResponseDTO;
     }
 
+    public DefensorResponseDTO buscarDefensorNumeroPermissao(String numeroPermissao) {
+        Defensor defensor = defensorRepository.findDefensorByNumeroPermissao(numeroPermissao);
+        DefensorResponseDTO defensorResponseDTO = new DefensorResponseDTO();
+        if (defensor != null){
+            defensorResponseDTO = converterDefensorToDefensorDTO(defensor);
+        }
+        return defensorResponseDTO;
+    }
+
     public Page<DefensorResponseDTO> listarTodosDefensorFiltros(   String numeroPermissao, String nomeDefensor,
                                                                    String cpfDefensor, String cnpjEmpresa,
-                                                                   String cnhDefensor, PageRequest pageRequest) {
+                                                                   String cnhDefensor, String nomePermissionario,
+                                                                   String cpfPermissionario, PageRequest pageRequest) {
         List<Defensor> listaDefensor = defensorRepository.listarTodosDefensorsFiltros(
                 numeroPermissao,  nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
-                cpfDefensor, cnpjEmpresa, cnhDefensor, pageRequest
+                cpfDefensor, cnpjEmpresa, cnhDefensor, nomePermissionario, cpfPermissionario, pageRequest
         );
 
         Integer countRegistros = defensorRepository.listarTodosDefensorsFiltros(
                 numeroPermissao,  nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
-                cpfDefensor, cnpjEmpresa, cnhDefensor, null
+                cpfDefensor, cnpjEmpresa, cnhDefensor, nomePermissionario, cpfPermissionario, null
         ).size();
 
         List<DefensorResponseDTO> listaDefensorResponseDTO = new ArrayList<>();

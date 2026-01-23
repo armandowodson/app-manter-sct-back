@@ -58,9 +58,4 @@ public class AuditoriaController {
         return ResponseEntity.ok(service.imprimirAuditoria(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao, pageRequest));
     }
 
-    @GetMapping("/gerar-relatorio")
-    public void gerarRelatorio() throws JRException, SQLException, IOException {
-        service.gerarRelatorio(null);
-    }
-
 }
