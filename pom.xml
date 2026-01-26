@@ -13,9 +13,9 @@
     <version>1.2-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>ManterTransportes</name>
-    <description>Sistema de Controle de Transportes</description>
+    <description>Sistema de Gerenciamento de Serviços Concedidos</description>
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
     </properties>
     <dependencies>
         <dependency>

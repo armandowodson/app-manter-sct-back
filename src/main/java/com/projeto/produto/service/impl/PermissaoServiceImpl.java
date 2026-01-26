@@ -36,13 +36,6 @@ public class PermissaoServiceImpl {
 
     @Transactional
     public PermissaoDTO inserirPermissao(PermissaoDTO permissaoDTO) {
-        if (permissaoDTO.getNumeroPermissao().isEmpty() || permissaoDTO.getNumeroAlvara().isEmpty() ||
-            permissaoDTO.getAnoPermissao().isEmpty() || permissaoDTO.getCategoriaPermissao().isEmpty() ||
-            permissaoDTO.getStatusPermissao().isEmpty() || permissaoDTO.getDataValidadePermissao().isEmpty() ||
-            permissaoDTO.getPeriodoInicialStatus().isEmpty() || permissaoDTO.getPeriodoFinalStatus().isEmpty()) {
-                throw new RuntimeException("Campos inválidos/vazios para a Permissão!");
-        }
-
         if(Objects.isNull(permissaoDTO.getUsuario()) || permissaoDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário não logado ou não identificado!");
 
@@ -63,13 +56,6 @@ public class PermissaoServiceImpl {
 
     @Transactional
     public PermissaoDTO atualizarPermissao(PermissaoDTO permissaoDTO) {
-        if (permissaoDTO.getNumeroPermissao().isEmpty() || permissaoDTO.getNumeroAlvara().isEmpty() ||
-                permissaoDTO.getAnoPermissao().isEmpty() || permissaoDTO.getCategoriaPermissao().isEmpty() ||
-                permissaoDTO.getStatusPermissao().isEmpty() || permissaoDTO.getDataValidadePermissao().isEmpty() ||
-                permissaoDTO.getPeriodoInicialStatus().isEmpty() || permissaoDTO.getPeriodoFinalStatus().isEmpty()) {
-            throw new RuntimeException("Campos inválidos/vazios para a Permissão!");
-        }
-
         if(Objects.isNull(permissaoDTO.getUsuario()) || permissaoDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário não logado ou não identificado!");
 
@@ -278,17 +264,9 @@ public class PermissaoServiceImpl {
         permissao.setNumeroAlvara(permissaoDTO.getNumeroAlvara());
         permissao.setAnoPermissao(permissaoDTO.getAnoPermissao());
 
-        if(tipo == 1){
-            permissao.setCategoriaPermissao(permissaoDTO.getCategoriaPermissao());
-        }else{
-            permissao.setCategoriaPermissao(converterNomeCategoriaPermissao(permissaoDTO.getCategoriaPermissao()));
-        }
+        permissao.setCategoriaPermissao(permissaoDTO.getCategoriaPermissao());
 
-        if(tipo == 1){
-            permissao.setStatusPermissao(permissaoDTO.getStatusPermissao());
-        }else{
-            permissao.setStatusPermissao(converterNomeStatusPermissao(permissaoDTO.getStatusPermissao()));
-        }
+        permissao.setStatusPermissao(permissaoDTO.getStatusPermissao());
 
         if(Objects.nonNull(permissaoDTO.getPeriodoInicialStatus()) && !permissaoDTO.getPeriodoInicialStatus().isEmpty()) {
             String data = permissaoDTO.getPeriodoInicialStatus();
@@ -332,11 +310,7 @@ public class PermissaoServiceImpl {
             }
         }
 
-        if(tipo == 1){
-            permissao.setPenalidade(permissaoDTO.getPenalidade());
-        }else{
-            permissao.setPenalidade(converterNomePenalidade(permissaoDTO.getPenalidade()));
-        }
+        permissao.setPenalidade(permissaoDTO.getPenalidade());
 
         if(Objects.nonNull(permissaoDTO.getDataValidadePenalidade()) && !permissaoDTO.getDataValidadePenalidade().isEmpty()){
             String data = permissaoDTO.getDataValidadePenalidade();
@@ -350,11 +324,7 @@ public class PermissaoServiceImpl {
                 }
         }
 
-        if(tipo == 1){
-            permissao.setModalidade(permissaoDTO.getModalidade());
-        }else{
-            permissao.setModalidade(converterNomeModalidadePermissao(permissaoDTO.getModalidade()));
-        }
+        permissao.setModalidade(permissaoDTO.getModalidade());
 
         if(Objects.nonNull(permissaoDTO.getDataCriacao()) && !permissaoDTO.getDataCriacao().isEmpty())
             permissao.setDataCriacao(LocalDate.parse(permissaoDTO.getDataCriacao()));
@@ -376,67 +346,4 @@ public class PermissaoServiceImpl {
         auditoriaRepository.save(auditoria);
     }
 
-    public String converterNomeCategoriaPermissao(String categoria){
-        switch (categoria){
-            case "DELEGAÇÃO":
-                return "1";
-            case "TÍTULO PRECÁRIO":
-                return "2";
-            case "LICITAÇÃO":
-                return "3";
-            case "PRESTAÇÃO DO SERVIÇO PÚBLICO DE TRANSPORTE DE PASSAGEIROS":
-                return "4";
-        }
-
-        return "";
-    }
-
-    public String converterNomeStatusPermissao(String status){
-        switch (status){
-            case "EM USO":
-                return "1";
-            case "SUSPENSA":
-                return "2";
-            case "RENUNCIADA":
-                return "3";
-            case "RESERVADA":
-                return "4";
-            case "SUBSTITUÍDA":
-                return "5";
-            case "REVOGADA":
-                return "6";
-            case "EXPIRADA":
-                return "7";
-            case "ABANDONADA":
-                return "8";
-        }
-
-        return "";
-    }
-
-    public String converterNomePenalidade(String permissao){
-        switch (permissao){
-            case "MULTA":
-                return "1";
-            case "SUSPENSÃO":
-                return "2";
-            case "CASSAÇÃO DO REGISTRO DE CONDUTOR":
-                return "3";
-        }
-
-        return "";
-    }
-
-    public String converterNomeModalidadePermissao(String modalidade){
-        switch (modalidade){
-            case "FIXO":
-                return "1";
-            case "ROTATIVO":
-                return "2";
-            case "FIXO-ROTATIVO":
-                return "3";
-        }
-
-        return "";
-    }
 }
