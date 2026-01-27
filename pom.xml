@@ -9,8 +9,8 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.projeto</groupId>
-    <artifactId>produto</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <artifactId>sgsc</artifactId>
+    <version>1.0.0</version>
     <packaging>war</packaging>
     <name>ManterTransportes</name>
     <description>Sistema de Gerenciamento de Serviços Concedidos</description>
@@ -113,6 +113,17 @@
             <artifactId>xml-apis</artifactId>
             <version>1.4.01</version>
         </dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.7</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -123,7 +134,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.4</version>
+                <version>3.4.0</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
@@ -132,24 +143,6 @@
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-codegen-maven-plugin</artifactId>
                 <version>2.4.21</version>
-                <executions>
-                    <execution>
-                        <id>manter-produto-api</id>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <inputSpec>src/main/resources/manter-produto-api.yml</inputSpec>
-                            <language>spring</language>
-                            <modelPackage>com.projeto.produto.api.model</modelPackage>
-                            <generateSupportingFiles>false</generateSupportingFiles>
-                            <modelNameSuffix>DTO</modelNameSuffix>
-                            <configOptions>
-                                <dateLibrary>java8-OffsetDateTime</dateLibrary>
-                            </configOptions>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>

@@ -20,14 +20,10 @@ public class Permissionario {
     private String nomePermissionario;
     @Column(name = "CPF_PERMISSIONARIO")
     private String cpfPermissionario;
-    @Column(name = "CNPJ_EMPRESA")
-    private String cnpjEmpresa;
     @Column(name = "RG_PERMISSIONARIO")
     private String rgPermissionario;
     @Column(name = "ORGAO_EMISSOR")
     private String orgaoEmissor;
-    @Column(name = "NATUREZA_PESSOA")
-    private String naturezaPessoa;
     @Column(name = "UF_PERMISSIONARIO")
     private String ufPermissionario;
     @Column(name = "CIDADE_PERMISSIONARIO")
@@ -38,6 +34,8 @@ public class Permissionario {
     private String enderecoPermissionario;
     @Column(name = "CELULAR_PERMISSIONARIO")
     private String celularPermissionario;
+    @Column(name = "EMAIL_PERMISSIONARIO")
+    private String emailPermissionario;
     @Column(name = "CNH_PERMISSIONARIO")
     private String cnhPermissionario;
     @Column(name = "CATEGORIA_CNH_PERMISSIONARIO")

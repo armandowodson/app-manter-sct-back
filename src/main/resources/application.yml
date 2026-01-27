@@ -15,4 +15,4 @@ spring:
         show_sql: true
         format_sql: true
 server:
-  port: 9190
+  port: 8081

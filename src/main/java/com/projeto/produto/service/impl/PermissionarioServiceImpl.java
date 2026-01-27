@@ -12,6 +12,8 @@ import com.projeto.produto.repository.PermissionarioRepository;
 import com.projeto.produto.repository.VeiculoRepository;
 import com.projeto.produto.utils.ValidaCNPJ;
 import com.projeto.produto.utils.ValidaCPF;
+import com.projeto.produto.utils.ValidaEmail;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -45,20 +47,19 @@ public class PermissionarioServiceImpl {
                                                                MultipartFile certidaoNegativaCriminal,
                                                                MultipartFile certidaoNegativaMunicipal,
                                                                MultipartFile foto) {
-        if (permissionarioRequestDTO.getNomePermissionario().isEmpty() || permissionarioRequestDTO.getCpfPermissionario().isEmpty() ||
-            permissionarioRequestDTO.getRgPermissionario().isEmpty() || permissionarioRequestDTO.getCnhPermissionario().isEmpty() ||
-            permissionarioRequestDTO.getEnderecoPermissionario().isEmpty() || permissionarioRequestDTO.getCelularPermissionario().isEmpty() ||
-            permissionarioRequestDTO.getNumeroPermissao().isEmpty()) {
-                throw new RuntimeException("Dados inválidos para o Permissionário/Proprietário!");
+
+        if(Objects.nonNull(permissionarioRequestDTO.getCpfPermissionario()) && !permissionarioRequestDTO.getCpfPermissionario().isEmpty() &&
+                permissionarioRequestDTO.getCpfPermissionario().length() < 11){
+            permissionarioRequestDTO.setCpfPermissionario(StringUtils.leftPad(permissionarioRequestDTO.getCpfPermissionario(), 11, "0"));
         }
 
         if(Objects.nonNull(permissionarioRequestDTO.getCpfPermissionario()) && !permissionarioRequestDTO.getCpfPermissionario().isEmpty() &&
                 !ValidaCPF.isCPF(permissionarioRequestDTO.getCpfPermissionario()))
             throw new RuntimeException("O CPF " + permissionarioRequestDTO.getCpfPermissionario() + " é inválido!");
 
-        if(Objects.nonNull(permissionarioRequestDTO.getCnpjEmpresa()) && !permissionarioRequestDTO.getCnpjEmpresa().isEmpty() &&
-                !ValidaCNPJ.isCNPJ(permissionarioRequestDTO.getCnpjEmpresa()))
-            throw new RuntimeException("O CNPJ " + permissionarioRequestDTO.getCnpjEmpresa() + " é inválido!");
+        if(Objects.nonNull(permissionarioRequestDTO.getEmailPermissionario()) && !permissionarioRequestDTO.getEmailPermissionario().isEmpty() &&
+                !ValidaEmail.isEmail(permissionarioRequestDTO.getEmailPermissionario()))
+            throw new RuntimeException("O E-mail " + permissionarioRequestDTO.getEmailPermissionario() + " é inválido!");
 
         if(Objects.isNull(permissionarioRequestDTO.getUsuario()) || permissionarioRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário não logado ou não identificado!");
@@ -85,20 +86,18 @@ public class PermissionarioServiceImpl {
                                                              MultipartFile certidaoNegativaCriminal,
                                                              MultipartFile certidaoNegativaMunicipal,
                                                              MultipartFile foto) {
-        if (permissionarioRequestDTO.getNomePermissionario().isEmpty() || permissionarioRequestDTO.getCpfPermissionario().isEmpty() ||
-                permissionarioRequestDTO.getRgPermissionario().isEmpty() || permissionarioRequestDTO.getCnhPermissionario().isEmpty() ||
-                permissionarioRequestDTO.getEnderecoPermissionario().isEmpty() || permissionarioRequestDTO.getCelularPermissionario().isEmpty() ||
-                permissionarioRequestDTO.getNumeroPermissao().isEmpty()) {
-            throw new RuntimeException("Dados inválidos para o Permissionário/Proprietário!");
+        if(Objects.nonNull(permissionarioRequestDTO.getCpfPermissionario()) && !permissionarioRequestDTO.getCpfPermissionario().isEmpty() &&
+                permissionarioRequestDTO.getCpfPermissionario().length() < 11){
+            permissionarioRequestDTO.setCpfPermissionario(StringUtils.leftPad(permissionarioRequestDTO.getCpfPermissionario(), 11, "0"));
         }
 
         if(Objects.nonNull(permissionarioRequestDTO.getCpfPermissionario()) && !permissionarioRequestDTO.getCpfPermissionario().isEmpty() &&
                 !ValidaCPF.isCPF(permissionarioRequestDTO.getCpfPermissionario()))
             throw new RuntimeException("O CPF " + permissionarioRequestDTO.getCpfPermissionario() + " é inválido!");
 
-        if(Objects.nonNull(permissionarioRequestDTO.getCnpjEmpresa()) && !permissionarioRequestDTO.getCnpjEmpresa().isEmpty() &&
-                !ValidaCNPJ.isCNPJ(permissionarioRequestDTO.getCnpjEmpresa()))
-            throw new RuntimeException("O CNPJ " + permissionarioRequestDTO.getCnpjEmpresa() + " é inválido!");
+        if(Objects.nonNull(permissionarioRequestDTO.getEmailPermissionario()) && !permissionarioRequestDTO.getEmailPermissionario().isEmpty() &&
+                !ValidaEmail.isEmail(permissionarioRequestDTO.getEmailPermissionario()))
+            throw new RuntimeException("O E-mail " + permissionarioRequestDTO.getEmailPermissionario() + " é inválido!");
 
         if(Objects.isNull(permissionarioRequestDTO.getUsuario()) || permissionarioRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário não logado ou não identificado!");
@@ -224,17 +223,16 @@ public class PermissionarioServiceImpl {
         permissionarioResponseDTO.setNumeroPermissao(permissionario.getNumeroPermissao());
         permissionarioResponseDTO.setNomePermissionario(permissionario.getNomePermissionario());
         permissionarioResponseDTO.setCpfPermissionario(permissionario.getCpfPermissionario());
-        permissionarioResponseDTO.setCnpjEmpresa((permissionario.getCnpjEmpresa() != null && !permissionario.getCnpjEmpresa().equals("null")) ? permissionario.getCnpjEmpresa() : "");
         permissionarioResponseDTO.setRgPermissionario(permissionario.getRgPermissionario());
         permissionarioResponseDTO.setOrgaoEmissor(permissionario.getOrgaoEmissor());
-        permissionarioResponseDTO.setNaturezaPessoa(permissionario.getNaturezaPessoa().equals("1") ? "FÍSICA" : "JURÍDICA");
         permissionarioResponseDTO.setCnhPermissionario(permissionario.getCnhPermissionario());
-        permissionarioResponseDTO.setCategoriaCnhPermissionario(converterIdCategoriaCnh(permissionario.getCategoriaCnhPermissionario()));
+        permissionarioResponseDTO.setCategoriaCnhPermissionario(permissionario.getCategoriaCnhPermissionario());
         permissionarioResponseDTO.setUfPermissionario(permissionario.getUfPermissionario());
         permissionarioResponseDTO.setCidadePermissionario(permissionario.getCidadePermissionario());
         permissionarioResponseDTO.setBairroPermissionario(permissionario.getBairroPermissionario());
         permissionarioResponseDTO.setEnderecoPermissionario(permissionario.getEnderecoPermissionario());
         permissionarioResponseDTO.setCelularPermissionario(permissionario.getCelularPermissionario());
+        permissionarioResponseDTO.setEmailPermissionario(permissionario.getEmailPermissionario());
         permissionarioResponseDTO.setNumeroQuitacaoMilitar(permissionario.getNumeroQuitacaoMilitar());
         permissionarioResponseDTO.setNumeroQuitacaoEleitoral(permissionario.getNumeroQuitacaoEleitoral());
         permissionarioResponseDTO.setNumeroInscricaoInss(permissionario.getNumeroInscricaoInss());
@@ -244,7 +242,7 @@ public class PermissionarioServiceImpl {
         permissionarioResponseDTO.setFoto(permissionario.getFoto());
         permissionarioResponseDTO.setDataCriacao(permissionario.getDataCriacao().toString());
         permissionarioResponseDTO.setStatus(permissionario.getStatus());
-        permissionarioResponseDTO.setAplicativoAlternativo(permissionario.getAplicativoAlternativo().equals("1") ? "SIM" : "NÃO");
+        permissionarioResponseDTO.setAplicativoAlternativo(permissionario.getAplicativoAlternativo());
         permissionarioResponseDTO.setObservacao(permissionario.getObservacao());
 
         return permissionarioResponseDTO;
@@ -270,36 +268,16 @@ public class PermissionarioServiceImpl {
             permissionario.setCpfPermissionario(permissionarioRequestDTO.getCpfPermissionario());
         }
 
-        if(Objects.nonNull(permissionarioRequestDTO.getCnpjEmpresa()) && !permissionarioRequestDTO.getCnpjEmpresa().isEmpty() &&
-                !permissionarioRequestDTO.getCnpjEmpresa().equals("null")){
-            permissionarioRequestDTO.setCnpjEmpresa(
-                    permissionarioRequestDTO.getCnpjEmpresa().replace(".", "").replace("-", "").replace("/", "")
-            );
-            permissionario.setCnpjEmpresa(permissionarioRequestDTO.getCnpjEmpresa());
-        }
-
         permissionario.setRgPermissionario(permissionarioRequestDTO.getRgPermissionario());
         permissionario.setOrgaoEmissor(permissionarioRequestDTO.getOrgaoEmissor());
-
-        if(tipo == 1){
-            permissionario.setNaturezaPessoa(permissionarioRequestDTO.getNaturezaPessoa());
-        }else{
-            permissionario.setNaturezaPessoa(permissionarioRequestDTO.getNaturezaPessoa().equals("FÍSICA") ? "1" : "2");
-        }
-
         permissionario.setUfPermissionario(permissionarioRequestDTO.getUfPermissionario());
         permissionario.setCidadePermissionario(permissionarioRequestDTO.getCidadePermissionario());
         permissionario.setBairroPermissionario(permissionarioRequestDTO.getBairroPermissionario());
         permissionario.setEnderecoPermissionario(permissionarioRequestDTO.getEnderecoPermissionario());
         permissionario.setCelularPermissionario(permissionarioRequestDTO.getCelularPermissionario());
+        permissionario.setEmailPermissionario(permissionarioRequestDTO.getEmailPermissionario());
         permissionario.setCnhPermissionario(permissionarioRequestDTO.getCnhPermissionario());
-
-        if(tipo == 1){
-            permissionario.setCategoriaCnhPermissionario(permissionarioRequestDTO.getCategoriaCnhPermissionario());
-        }else{
-            permissionario.setCategoriaCnhPermissionario(converterNomeCategoriaCnh(permissionarioRequestDTO.getCategoriaCnhPermissionario()));
-        }
-
+        permissionario.setCategoriaCnhPermissionario(permissionarioRequestDTO.getCategoriaCnhPermissionario());
         permissionario.setNumeroQuitacaoMilitar(permissionarioRequestDTO.getNumeroQuitacaoMilitar());
         permissionario.setNumeroQuitacaoEleitoral(permissionarioRequestDTO.getNumeroQuitacaoEleitoral());
         permissionario.setNumeroCertificadoCondutor(permissionarioRequestDTO.getNumeroCertificadoCondutor());
@@ -319,15 +297,10 @@ public class PermissionarioServiceImpl {
         else
             permissionario.setDataCriacao(LocalDate.now());
 
-        permissionario.setStatus("ATIVO");
-
-        if(tipo == 1){
-            permissionario.setAplicativoAlternativo(permissionarioRequestDTO.getAplicativoAlternativo());
-        }else{
-            permissionario.setAplicativoAlternativo(permissionarioRequestDTO.getAplicativoAlternativo().equals("SIM") ? "1" : "2");
-        }
-
+        permissionario.setAplicativoAlternativo(permissionarioRequestDTO.getAplicativoAlternativo());
         permissionario.setObservacao(permissionarioRequestDTO.getObservacao());
+
+        permissionario.setStatus("ATIVO");
 
         return  permissionario;
     }
@@ -339,36 +312,6 @@ public class PermissionarioServiceImpl {
         auditoria.setUsuarioOperacao(usuario);
         auditoria.setDataOperacao(LocalDate.now());
         auditoriaRepository.save(auditoria);
-    }
-
-    public String converterIdCategoriaCnh(String categoria){
-        switch (categoria){
-            case "1":
-                return "B";
-            case "2":
-                return "C";
-            case "3":
-                return "D";
-            case "4":
-                return "E";
-        }
-
-        return "";
-    }
-
-    public String converterNomeCategoriaCnh(String categoria){
-        switch (categoria){
-            case "B":
-                return "1";
-            case "C":
-                return "2";
-            case "D":
-                return "3";
-            case "E":
-                return "4";
-        }
-
-        return "";
     }
 
 }

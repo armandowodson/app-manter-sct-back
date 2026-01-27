@@ -10,15 +10,14 @@ public class PermissionarioRequestDTO {
     private String numeroPermissao;
     private String nomePermissionario;
     private String cpfPermissionario;
-    private String cnpjEmpresa;
     private String rgPermissionario;
     private String orgaoEmissor;
-    private String naturezaPessoa;
     private String ufPermissionario;
     private String cidadePermissionario;
     private String bairroPermissionario;
     private String enderecoPermissionario;
     private String celularPermissionario;
+    private String emailPermissionario;
     private String cnhPermissionario;
     private String categoriaCnhPermissionario;
     private String numeroQuitacaoMilitar;

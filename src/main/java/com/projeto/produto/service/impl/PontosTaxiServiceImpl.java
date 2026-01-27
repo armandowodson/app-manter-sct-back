@@ -1,9 +1,7 @@
 package com.projeto.produto.service.impl;
 
-import com.projeto.produto.dto.PermissionarioResponseDTO;
 import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.entity.Auditoria;
-import com.projeto.produto.entity.Permissionario;
 import com.projeto.produto.entity.PontoTaxi;
 import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.PontosTaxiRepository;
@@ -31,10 +29,6 @@ public class PontosTaxiServiceImpl {
 
     @Transactional
     public PontoTaxiDTO inserirPontoTaxi(PontoTaxiDTO pontoTaxiDTO) {
-        if (pontoTaxiDTO.getDescricaoPonto().isEmpty() || pontoTaxiDTO.getNumeroPonto().isEmpty()) {
-            throw new RuntimeException("Dados inválidos/vazios para o Ponto de Estacionamento de Táxi!");
-        }
-
         if(Objects.isNull(pontoTaxiDTO.getUsuario()) || pontoTaxiDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário não logado ou não identificado!");
 
@@ -44,7 +38,7 @@ public class PontosTaxiServiceImpl {
 
         PontoTaxi pontoTaxi = new PontoTaxi();
         try{
-            pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO, 1);
+            pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO);
             pontoTaxi.setDataCriacao(LocalDate.now());
             pontoTaxi = pontosTaxiRepository.save(pontoTaxi);
 
@@ -59,16 +53,12 @@ public class PontosTaxiServiceImpl {
 
     @Transactional
     public PontoTaxiDTO atualizarPontoTaxi(PontoTaxiDTO pontoTaxiDTO) {
-        if (pontoTaxiDTO.getDescricaoPonto().isEmpty() || pontoTaxiDTO.getNumeroPonto().isEmpty()) {
-            throw new RuntimeException("Dados inválidos para o Ponto de Estacionamento de Táxi!");
-        }
-
         if(Objects.isNull(pontoTaxiDTO.getUsuario()) || pontoTaxiDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário não logado ou não identificado!");
 
         PontoTaxi pontoTaxi = new PontoTaxi();
         try{
-            pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO, 2);
+            pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO);
             pontoTaxi = pontosTaxiRepository.save(pontoTaxi);
             //Auditoria
             salvarAuditoria("PONTO DE ESTACIONAMENTO DE TÁXI", "ALTERAÇÃO", pontoTaxiDTO.getUsuario());
@@ -183,7 +173,7 @@ public class PontosTaxiServiceImpl {
         return  pontoTaxiDTO;
     }
 
-    public PontoTaxi converterPontoTaxiDTOToPontoTaxi(PontoTaxiDTO pontoTaxiDTO, Integer tipo){
+    public PontoTaxi converterPontoTaxiDTOToPontoTaxi(PontoTaxiDTO pontoTaxiDTO){
         PontoTaxi pontoTaxi = new PontoTaxi();
         if (pontoTaxiDTO.getIdPontoTaxi() != null && pontoTaxiDTO.getIdPontoTaxi() != 0){
             pontoTaxi = pontosTaxiRepository.findByIdPontoTaxi(pontoTaxiDTO.getIdPontoTaxi());
@@ -193,13 +183,7 @@ public class PontosTaxiServiceImpl {
         pontoTaxi.setReferenciaPonto(pontoTaxiDTO.getReferenciaPonto());
         pontoTaxi.setFatorRotatividade(pontoTaxiDTO.getFatorRotatividade());
         pontoTaxi.setNumeroVagas(pontoTaxiDTO.getNumeroVagas());
-
-        if(tipo == 1){
-            pontoTaxi.setModalidade(pontoTaxiDTO.getModalidade());
-        }else{
-            pontoTaxi.setModalidade(converterNomeModalidade(pontoTaxiDTO.getModalidade()));
-        }
-
+        pontoTaxi.setModalidade(pontoTaxiDTO.getModalidade());
         pontoTaxi.setStatus("ATIVO");
 
         return  pontoTaxi;
