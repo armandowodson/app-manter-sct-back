@@ -4,6 +4,7 @@ import com.projeto.produto.dto.LoginDTO;
 import com.projeto.produto.dto.RegistroDTO;
 import com.projeto.produto.entity.Login;
 import com.projeto.produto.repository.LoginRepository;
+import com.projeto.produto.utils.ValidaCPF;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,32 +19,37 @@ public class LoginServiceImpl {
     @Autowired
     private LoginRepository loginRepository;
 
-    public LoginDTO efetuarLogin(String login, String senha) throws NoSuchAlgorithmException {
-        if (Objects.isNull(login) || Objects.isNull(senha) || login.isEmpty() || senha.isEmpty()) {
-            throw new RuntimeException("Dados inválidos para o Login!");
-        }
+    public LoginDTO efetuarLogin(String login, String senha) {
+        if(Objects.nonNull(login) && !login.isEmpty() &&  !ValidaCPF.isCPF(login))
+            throw new RuntimeException("O CPF " + login + " é inválido!");
 
-        Login loginEntity = loginRepository.findLoginByLoginUsuarioAndSenhaUsuario(login, hash(senha));
+        Login loginEntity = loginRepository.findLoginByLoginUsuarioAndSenhaUsuario(login, senha);
         if (loginEntity != null){
             return converterLoginToLoginDTO(loginEntity);
         }else{
-            return null;
+            throw new RuntimeException("Usuário não identificado!");
         }
     }
 
-    public LoginDTO gravarUsuario(RegistroDTO registro) throws NoSuchAlgorithmException {
-        if (Objects.isNull(registro.getUsuario()) || Objects.isNull(registro.getSenha()) ||
-                Objects.isNull(registro.getNome()) || registro.getUsuario().isEmpty() ||
-                registro.getSenha().isEmpty() || registro.getNome().isEmpty()) {
-            throw new RuntimeException("Dados inválidos para o Usuário!");
-        }
+    public LoginDTO gravarUsuario(RegistroDTO registro) {
+        if(Objects.nonNull(registro.getUsuario()) && !registro.getUsuario().isEmpty() &&  !ValidaCPF.isCPF(registro.getUsuario()))
+            throw new RuntimeException("O CPF " + registro.getUsuario() + " é inválido!");
+
+        Login existLogin = this.loginRepository.findLoginByLoginUsuario(registro.getUsuario());
+        if(Objects.nonNull(existLogin))
+            throw new RuntimeException("Já existe usuário para o CPF " + registro.getUsuario() + "!");
 
         Login login = new Login();
-        login.setNomeCompleto(registro.getNome().toUpperCase());
-        login.setLoginUsuario(registro.getUsuario());
-        login.setSenhaUsuario(hash(registro.getSenha()));
-        login.setDataCriacao(LocalDate.now());
-        login = loginRepository.save(login);
+        try{
+            login.setNomeCompleto(registro.getNome().toUpperCase());
+            login.setLoginUsuario(registro.getUsuario());
+            login.setSenhaUsuario(registro.getSenha());
+            login.setDataCriacao(LocalDate.now());
+            login = loginRepository.save(login);
+
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível gravar o Usuário!");
+        }
         return converterLoginToLoginDTO(login);
     }
 

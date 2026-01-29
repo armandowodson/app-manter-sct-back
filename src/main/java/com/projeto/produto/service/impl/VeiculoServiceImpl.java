@@ -47,14 +47,6 @@ public class VeiculoServiceImpl {
     public VeiculoResponseDTO inserirVeiculo(VeiculoRequestDTO veiculoRequestDTO,
                                              MultipartFile crlv,
                                              MultipartFile comprovanteVistoria) {
-        if (veiculoRequestDTO.getMarca().isEmpty() || veiculoRequestDTO.getModelo().isEmpty() ||
-            veiculoRequestDTO.getModelo().isEmpty() || veiculoRequestDTO.getAnoModelo().isEmpty() ||
-            veiculoRequestDTO.getCor().isEmpty() || veiculoRequestDTO.getPlaca().isEmpty() ||
-            veiculoRequestDTO.getChassi().isEmpty() || veiculoRequestDTO.getRenavam().isEmpty() ||
-            Objects.isNull(crlv) || comprovanteVistoria.isEmpty() || veiculoRequestDTO.getIdPermissionario() == 0 ||
-            veiculoRequestDTO.getNumeroPermissao().isEmpty() || veiculoRequestDTO.getIdPontoTaxi() == 0) {
-            throw new RuntimeException("Dados inválidos/vazios para o Veículo!");
-        }
         if(Objects.isNull(veiculoRequestDTO.getUsuario()) || veiculoRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário não logado ou não identificado!");
 
@@ -77,15 +69,6 @@ public class VeiculoServiceImpl {
     public VeiculoResponseDTO atualizarVeiculo(VeiculoRequestDTO veiculoRequestDTO,
                                                MultipartFile crlv,
                                                MultipartFile comprovanteVistoria) {
-        if (veiculoRequestDTO.getMarca().isEmpty() || veiculoRequestDTO.getModelo().isEmpty() ||
-            veiculoRequestDTO.getModelo().isEmpty() || veiculoRequestDTO.getAnoModelo().isEmpty() ||
-            veiculoRequestDTO.getCor().isEmpty() || veiculoRequestDTO.getPlaca().isEmpty() ||
-            veiculoRequestDTO.getChassi().isEmpty() || veiculoRequestDTO.getRenavam().isEmpty() ||
-            veiculoRequestDTO.getIdPermissionario() == 0 || veiculoRequestDTO.getNumeroPermissao().isEmpty() ||
-            veiculoRequestDTO.getIdPontoTaxi() == 0) {
-                throw new RuntimeException("Dados inválidos/vazios para o Veículo!");
-        }
-
         if(Objects.isNull(veiculoRequestDTO.getUsuario()) || veiculoRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário não logado ou não identificado!");
 
@@ -148,13 +131,10 @@ public class VeiculoServiceImpl {
 
         switch (veiculoList.get(0).getCor()){
             case "1":
-                veiculoList.get(0).setCor("BRANCO");
+                veiculoList.get(0).setCor("BRANCA");
                 break;
             case "2":
                 veiculoList.get(0).setCor("PRATA");
-                break;
-            case "3":
-                veiculoList.get(0).setCor("CINZA");
                 break;
             default:
                 veiculoList.get(0).setCor("");
@@ -248,11 +228,7 @@ public class VeiculoServiceImpl {
         veiculo.setModelo(veiculoRequestDTO.getModelo());
         veiculo.setAnoModelo(veiculoRequestDTO.getAnoModelo());
 
-        if(tipo == 1){
-            veiculo.setCor(veiculoRequestDTO.getCor());
-        }else{
-            veiculo.setCor(converterNomeCor(veiculoRequestDTO.getCor()));
-        }
+        veiculo.setCor(veiculoRequestDTO.getCor());
 
         veiculo.setCombustivel(veiculoRequestDTO.getCombustivel());
         veiculo.setNumeroTaximetro(veiculoRequestDTO.getNumeroTaximetro());
@@ -316,61 +292,13 @@ public class VeiculoServiceImpl {
 
     public String converterNomeCor(String cor){
         switch (cor){
-            case "BRANCO":
+            case "BRANCA":
                 return "1";
             case "PRATA":
                 return "2";
-            case "CINZA":
-                return "3";
         }
 
         return "";
     }
 
-    public String converterIdCor(String cor){
-        switch (cor){
-            case "1":
-                return "BRANCO";
-            case "2":
-                return "PRATA";
-            case "3":
-                return "CINZA";
-        }
-
-        return "";
-    }
-
-    public String converterNomeCombustive(String combustivel){
-        switch (combustivel){
-            case "GASOLINA":
-                return "1";
-            case "ÁLCOOL/ETANOL":
-                return "2";
-            case "DIESEL":
-                return "3";
-            case "GÁS NATURAL":
-                return "4";
-            case "ELETRICIDADE":
-                return "5";
-        }
-
-        return "";
-    }
-
-    public String converterIdCombustive(String combustivel){
-        switch (combustivel){
-            case "1":
-                return "GASOLINA";
-            case "2":
-                return "ÁLCOOL/ETANOL";
-            case "3":
-                return "DIESEL";
-            case "4":
-                return "GÁS NATURAL";
-            case "5":
-                return "ELETRICIDADE";
-        }
-
-        return "";
-    }
 }

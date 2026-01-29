@@ -449,11 +449,9 @@ public class FiscalizacaoServiceImpl {
     public String converterIdCor(String cor){
         switch (cor){
             case "1":
-                return "BRANCO";
+                return "BRANCA";
             case "2":
                 return "PRATA";
-            case "3":
-                return "CINZA";
         }
 
         return "";

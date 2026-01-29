@@ -20,14 +20,10 @@ public class Defensor {
     private String nomeDefensor;
     @Column(name = "CPF_DEFENSOR")
     private String cpfDefensor;
-    @Column(name = "CNPJ_EMPRESA")
-    private String cnpjEmpresa;
     @Column(name = "RG_DEFENSOR")
     private String rgDefensor;
     @Column(name = "ORGAO_EMISSOR")
     private String orgaoEmissor;
-    @Column(name = "NATUREZA_PESSOA")
-    private String naturezaPessoa;
     @Column(name = "UF_DEFENSOR")
     private String ufDefensor;
     @Column(name = "CIDADE_DEFENSOR")
@@ -38,6 +34,8 @@ public class Defensor {
     private String enderecoDefensor;
     @Column(name = "CELULAR_DEFENSOR")
     private String celularDefensor;
+    @Column(name = "EMAIL_DEFENSOR")
+    private String emailDefensor;
     @Column(name = "CNH_DEFENSOR")
     private String cnhDefensor;
     @Column(name = "CATEGORIA_CNH_DEFENSOR")

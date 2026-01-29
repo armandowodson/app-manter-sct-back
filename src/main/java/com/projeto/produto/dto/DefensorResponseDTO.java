@@ -10,15 +10,14 @@ public class DefensorResponseDTO {
     private String numeroPermissao;
     private String nomeDefensor;
     private String cpfDefensor;
-    private String cnpjEmpresa;
     private String rgDefensor;
     private String orgaoEmissor;
-    private String naturezaPessoa;
     private String ufDefensor;
     private String cidadeDefensor;
     private String bairroDefensor;
     private String enderecoDefensor;
     private String celularDefensor;
+    private String emailDefensor;
     private String cnhDefensor;
     private String categoriaCnhDefensor;
     private String numeroQuitacaoMilitar;

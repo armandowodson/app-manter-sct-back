@@ -2,20 +2,17 @@ package com.projeto.produto.service.impl;
 
 import com.projeto.produto.dto.DefensorRequestDTO;
 import com.projeto.produto.dto.DefensorResponseDTO;
-import com.projeto.produto.dto.VeiculoResponseDTO;
 import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.entity.Defensor;
-import com.projeto.produto.entity.Veiculo;
 import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.DefensorRepository;
 import com.projeto.produto.repository.VeiculoRepository;
-import com.projeto.produto.utils.ValidaCNPJ;
 import com.projeto.produto.utils.ValidaCPF;
+import com.projeto.produto.utils.ValidaEmail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,21 +41,14 @@ public class DefensorServiceImpl {
                                                    MultipartFile certificadoCondutor,
                                                    MultipartFile certidaoNegativaCriminal,
                                                    MultipartFile certidaoNegativaMunicipal,
-                                                   MultipartFile foto) throws IOException {
-        if (defensorRequestDTO.getNomeDefensor().isEmpty() || defensorRequestDTO.getCpfDefensor().isEmpty() ||
-            defensorRequestDTO.getRgDefensor().isEmpty() || defensorRequestDTO.getCnhDefensor().isEmpty() ||
-            defensorRequestDTO.getEnderecoDefensor().isEmpty() || defensorRequestDTO.getCelularDefensor().isEmpty() ||
-            defensorRequestDTO.getNumeroPermissao().isEmpty()) {
-            throw new RuntimeException("Dados inválidos/vazios para o Defensor!");
-        }
-
+                                                   MultipartFile foto) {
         if(Objects.nonNull(defensorRequestDTO.getCpfDefensor()) && !defensorRequestDTO.getCpfDefensor().isEmpty() &&
                 !ValidaCPF.isCPF(defensorRequestDTO.getCpfDefensor()))
             throw new RuntimeException("O CPF " + defensorRequestDTO.getCpfDefensor() + " é inválido!");
 
-        if(Objects.nonNull(defensorRequestDTO.getCnpjEmpresa()) && !defensorRequestDTO.getCnpjEmpresa().isEmpty() &&
-                !ValidaCNPJ.isCNPJ(defensorRequestDTO.getCnpjEmpresa()))
-            throw new RuntimeException("O CNPJ " + defensorRequestDTO.getCnpjEmpresa() + " é inválido!");
+        if(Objects.nonNull(defensorRequestDTO.getEmailDefensor()) && !defensorRequestDTO.getEmailDefensor().isEmpty() &&
+                !ValidaEmail.isEmail(defensorRequestDTO.getEmailDefensor()))
+            throw new RuntimeException("O E-mail " + defensorRequestDTO.getEmailDefensor() + " é inválido!");
 
         if(Objects.isNull(defensorRequestDTO.getUsuario()) || defensorRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário não logado ou não identificado!");
@@ -84,21 +74,14 @@ public class DefensorServiceImpl {
                                                  MultipartFile certificadoCondutor,
                                                  MultipartFile certidaoNegativaCriminal,
                                                  MultipartFile certidaoNegativaMunicipal,
-                                                 MultipartFile foto) throws IOException {
-        if (defensorRequestDTO.getNomeDefensor().isEmpty() || defensorRequestDTO.getCpfDefensor().isEmpty() ||
-                defensorRequestDTO.getRgDefensor().isEmpty() || defensorRequestDTO.getCnhDefensor().isEmpty() ||
-                defensorRequestDTO.getEnderecoDefensor().isEmpty() || defensorRequestDTO.getCelularDefensor().isEmpty() ||
-                defensorRequestDTO.getNumeroPermissao().isEmpty()) {
-            throw new RuntimeException("Dados inválidos/vazios para o Defensor!");
-        }
-
+                                                 MultipartFile foto) {
         if(Objects.nonNull(defensorRequestDTO.getCpfDefensor()) && !defensorRequestDTO.getCpfDefensor().isEmpty() &&
                 !ValidaCPF.isCPF(defensorRequestDTO.getCpfDefensor()))
             throw new RuntimeException("O CPF " + defensorRequestDTO.getCpfDefensor() + " é inválido!");
 
-        if(Objects.nonNull(defensorRequestDTO.getCnpjEmpresa()) && !defensorRequestDTO.getCnpjEmpresa().isEmpty() &&
-                !ValidaCNPJ.isCNPJ(defensorRequestDTO.getCnpjEmpresa()))
-            throw new RuntimeException("O CNPJ " + defensorRequestDTO.getCnpjEmpresa() + " é inválido!");
+        if(Objects.nonNull(defensorRequestDTO.getEmailDefensor()) && !defensorRequestDTO.getEmailDefensor().isEmpty() &&
+                !ValidaEmail.isEmail(defensorRequestDTO.getEmailDefensor()))
+            throw new RuntimeException("O E-mail " + defensorRequestDTO.getEmailDefensor() + " é inválido!");
 
         if(Objects.isNull(defensorRequestDTO.getUsuario()) || defensorRequestDTO.getUsuario().isEmpty())
             throw new RuntimeException("Usuário não logado ou não identificado!");
@@ -228,17 +211,16 @@ public class DefensorServiceImpl {
         defensorResponseDTO.setNumeroPermissao(defensor.getNumeroPermissao());
         defensorResponseDTO.setNomeDefensor(defensor.getNomeDefensor());
         defensorResponseDTO.setCpfDefensor(defensor.getCpfDefensor());
-        defensorResponseDTO.setCnpjEmpresa((defensor.getCnpjEmpresa() != null && !defensor.getCnpjEmpresa().equals("null")) ? defensor.getCnpjEmpresa() : "");
         defensorResponseDTO.setRgDefensor(defensor.getRgDefensor());
         defensorResponseDTO.setOrgaoEmissor(defensor.getOrgaoEmissor());
-        defensorResponseDTO.setNaturezaPessoa(defensor.getNaturezaPessoa().equals("1") ? "FÍSICA" : "JURÍDICA");
         defensorResponseDTO.setCnhDefensor(defensor.getCnhDefensor());
-        defensorResponseDTO.setCategoriaCnhDefensor(converterIdCategoriaCnh(defensor.getCategoriaCnhDefensor()));
+        defensorResponseDTO.setCategoriaCnhDefensor(defensor.getCategoriaCnhDefensor());
         defensorResponseDTO.setUfDefensor(defensor.getUfDefensor());
         defensorResponseDTO.setCidadeDefensor(defensor.getCidadeDefensor());
         defensorResponseDTO.setBairroDefensor(defensor.getBairroDefensor());
         defensorResponseDTO.setEnderecoDefensor(defensor.getEnderecoDefensor());
         defensorResponseDTO.setCelularDefensor(defensor.getCelularDefensor());
+        defensorResponseDTO.setEmailDefensor(defensor.getEmailDefensor());
         defensorResponseDTO.setNumeroQuitacaoMilitar(defensor.getNumeroQuitacaoMilitar());
         defensorResponseDTO.setNumeroQuitacaoEleitoral(defensor.getNumeroQuitacaoEleitoral());
         defensorResponseDTO.setNumeroInscricaoInss(defensor.getNumeroInscricaoInss());
@@ -273,36 +255,16 @@ public class DefensorServiceImpl {
             defensor.setCpfDefensor(defensorRequestDTO.getCpfDefensor());
         }
 
-        if(Objects.nonNull(defensorRequestDTO.getCnpjEmpresa()) && !defensorRequestDTO.getCnpjEmpresa().isEmpty() &&
-                !defensorRequestDTO.getCnpjEmpresa().equals("null")){
-            defensorRequestDTO.setCnpjEmpresa(
-                    defensorRequestDTO.getCnpjEmpresa().replace(".", "").replace("-", "").replace("/", "")
-            );
-            defensor.setCnpjEmpresa(defensorRequestDTO.getCnpjEmpresa());
-        }
-
         defensor.setRgDefensor(defensorRequestDTO.getRgDefensor());
         defensor.setOrgaoEmissor(defensorRequestDTO.getOrgaoEmissor());
-
-        if(tipo == 1){
-            defensor.setNaturezaPessoa(defensorRequestDTO.getNaturezaPessoa());
-        }else{
-            defensor.setNaturezaPessoa(defensorRequestDTO.getNaturezaPessoa().equals("FÍSICA") ? "1" : "2");
-        }
-
         defensor.setUfDefensor(defensorRequestDTO.getUfDefensor());
         defensor.setCidadeDefensor(defensorRequestDTO.getCidadeDefensor());
         defensor.setBairroDefensor(defensorRequestDTO.getBairroDefensor());
         defensor.setEnderecoDefensor(defensorRequestDTO.getEnderecoDefensor());
         defensor.setCelularDefensor(defensorRequestDTO.getCelularDefensor());
+        defensor.setEmailDefensor(defensorRequestDTO.getEmailDefensor());
         defensor.setCnhDefensor(defensorRequestDTO.getCnhDefensor());
-
-        if(tipo == 1){
-            defensor.setCategoriaCnhDefensor(defensorRequestDTO.getCategoriaCnhDefensor());
-        }else{
-            defensor.setCategoriaCnhDefensor(converterNomeCategoriaCnh(defensorRequestDTO.getCategoriaCnhDefensor()));
-        }
-
+        defensor.setCategoriaCnhDefensor(defensorRequestDTO.getCategoriaCnhDefensor());
         defensor.setNumeroQuitacaoMilitar(defensorRequestDTO.getNumeroQuitacaoMilitar());
         defensor.setNumeroQuitacaoEleitoral(defensorRequestDTO.getNumeroQuitacaoEleitoral());
         defensor.setNumeroCertificadoCondutor(defensorRequestDTO.getNumeroCertificadoCondutor());
@@ -334,36 +296,6 @@ public class DefensorServiceImpl {
         auditoria.setUsuarioOperacao(usuario);
         auditoria.setDataOperacao(LocalDate.now());
         auditoriaRepository.save(auditoria);
-    }
-
-    public String converterIdCategoriaCnh(String categoria){
-        switch (categoria){
-            case "1":
-                return "B";
-            case "2":
-                return "C";
-            case "3":
-                return "D";
-            case "4":
-                return "E";
-        }
-
-        return "";
-    }
-
-    public String converterNomeCategoriaCnh(String categoria){
-        switch (categoria){
-            case "B":
-                return "1";
-            case "C":
-                return "2";
-            case "D":
-                return "3";
-            case "E":
-                return "4";
-        }
-
-        return "";
     }
 
 }
