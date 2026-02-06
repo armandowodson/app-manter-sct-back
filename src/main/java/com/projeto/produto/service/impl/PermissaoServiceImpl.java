@@ -40,6 +40,8 @@ public class PermissaoServiceImpl {
             throw new RuntimeException("Usuário não logado ou não identificado!");
 
         Permissao permissao = new Permissao();
+        Long numeroMaximo = permissaoRepository.buscarNumeroMaximo();
+        permissaoDTO.setNumeroPermissao(String.valueOf(numeroMaximo + 1));
 
         try{
             permissao = converterPermissaoDTOToPermissao(permissaoDTO, 1);
@@ -260,7 +262,6 @@ public class PermissaoServiceImpl {
         if (permissaoDTO.getIdPermissao() != null && permissaoDTO.getIdPermissao() != 0){
             permissao = permissaoRepository.findById(permissaoDTO.getIdPermissao()).get();
         }
-        permissao.setNumeroPermissao(permissaoDTO.getNumeroPermissao());
         permissao.setNumeroAlvara(permissaoDTO.getNumeroAlvara());
         permissao.setAnoPermissao(permissaoDTO.getAnoPermissao());
 
@@ -311,6 +312,11 @@ public class PermissaoServiceImpl {
         }
 
         permissao.setPenalidade(permissaoDTO.getPenalidade());
+
+        if(Objects.nonNull(permissaoDTO.getDataValidadePenalidade()) && permissaoDTO.getDataValidadePenalidade().equals("null")){
+            permissao.setDataValidadePenalidade(null);
+            permissaoDTO.setDataValidadePermissao(null);
+        }
 
         if(Objects.nonNull(permissaoDTO.getDataValidadePenalidade()) && !permissaoDTO.getDataValidadePenalidade().isEmpty()){
             String data = permissaoDTO.getDataValidadePenalidade();

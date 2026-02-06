@@ -16,13 +16,18 @@ public class LoginController {
     public LoginServiceImpl service;
 
     @GetMapping("/conectar")
-    public ResponseEntity<LoginDTO> efetuarLogin(@RequestParam String usuario, @RequestParam String senha) throws NoSuchAlgorithmException {
+    public ResponseEntity<LoginDTO> efetuarLogin(@RequestParam String usuario, @RequestParam String senha) {
         return ResponseEntity.ok(service.efetuarLogin(usuario, senha));
     }
 
     @PostMapping("/gravar")
-    public ResponseEntity<LoginDTO> gravarUsuario(@RequestBody RegistroDTO registro) throws NoSuchAlgorithmException {
+    public ResponseEntity<LoginDTO> gravarUsuario(@RequestBody RegistroDTO registro) {
         return ResponseEntity.ok(service.gravarUsuario(registro));
+    }
+
+    @PostMapping("/alterar")
+    public ResponseEntity<LoginDTO> alterarSenha(@RequestBody RegistroDTO registro) {
+        return ResponseEntity.ok(service.alterarSenha(registro));
     }
 
 }

@@ -9,4 +9,5 @@ public class RegistroDTO {
     private String usuario;
     private String senha;
     private String nome;
+    private String modulos;
 }

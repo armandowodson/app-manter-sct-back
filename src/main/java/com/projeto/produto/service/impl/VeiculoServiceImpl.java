@@ -234,6 +234,11 @@ public class VeiculoServiceImpl {
         veiculo.setNumeroTaximetro(veiculoRequestDTO.getNumeroTaximetro());
         veiculo.setAnoRenovacao(veiculoRequestDTO.getAnoRenovacao());
 
+        if(Objects.nonNull(veiculoRequestDTO.getDataVistoria()) && veiculoRequestDTO.getDataVistoria().equals("null")){
+            veiculo.setDataVistoria(null);
+            veiculoRequestDTO.setDataVistoria(null);
+        }
+
         if(Objects.nonNull(veiculoRequestDTO.getDataVistoria())) {
             String data = veiculoRequestDTO.getDataVistoria();
             Integer indexChar = data.indexOf('(');
@@ -244,6 +249,11 @@ public class VeiculoServiceImpl {
                 LocalDate localDateVistoria = zonedDateTime.toLocalDate();
                 veiculo.setDataVistoria(localDateVistoria);
             }
+        }
+
+        if(Objects.nonNull(veiculoRequestDTO.getDataRetorno()) && veiculoRequestDTO.getDataRetorno().equals("null")){
+            veiculo.setDataRetorno(null);
+            veiculoRequestDTO.setDataRetorno(null);
         }
 
         if(Objects.nonNull(veiculoRequestDTO.getDataRetorno())) {

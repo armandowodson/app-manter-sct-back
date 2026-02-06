@@ -15,7 +15,7 @@ import java.util.TimeZone;
 public class ManterProdutosApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
-        System.setProperty("server.servlet.context-path", "/");
+        System.setProperty("server.servlet.context-path", "/sgsc");
         SpringApplication.run(ManterProdutosApplication.class, args);
     }
 
