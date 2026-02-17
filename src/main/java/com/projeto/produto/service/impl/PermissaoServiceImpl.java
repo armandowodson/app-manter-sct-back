@@ -4,12 +4,8 @@ import com.projeto.produto.dto.AuditoriaDTO;
 import com.projeto.produto.dto.PermissaoDTO;
 import com.projeto.produto.dto.PermissaoRelatorioDTO;
 import com.projeto.produto.dto.PermissionarioResponseDTO;
-import com.projeto.produto.entity.Auditoria;
-import com.projeto.produto.entity.Defensor;
-import com.projeto.produto.entity.Permissao;
-import com.projeto.produto.entity.Permissionario;
-import com.projeto.produto.repository.AuditoriaRepository;
-import com.projeto.produto.repository.PermissaoRepository;
+import com.projeto.produto.entity.*;
+import com.projeto.produto.repository.*;
 import com.projeto.produto.utils.FormataData;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -27,7 +23,6 @@ import org.springframework.util.ResourceUtils;
 
 import javax.transaction.Transactional;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -42,6 +37,15 @@ public class PermissaoServiceImpl {
 
     @Autowired
     private AuditoriaRepository auditoriaRepository;
+
+    @Autowired
+    private VeiculoRepository veiculoRepository;
+
+    @Autowired
+    private PontosTaxiRepository pontosTaxiRepository;
+
+    @Autowired
+    private PermissionarioRepository permissionarioRepository;
 
     private static final Logger logger = LogManager.getLogger(PermissaoServiceImpl.class);
 
@@ -497,6 +501,74 @@ public class PermissaoServiceImpl {
         }
     }
 
+    public byte[] gerarAutorizacaoTrafego(Long idPermissao) {
+        logger.info("Início Gerar Autorização Tráfego Busca dos Dados");
+        try{
+            Permissao permissao = permissaoRepository.findPermissaoByIdPermissao(idPermissao);
+            if(Objects.isNull(permissao))
+                throw new RuntimeException("Não é possível emitir a AT! Não há Permissão para o ID informado!");
+
+            Veiculo veiculo = veiculoRepository.findVeiculoByNumeroPermissao(permissao.getNumeroPermissao());
+            if(Objects.isNull(veiculo))
+                throw new RuntimeException("Não é possível emitir a AT! Não há Veículo associado à Permissão!");
+
+            PontoTaxi pontoTaxi = pontosTaxiRepository.findByIdPontoTaxi(veiculo.getPontoTaxi().getIdPontoTaxi());
+            if(Objects.isNull(pontoTaxi))
+                throw new RuntimeException("Não é possível emitir a AT! Não há PET associado ao Veículo!");
+
+            Permissionario permissionario = permissionarioRepository.findPermissionarioByNumeroPermissao(permissao.getNumeroPermissao());
+            if(Objects.isNull(pontoTaxi))
+                throw new RuntimeException("Não é possível emitir a AT! Não há PET associado ao Veículo!");
+
+            byte[] bytes = gerarAutorizacaoTrafegoJasper(permissao, veiculo, pontoTaxi, permissionario);
+            return bytes;
+        } catch (Exception e){
+            logger.error("gerarAutorizacaoTrafego - Permissão: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public byte[] gerarAutorizacaoTrafegoJasper(Permissao permissao, Veiculo veiculo, PontoTaxi pontoTaxi, Permissionario permissionario) {
+        logger.info("Início Gerar Autorização Tráfego Jasper");
+        try{
+            ClassPathResource resource = new ClassPathResource("reports/autorizacaoTrafego.jrxml");
+            JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
+            FileInputStream  cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoAutorizacaoTrafego.png" ).getAbsolutePath());
+            FileInputStream  rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeAutorizacaoTrafego.png" ).getAbsolutePath());
+
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("imagemCabecalho", cabecalhoStream);
+            parameters.put("imagemRodape", rodapeStream);
+            parameters.put("numeroAutorizacao", permissao.getAutorizacaoTrafego());
+            parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(LocalDate.now()));
+            parameters.put("categoriaServicoAutorizado", carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
+            parameters.put("validadeAutorizacao", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataCriacao()) +
+                    " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataValidadePermissao()));
+            parameters.put("placa", veiculo.getPlaca());
+            parameters.put("renavam", veiculo.getRenavam());
+            parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
+            parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
+            parameters.put("tipoCombustivel", carregarTipoCombustivelVeiculo(veiculo.getCombustivel()));
+            parameters.put("cor", veiculo.getCor().equals("1") ? "Branca" : "Prata");
+            parameters.put("capacidade", "");
+            parameters.put("pet", pontoTaxi.getDescricaoPonto());
+            parameters.put("numeroPermissao", permissao.getNumeroPermissao());
+            parameters.put("permissionario", permissionario.getNomePermissionario());
+            parameters.put("ultimaVistoria", Objects.nonNull(veiculo.getDataVistoria()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataVistoria()) : "");
+            parameters.put("quilometragem", "");
+            parameters.put("proximaVistoria", Objects.nonNull(veiculo.getDataRetorno()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataRetorno()) : "");
+            parameters.put("statusVistoria", "");
+
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+
+            byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
+            return bytes;
+        } catch (Exception e){
+            logger.error("gerarAutorizacaoTrafegoJasper: " + e.getMessage());
+            throw new RuntimeException("Erro ao Gerar Autorização Tráfego");
+        }
+    }
+
     public String carregarCategoriaPermissao(String categoria) {
         String strCategoria = "";
         switch (categoria) {
@@ -566,5 +638,43 @@ public class PermissaoServiceImpl {
                 break;
         }
         return strModalidade;
+    }
+
+    public String carregarCategoriaVeiculo(String tipo) {
+        String strTipo = "";
+        switch (tipo) {
+            case "1":
+                strTipo = "Convencional";
+                break;
+            case "2":
+                strTipo = "Executivo";
+                break;
+            case "3":
+                strTipo = "Especial";
+                break;
+        }
+        return strTipo;
+    }
+
+    public String carregarTipoCombustivelVeiculo(String tipo) {
+        String strTipo = "";
+        switch (tipo) {
+            case "1":
+                strTipo = "Gasolina";
+                break;
+            case "2":
+                strTipo = "Álcool/Etanol";
+                break;
+            case "3":
+                strTipo = "Diesel";
+                break;
+            case "4":
+                strTipo = "Gás Natural";
+                break;
+            case "5":
+                strTipo = "Eletricidade";
+                break;
+        }
+        return strTipo;
     }
 }

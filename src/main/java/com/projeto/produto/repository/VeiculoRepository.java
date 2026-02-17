@@ -23,6 +23,8 @@ public interface VeiculoRepository extends JpaRepository<Veiculo,Integer> {
 
     Veiculo findVeiculoByPermissionario(Permissionario permissionario);
 
+    Veiculo findVeiculoByNumeroPermissao(String numeroPermissao);
+
     @Query(
             value = "SELECT * " +
                     "FROM proj.veiculo " +

@@ -44,6 +44,6 @@ public interface PermissionarioRepository extends JpaRepository<Permissionario, 
     )
     List<Permissionario> listarPermissionariosDisponiveis();
 
-    void deletePermissionarioByIdPermissionario(Long idPermissionario);
+    Permissionario findPermissionarioByNumeroPermissao(String numeroPermissao);
 }
 

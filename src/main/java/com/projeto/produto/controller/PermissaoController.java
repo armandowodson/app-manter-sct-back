@@ -116,4 +116,18 @@ public class PermissaoController {
             return ResponseEntity.ok().headers(headers).body(fileBytes);
     }
 
+    @GetMapping("/gerar-autorizacao-trafego")
+    public ResponseEntity<byte[]> gerarRelatorio( @RequestParam(required = true) Long idPermissao) {
+        byte[] fileBytes = service.gerarAutorizacaoTrafego(idPermissao);
+
+        String fileName = "autorizacaoTrafego-" + LocalDate.now() + ":" + idPermissao + ".pdf";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDispositionFormData("attachment", fileName);
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentLength(fileBytes.length);
+
+        return ResponseEntity.ok().headers(headers).body(fileBytes);
+    }
+
 }

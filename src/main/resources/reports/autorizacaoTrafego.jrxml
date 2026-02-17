@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SCT-REPORTS" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="85fa479f-3717-4d1e-a4a2-c4ea08982cc9">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Sample DB"/>
+	<parameter name="imagemCabecalho" class="java.io.InputStream"/>
+	<parameter name="numeroAutorizacao" class="java.lang.String"/>
+	<parameter name="dataEmissao" class="java.lang.String"/>
+	<parameter name="categoriaServicoAutorizado" class="java.lang.String"/>
+	<parameter name="validadeAutorizacao" class="java.lang.String"/>
+	<parameter name="imagemRodape" class="java.io.InputStream"/>
+	<parameter name="placa" class="java.lang.String"/>
+	<parameter name="renavam" class="java.lang.String"/>
+	<parameter name="marcaModelo" class="java.lang.String"/>
+	<parameter name="anoFabricacao" class="java.lang.String"/>
+	<parameter name="tipoCombustivel" class="java.lang.String"/>
+	<parameter name="cor" class="java.lang.String"/>
+	<parameter name="capacidade" class="java.lang.String"/>
+	<parameter name="pet" class="java.lang.String"/>
+	<parameter name="numeroPermissao" class="java.lang.String"/>
+	<parameter name="permissionario" class="java.lang.String"/>
+	<parameter name="ultimaVistoria" class="java.lang.String"/>
+	<parameter name="quilometragem" class="java.lang.String"/>
+	<parameter name="proximaVistoria" class="java.lang.String"/>
+	<parameter name="statusVistoria" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="166" splitType="Stretch">
+			<image hAlign="Center">
+				<reportElement x="20" y="3" width="520" height="156" uuid="2e93be38-7968-440a-8e18-aa219e0bce36"/>
+				<imageExpression><![CDATA[$P{imagemCabecalho}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="518" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="6" y="4" width="547" height="17" forecolor="#FFFFFF" backcolor="#2F1491" uuid="013bb842-810a-470f-a434-786ccef03305"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[1. DADOS DA AUTORIZAÇÃO (AT)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="6" y="30" width="44" height="17" uuid="4705374d-327b-49b0-a567-9c2e71a93683"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nº AT: ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="51" y="30" width="129" height="17" uuid="d609b55e-1faf-4383-beb3-62576272b19f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{numeroAutorizacao}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="330" y="30" width="110" height="17" uuid="152d4651-720a-4d63-8b65-eb4d411cd524"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Emissão:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="440" y="30" width="99" height="17" uuid="32705968-9ccc-4fca-bec5-d199de4f21cb">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{dataEmissao}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="53" width="194" height="17" uuid="f68916d1-0207-4c21-99c3-c767deabc045"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Categoria de Serviço Autorizado:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="330" y="53" width="210" height="17" uuid="6c3f6527-b04c-43bc-af9c-e972d6b16fa6">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$P{categoriaServicoAutorizado}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="160" y="90" width="260" height="17" uuid="fef1cb63-8af4-47ec-83e7-0e5bca051e59"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[VALIDADE DESTA AUTORIZAÇÃO (AT)]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="140" y="110" width="290" height="17" uuid="c605c9d9-3420-4714-8a33-ae22d37b3576">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$P{validadeAutorizacao}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="5" y="132" width="547" height="17" forecolor="#FFFFFF" backcolor="#2F1491" uuid="f3754fce-def3-4d34-be1f-51a1af5fb273"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[2. DADOS DO VEÍCULO AUTORIZADO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="6" y="153" width="84" height="17" uuid="f37db321-c02c-41b9-b51d-98b2022ea8f8"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Placa:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="104" y="153" width="129" height="17" uuid="28577c7e-d984-47bd-87e3-c7b26f3253ad">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{placa}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="332" y="153" width="88" height="17" uuid="90b3c09b-1c7c-4bd1-8e6e-dcaa45918fd3"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RENAVAM:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="432" y="153" width="116" height="17" uuid="11c37af0-1e0d-4a16-a330-e3891d7d23a0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{renavam}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="172" width="93" height="17" uuid="45283ceb-333c-4cc2-a70b-7fecce5e9380"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Marca/Modelo:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="104" y="172" width="218" height="17" uuid="a986055b-2177-438e-b6d8-2f5b86cf6006">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{marcaModelo}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="332" y="172" width="98" height="17" uuid="dc5ab3bd-d2dd-499d-8342-43e1074a232f"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ano Fabricação:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="432" y="172" width="90" height="17" uuid="069bda8b-254d-4dba-a1ac-5134ddf0b700">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{anoFabricacao}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="191" width="84" height="17" uuid="f5bf7d8a-00aa-495f-86de-df2f65302a5d"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Combustível:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="104" y="191" width="90" height="17" uuid="bbb2d01a-b5a1-48fc-bccc-a89e29b4757a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{tipoCombustivel}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="200" y="191" width="52" height="17" uuid="eb8f323c-6c4a-4f65-8583-2e630069f96f"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cor:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="254" y="191" width="67" height="17" uuid="61c6b80b-6d34-44b7-b10d-9083e486c161">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{cor}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="332" y="191" width="84" height="17" uuid="27f7950d-6661-4d1b-a18c-ec108da124e4"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Capacidade:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="433" y="191" width="90" height="17" uuid="6ad7b8e8-3f94-4c72-ae80-2c9017840225">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{capacidade}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="211" width="84" height="17" uuid="724ac348-1967-480e-acd4-fff4f0f3d5e1"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PET:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="104" y="211" width="216" height="17" uuid="f3ceb054-99c2-400e-a13d-2a27cfdeef9c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{pet}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="332" y="211" width="84" height="17" uuid="cdddd3eb-9040-45d4-98a6-822a03f3f819"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nº Permissão:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="433" y="211" width="90" height="17" uuid="469a4db5-4800-4ffc-9eab-44a4f4ea42a4">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{numeroPermissao}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="230" width="93" height="17" uuid="ce7b1c3d-d668-491c-9017-7649e52fa0b1"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Permissionário:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="104" y="230" width="216" height="17" uuid="bc680cbf-0251-41df-8d6d-b6377ebca2db">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{permissionario}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="5" y="250" width="547" height="17" forecolor="#FFFFFF" backcolor="#2F1491" uuid="73bb3a0e-88f3-4576-a97b-4c3c485ca5ce"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[3. VISTORIA OBRIGATÓRIA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="6" y="270" width="93" height="17" uuid="e318db17-9aeb-43b2-a009-e37dc3d5c613"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Última Vistoria:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="105" y="270" width="129" height="17" uuid="a2691977-efde-40b4-9772-5e0a5101b52e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{ultimaVistoria}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="332" y="270" width="98" height="17" uuid="e10b8fe0-4383-4665-9a14-4a222950b7aa"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Quilometragem:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="433" y="270" width="90" height="17" uuid="d831a43b-f182-418c-a083-0978daa6f846">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{quilometragem}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="106" y="291" width="129" height="17" uuid="c506c84e-f633-4ebd-878f-c28f4869d1c0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{proximaVistoria}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="7" y="291" width="99" height="17" uuid="4371f973-f4ca-4a04-a09d-0e7e912dd177"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Próxima Vistoria:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="312" width="99" height="17" uuid="f7d3215b-71d3-4c3a-9ed3-8a2cd297e9e2"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Status Vistoria:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="107" y="312" width="162" height="17" uuid="70f375bc-2d97-470d-925e-f48c69a15832">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{statusVistoria}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Left">
+				<reportElement x="7" y="337" width="535" height="173" uuid="886cf715-2a31-43fb-8fbd-56bbc50ca539"/>
+				<imageExpression><![CDATA[$P{imagemRodape}]]></imageExpression>
+			</image>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="3" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
