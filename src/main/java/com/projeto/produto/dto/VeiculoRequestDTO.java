@@ -19,10 +19,13 @@ public class VeiculoRequestDTO {
     private String anoModelo;
     private String cor;
     private String combustivel;
+    private String capacidade;
+    private String quilometragem;
     private String numeroTaximetro;
     private String anoRenovacao;
     private String dataVistoria;
     private String dataRetorno;
+    private String statusVistoria;
     private String situacaoVeiculo;
     private String numeroCrlv;
     private String anoCrlv;

@@ -24,6 +24,12 @@ public class Permissionario {
     private String rgPermissionario;
     @Column(name = "ORGAO_EMISSOR")
     private String orgaoEmissor;
+    @Column(name = "DATA_NASCIMENTO")
+    private LocalDate dataNascimento;
+    @Column(name = "SEXO")
+    private String sexo;
+    @Column(name = "ESTADO_CIVIL")
+    private String estadoCivil;
     @Column(name = "UF_PERMISSIONARIO")
     private String ufPermissionario;
     @Column(name = "CIDADE_PERMISSIONARIO")

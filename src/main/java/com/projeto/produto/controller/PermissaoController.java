@@ -117,17 +117,31 @@ public class PermissaoController {
     }
 
     @GetMapping("/gerar-autorizacao-trafego")
-    public ResponseEntity<byte[]> gerarRelatorio( @RequestParam(required = true) Long idPermissao) {
-        byte[] fileBytes = service.gerarAutorizacaoTrafego(idPermissao);
+    public ResponseEntity<byte[]> gerarAutorizacaoTrafego( @RequestParam(required = true) Long idPermissao) {
+        try{
+            byte[] fileBytes = service.gerarAutorizacaoTrafego(idPermissao);
 
-        String fileName = "autorizacaoTrafego-" + LocalDate.now() + ":" + idPermissao + ".pdf";
+            String fileName = "autorizacaoTrafego-" + LocalDate.now() + "Nº" + idPermissao + ".pdf";
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentDispositionFormData("attachment", fileName);
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentLength(fileBytes.length);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDispositionFormData("attachment", fileName);
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentLength(fileBytes.length);
 
-        return ResponseEntity.ok().headers(headers).body(fileBytes);
+            return ResponseEntity.ok().headers(headers).body(fileBytes);
+        } catch (Exception e){
+            if(e.getMessage().equals("400"))
+                return ResponseEntity.status(400).body(null);
+            if(e.getMessage().equals("401"))
+                return ResponseEntity.status(401).body(null);
+            if(e.getMessage().equals("402"))
+                return ResponseEntity.status(402).body(null);
+            if(e.getMessage().equals("403"))
+                return ResponseEntity.status(403).body(null);
+            if(e.getMessage().equals("500"))
+                return ResponseEntity.status(500).body(null);
+        }
+        return  null;
     }
 
 }

@@ -190,11 +190,14 @@ public class VeiculoServiceImpl {
         veiculoResponseDTO.setAnoModelo(veiculo.getAnoModelo());
         veiculoResponseDTO.setCor(veiculo.getCor());
         veiculoResponseDTO.setCombustivel(veiculo.getCombustivel());
+        veiculoResponseDTO.setCapacidade(veiculo.getCapacidade());
+        veiculoResponseDTO.setQuilometragem(veiculo.getQuilometragem());
         veiculoResponseDTO.setCrlv(veiculo.getCrlv());
         veiculoResponseDTO.setNumeroTaximetro(veiculo.getNumeroTaximetro());
         veiculoResponseDTO.setAnoRenovacao(veiculo.getAnoRenovacao());
         veiculoResponseDTO.setDataVistoria(veiculo.getDataVistoria().plusDays(1).toString());
         veiculoResponseDTO.setDataRetorno(veiculo.getDataRetorno().plusDays(1).toString());
+        veiculoResponseDTO.setStatusVistoria(veiculo.getStatusVistoria());
         veiculoResponseDTO.setComprovanteVistoria(veiculo.getComprovanteVistoria());
         veiculoResponseDTO.setSituacaoVeiculo(veiculo.getSituacaoVeiculo());
         veiculoResponseDTO.setTipoVeiculo(veiculo.getTipoVeiculo());
@@ -227,10 +230,10 @@ public class VeiculoServiceImpl {
         veiculo.setMarca(veiculoRequestDTO.getMarca());
         veiculo.setModelo(veiculoRequestDTO.getModelo());
         veiculo.setAnoModelo(veiculoRequestDTO.getAnoModelo());
-
         veiculo.setCor(veiculoRequestDTO.getCor());
-
         veiculo.setCombustivel(veiculoRequestDTO.getCombustivel());
+        veiculo.setCapacidade(veiculoRequestDTO.getCapacidade());
+        veiculo.setQuilometragem(veiculoRequestDTO.getQuilometragem());
         veiculo.setNumeroTaximetro(veiculoRequestDTO.getNumeroTaximetro());
         veiculo.setAnoRenovacao(veiculoRequestDTO.getAnoRenovacao());
 
@@ -238,6 +241,7 @@ public class VeiculoServiceImpl {
             veiculo.setDataVistoria(null);
             veiculoRequestDTO.setDataVistoria(null);
         }
+        veiculo.setStatusVistoria(veiculoRequestDTO.getStatusVistoria());
 
         if(Objects.nonNull(veiculoRequestDTO.getDataVistoria())) {
             String data = veiculoRequestDTO.getDataVistoria();

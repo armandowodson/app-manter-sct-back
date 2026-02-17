@@ -1,11 +1,10 @@
 package com.projeto.produto.service.impl;
 
-import com.projeto.produto.dto.AuditoriaDTO;
 import com.projeto.produto.dto.PermissaoDTO;
 import com.projeto.produto.dto.PermissaoRelatorioDTO;
-import com.projeto.produto.dto.PermissionarioResponseDTO;
 import com.projeto.produto.entity.*;
 import com.projeto.produto.repository.*;
+import com.projeto.produto.utils.CarregarTipos;
 import com.projeto.produto.utils.FormataData;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -16,7 +15,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
@@ -506,19 +504,19 @@ public class PermissaoServiceImpl {
         try{
             Permissao permissao = permissaoRepository.findPermissaoByIdPermissao(idPermissao);
             if(Objects.isNull(permissao))
-                throw new RuntimeException("Não é possível emitir a AT! Não há Permissão para o ID informado!");
+                throw new RuntimeException("400");
 
             Veiculo veiculo = veiculoRepository.findVeiculoByNumeroPermissao(permissao.getNumeroPermissao());
             if(Objects.isNull(veiculo))
-                throw new RuntimeException("Não é possível emitir a AT! Não há Veículo associado à Permissão!");
+                throw new RuntimeException("401");
 
             PontoTaxi pontoTaxi = pontosTaxiRepository.findByIdPontoTaxi(veiculo.getPontoTaxi().getIdPontoTaxi());
             if(Objects.isNull(pontoTaxi))
-                throw new RuntimeException("Não é possível emitir a AT! Não há PET associado ao Veículo!");
+                throw new RuntimeException("402");
 
             Permissionario permissionario = permissionarioRepository.findPermissionarioByNumeroPermissao(permissao.getNumeroPermissao());
             if(Objects.isNull(pontoTaxi))
-                throw new RuntimeException("Não é possível emitir a AT! Não há PET associado ao Veículo!");
+                throw new RuntimeException("403");
 
             byte[] bytes = gerarAutorizacaoTrafegoJasper(permissao, veiculo, pontoTaxi, permissionario);
             return bytes;
@@ -541,23 +539,23 @@ public class PermissaoServiceImpl {
             parameters.put("imagemRodape", rodapeStream);
             parameters.put("numeroAutorizacao", permissao.getAutorizacaoTrafego());
             parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(LocalDate.now()));
-            parameters.put("categoriaServicoAutorizado", carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
+            parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
             parameters.put("validadeAutorizacao", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataCriacao()) +
                     " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataValidadePermissao()));
             parameters.put("placa", veiculo.getPlaca());
             parameters.put("renavam", veiculo.getRenavam());
             parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
             parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
-            parameters.put("tipoCombustivel", carregarTipoCombustivelVeiculo(veiculo.getCombustivel()));
+            parameters.put("tipoCombustivel", CarregarTipos.carregarTipoCombustivelVeiculo(veiculo.getCombustivel()));
             parameters.put("cor", veiculo.getCor().equals("1") ? "Branca" : "Prata");
-            parameters.put("capacidade", "");
+            parameters.put("capacidade", veiculo.getCapacidade());
             parameters.put("pet", pontoTaxi.getDescricaoPonto());
             parameters.put("numeroPermissao", permissao.getNumeroPermissao());
             parameters.put("permissionario", permissionario.getNomePermissionario());
             parameters.put("ultimaVistoria", Objects.nonNull(veiculo.getDataVistoria()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataVistoria()) : "");
-            parameters.put("quilometragem", "");
+            parameters.put("quilometragem", veiculo.getQuilometragem());
             parameters.put("proximaVistoria", Objects.nonNull(veiculo.getDataRetorno()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataRetorno()) : "");
-            parameters.put("statusVistoria", "");
+            parameters.put("statusVistoria", CarregarTipos.carregarStatusVistoriaVeiculo(veiculo.getStatusVistoria()));
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
 
@@ -565,7 +563,7 @@ public class PermissaoServiceImpl {
             return bytes;
         } catch (Exception e){
             logger.error("gerarAutorizacaoTrafegoJasper: " + e.getMessage());
-            throw new RuntimeException("Erro ao Gerar Autorização Tráfego");
+            throw new RuntimeException("500");
         }
     }
 
@@ -640,41 +638,4 @@ public class PermissaoServiceImpl {
         return strModalidade;
     }
 
-    public String carregarCategoriaVeiculo(String tipo) {
-        String strTipo = "";
-        switch (tipo) {
-            case "1":
-                strTipo = "Convencional";
-                break;
-            case "2":
-                strTipo = "Executivo";
-                break;
-            case "3":
-                strTipo = "Especial";
-                break;
-        }
-        return strTipo;
-    }
-
-    public String carregarTipoCombustivelVeiculo(String tipo) {
-        String strTipo = "";
-        switch (tipo) {
-            case "1":
-                strTipo = "Gasolina";
-                break;
-            case "2":
-                strTipo = "Álcool/Etanol";
-                break;
-            case "3":
-                strTipo = "Diesel";
-                break;
-            case "4":
-                strTipo = "Gás Natural";
-                break;
-            case "5":
-                strTipo = "Eletricidade";
-                break;
-        }
-        return strTipo;
-    }
 }

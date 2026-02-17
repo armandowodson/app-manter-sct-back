@@ -19,11 +19,14 @@ public class VeiculoResponseDTO {
     private String anoModelo;
     private String cor;
     private String combustivel;
+    private String capacidade;
+    private String quilometragem;
     private byte[] crlv;
     private String numeroTaximetro;
     private String anoRenovacao;
     private String dataVistoria;
     private String dataRetorno;
+    private String statusVistoria;
     private byte[] comprovanteVistoria;
     private String situacaoVeiculo;
     private String numeroCrlv;

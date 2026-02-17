@@ -40,6 +40,10 @@ public class Veiculo {
     private String cor;
     @Column(name = "COMBUSTIVEL")
     private String combustivel;
+    @Column(name = "CAPACIDADE")
+    private String capacidade;
+    @Column(name = "QUILOMETRAGEM")
+    private String quilometragem;
     @Lob
     @Column(name = "CRLV")
     private byte[] crlv;
@@ -51,6 +55,8 @@ public class Veiculo {
     private LocalDate dataVistoria;
     @Column(name = "DATA_RETORNO")
     private LocalDate dataRetorno;
+    @Column(name = "STATUS_VISTORIA")
+    private String statusVistoria;
     @Lob
     @Column(name = "COMPROVANTE_VISTORIA")
     private byte[] comprovanteVistoria;
