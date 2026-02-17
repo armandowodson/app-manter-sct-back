@@ -3,6 +3,7 @@ package com.projeto.produto.service.impl;
 import com.projeto.produto.dto.AuditoriaDTO;
 import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.repository.AuditoriaRepository;
+import com.projeto.produto.utils.FormataData;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.view.JasperViewer;
@@ -68,15 +69,15 @@ public class AuditoriaServiceImpl {
 
     }
 
-    public List<AuditoriaDTO> imprimirAuditoria(String nomeModulo, String usuarioOperacao,
+    public byte[] imprimirAuditoria(String nomeModulo, String usuarioOperacao,
                                                 String operacao, String dataInicioOperacao,
                                                 String dataFimOperacao, PageRequest pageRequest) throws JRException, SQLException, IOException {
         logger.info("Início Imprimir Auditoria");
         try{
             Page<AuditoriaDTO> listaAuditoriasPage = listarTodosAuditoriaFiltros(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao, pageRequest);
             List<AuditoriaDTO> listaAuditorias = listaAuditoriasPage.getContent();
-            gerarRelatorio(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao, listaAuditorias);
-            return listaAuditorias;
+            byte[] bytes = gerarRelatorio(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao, listaAuditorias);
+            return bytes;
         } catch (Exception e){
             logger.error("imprimirAuditoria: " + e.getMessage());
             throw new RuntimeException("Erro ao Imprimir Auditoria");
@@ -181,7 +182,7 @@ public class AuditoriaServiceImpl {
         }
     }
 
-    public void gerarRelatorio(String nomeModulo, String usuarioOperacao, String operacao, String dataInicioOperacao,
+    public byte[] gerarRelatorio(String nomeModulo, String usuarioOperacao, String operacao, String dataInicioOperacao,
                                String dataFimOperacao, List<AuditoriaDTO> listaAuditorias) throws JRException, SQLException, IOException {
         logger.info("Início Gerar Reltório");
         try{
@@ -194,8 +195,8 @@ public class AuditoriaServiceImpl {
             parameters.put("nomeModulo", Objects.nonNull(nomeModulo) ? nomeModulo : "");
             parameters.put("usuario", Objects.nonNull(usuarioOperacao) ? usuarioOperacao : "");
             parameters.put("operacao", Objects.nonNull(operacao) ? operacao : "");
-            parameters.put("dataInicio", Objects.nonNull(dataInicioOperacao) ? formatarData(dataInicioOperacao) : "");
-            parameters.put("dataFim", Objects.nonNull(dataFimOperacao) ? formatarData(dataFimOperacao) : "");
+            parameters.put("dataInicio", Objects.nonNull(dataInicioOperacao) ? FormataData.formatarDataLocalDate(dataInicioOperacao) : "");
+            parameters.put("dataFim", Objects.nonNull(dataFimOperacao) ? FormataData.formatarDataLocalDate(dataFimOperacao) : "");
 
             Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "system", "1978");
             Statement stm = connection.createStatement();
@@ -204,54 +205,21 @@ public class AuditoriaServiceImpl {
                 JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(listaAuditorias);
                 JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
-                Long contador = contarArquivos();
-                JasperExportManager.exportReportToPdfFile(jasperPrint, "C:/Relatorios/auditoria-" + "Nº" + contador+1 + "-" + LocalDate.now() + ".pdf");
+                byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
+                return bytes;
             }else{
                 query = "SELECT NOME_MODULO, USUARIO_OPERACAO, OPERACAO, TO_CHAR(DATA_OPERACAO, 'dd/MM/yyyy') DATA_OPERACAO FROM PROJ.AUDITORIA";
                 ResultSet rs = stm.executeQuery( query );
                 JRResultSetDataSource jrRS = new JRResultSetDataSource( rs );
                 JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, jrRS);
 
-                Long contador = contarArquivos();
-                JasperExportManager.exportReportToPdfFile(jasperPrint, "C:/Relatorios/auditoria-" + "Nº" + contador+1 + "-" + LocalDate.now() + ".pdf");
+                byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
+                return bytes;
             }
         } catch (Exception e){
             logger.error("gerarRelatorio: " + e.getMessage());
             throw new RuntimeException("Erro ao Gerar Reltório");
         }
-    }
-
-    public Long contarArquivos(){
-        logger.info("Início Contar Arquivos");
-        Path caminhoDiretorio = Paths.get("C:\\Relatorios");
-
-        Long contador = 0L;
-        try (Stream<Path> stream = Files.walk(caminhoDiretorio)) {
-            contador = stream
-                    .filter(Files::isRegularFile) // Filtra apenas arquivos regulares
-                    .count(); // Conta os arquivos
-        } catch (IOException e) {
-            logger.error("contarArquivos: " + e.getMessage());
-        }
-
-        return contador;
-    }
-
-    public String formatarData(String dataOperacao){
-        LocalDate localDate = LocalDate.now();
-        Integer indexChar = dataOperacao.indexOf('(');
-        String dataFormatada = "";
-        if(indexChar > 0){
-            dataOperacao = dataOperacao.substring(0, indexChar);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss 'GMT'Z", Locale.ENGLISH);
-            ZonedDateTime zonedDateTime = ZonedDateTime.parse(dataOperacao.trim(), formatter);
-            localDate = zonedDateTime.toLocalDate();
-
-            formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            dataFormatada = localDate.format(formatter);
-        }
-
-        return dataFormatada;
     }
 
 }

@@ -52,6 +52,18 @@ public interface PermissaoRepository extends JpaRepository<Permissao, Long> {
     @Query(
             value = "SELECT * " +
                     "FROM proj.permissao " +
+                    "WHERE 1 = 1 " +
+                    "AND (:anoPermissao IS NULL OR ANO_PERMISSAO = :anoPermissao) " +
+                    "AND (:statusPermissao IS NULL OR STATUS_PERMISSAO = :statusPermissao) " +
+                    "AND DATA_CRIACAO >= :dataInicioGeracao AND DATA_CRIACAO <= :dataFimGeracao " ,
+            nativeQuery = true
+    )
+    List<Permissao> listarTodasPermissoesRelatorio(@Param("anoPermissao") String anoPermissao, @Param("statusPermissao") String statusPermissao,
+                                                   @Param("dataInicioGeracao") LocalDate dataInicioGeracao, @Param("dataFimGeracao") LocalDate dataFimGeracao);
+
+    @Query(
+            value = "SELECT * " +
+                    "FROM proj.permissao " +
                     "WHERE NUMERO_PERMISSAO NOT IN (SELECT NUMERO_PERMISSAO FROM PROJ.PERMISSIONARIO) " +
                     "AND STATUS = 'ATIVO' ",
             nativeQuery = true

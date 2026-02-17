@@ -3,13 +3,20 @@ package com.projeto.produto.controller;
 import com.projeto.produto.dto.PermissaoDTO;
 import com.projeto.produto.dto.PermissionarioResponseDTO;
 import com.projeto.produto.service.impl.PermissaoServiceImpl;
+import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/permissao")
@@ -88,6 +95,25 @@ public class PermissaoController {
     @DeleteMapping("/excluir/{idPermissao}/usuario/{usuario}")
     public ResponseEntity<Void> excluirPermissao(@PathVariable Long idPermissao, @PathVariable String usuario) {
         return service.excluirPermissao(idPermissao, usuario);
+    }
+
+    @GetMapping("/gerar-relatorio")
+    public ResponseEntity<byte[]> gerarRelatorio( @RequestParam(required = false) String anoPermissao,
+                                                  @RequestParam(required = false) String statusPermissao,
+                                                  @RequestParam(required = false) String dataInicioGeracao,
+                                                  @RequestParam(required = false) String dataFimGeracao) {
+            byte[] fileBytes = service.gerarRelatorio(anoPermissao, statusPermissao, dataInicioGeracao, dataFimGeracao);
+
+            Random gerador = new Random();
+            Integer numAleatorio = gerador.nextInt(100);
+            String fileName = "permissao-" + LocalDate.now() + ":" + numAleatorio + ".pdf";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDispositionFormData("attachment", fileName);
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentLength(fileBytes.length);
+
+            return ResponseEntity.ok().headers(headers).body(fileBytes);
     }
 
 }
