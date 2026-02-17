@@ -13,6 +13,9 @@ public class PermissionarioResponseDTO {
     private String cnpjEmpresa;
     private String rgPermissionario;
     private String orgaoEmissor;
+    private String sexo;
+    private String estadoCivil;
+    private String dataNascimento;
     private String ufPermissionario;
     private String cidadePermissionario;
     private String bairroPermissionario;

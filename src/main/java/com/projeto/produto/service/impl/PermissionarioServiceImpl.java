@@ -250,6 +250,9 @@ public class PermissionarioServiceImpl {
         permissionarioResponseDTO.setCpfPermissionario(permissionario.getCpfPermissionario());
         permissionarioResponseDTO.setRgPermissionario(permissionario.getRgPermissionario());
         permissionarioResponseDTO.setOrgaoEmissor(permissionario.getOrgaoEmissor());
+        permissionarioResponseDTO.setSexo(permissionario.getSexo());
+        permissionarioResponseDTO.setEstadoCivil(permissionario.getEstadoCivil());
+        permissionarioResponseDTO.setDataNascimento(permissionario.getDataNascimento().toString());
         permissionarioResponseDTO.setCnhPermissionario(permissionario.getCnhPermissionario());
         permissionarioResponseDTO.setCategoriaCnhPermissionario(permissionario.getCategoriaCnhPermissionario());
         permissionarioResponseDTO.setUfPermissionario(permissionario.getUfPermissionario());
@@ -295,6 +298,20 @@ public class PermissionarioServiceImpl {
 
         permissionario.setRgPermissionario(permissionarioRequestDTO.getRgPermissionario());
         permissionario.setOrgaoEmissor(permissionarioRequestDTO.getOrgaoEmissor());
+        permissionario.setSexo(permissionarioRequestDTO.getSexo());
+        permissionario.setEstadoCivil(permissionarioRequestDTO.getEstadoCivil());
+        if(Objects.nonNull(permissionarioRequestDTO.getDataNascimento())) {
+            String data = permissionarioRequestDTO.getDataNascimento();
+            Integer indexChar = data.indexOf('T');
+            if(indexChar > 0){
+                data = data.substring(0, indexChar);
+                if(tipo == 1){
+                    permissionario.setDataNascimento(LocalDate.parse(data));
+                }else{
+                    permissionario.setDataNascimento(LocalDate.parse(data).minusDays(1));
+                }
+            }
+        }
         permissionario.setUfPermissionario(permissionarioRequestDTO.getUfPermissionario());
         permissionario.setCidadePermissionario(permissionarioRequestDTO.getCidadePermissionario());
         permissionario.setBairroPermissionario(permissionarioRequestDTO.getBairroPermissionario());
