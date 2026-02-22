@@ -28,14 +28,13 @@ public interface DefensorRepository extends JpaRepository<Defensor, Integer> {
                     "AND (:numeroPermissao IS NULL OR d.NUMERO_PERMISSAO = :numeroPermissao) " +
                     "AND (:nomeDefensor IS NULL OR UPPER(d.NOME_DEFENSOR) LIKE %:nomeDefensor%) " +
                     "AND (:cpfDefensor IS NULL OR d.CPF_DEFENSOR = :cpfDefensor) " +
-                    "AND (:cnpjEmpresa IS NULL OR d.CNPJ_EMPRESA = :cnpjEmpresa) " +
                     "AND (:cnhDefensor IS NULL OR d.CNH_DEFENSOR = :cnhDefensor) " +
                     "AND (:nomePermissionario IS NULL OR UPPER(p.NOME_PERMISSIONARIO) LIKE %:nomePermissionario%) " +
                     "AND (:cpfPermissionario IS NULL OR p.CPF_PERMISSIONARIO = :cpfPermissionario) ",
             nativeQuery = true
     )
     List<Defensor> listarTodosDefensorsFiltros(
-            String numeroPermissao, String nomeDefensor, String cpfDefensor, String cnpjEmpresa,
+            String numeroPermissao, String nomeDefensor, String cpfDefensor,
             String cnhDefensor, String nomePermissionario, String cpfPermissionario, Pageable pageable
     );
 

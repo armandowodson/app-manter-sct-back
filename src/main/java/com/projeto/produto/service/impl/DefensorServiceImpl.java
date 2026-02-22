@@ -2,29 +2,30 @@ package com.projeto.produto.service.impl;
 
 import com.projeto.produto.dto.DefensorRequestDTO;
 import com.projeto.produto.dto.DefensorResponseDTO;
-import com.projeto.produto.entity.Auditoria;
-import com.projeto.produto.entity.Defensor;
-import com.projeto.produto.repository.AuditoriaRepository;
-import com.projeto.produto.repository.DefensorRepository;
-import com.projeto.produto.repository.VeiculoRepository;
+import com.projeto.produto.entity.*;
+import com.projeto.produto.repository.*;
+import com.projeto.produto.utils.CarregarTipos;
 import com.projeto.produto.utils.ValidaCPF;
 import com.projeto.produto.utils.ValidaEmail;
+import net.sf.jasperreports.engine.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 public class DefensorServiceImpl {
@@ -36,6 +37,9 @@ public class DefensorServiceImpl {
 
     @Autowired
     private VeiculoRepository veiculoRepository;
+
+    @Autowired
+    private PermissaoRepository permissaoRepository;
 
     private static final Logger logger = LogManager.getLogger(AuditoriaServiceImpl.class);
 
@@ -155,20 +159,19 @@ public class DefensorServiceImpl {
         }
     }
 
-    public Page<DefensorResponseDTO> listarTodosDefensorFiltros(   String numeroPermissao, String nomeDefensor,
-                                                                   String cpfDefensor, String cnpjEmpresa,
+    public Page<DefensorResponseDTO> listarTodosDefensorFiltros(   String numeroPermissao, String nomeDefensor, String cpfDefensor,
                                                                    String cnhDefensor, String nomePermissionario,
                                                                    String cpfPermissionario, PageRequest pageRequest) {
         logger.info("Início Listar Todos os Defensores por Filtros");
         try{
             List<Defensor> listaDefensor = defensorRepository.listarTodosDefensorsFiltros(
                     numeroPermissao,  nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
-                    cpfDefensor, cnpjEmpresa, cnhDefensor, nomePermissionario, cpfPermissionario, pageRequest
+                    cpfDefensor, cnhDefensor, nomePermissionario, cpfPermissionario, pageRequest
             );
 
             Integer countRegistros = defensorRepository.listarTodosDefensorsFiltros(
                     numeroPermissao,  nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
-                    cpfDefensor, cnpjEmpresa, cnhDefensor, nomePermissionario, cpfPermissionario, null
+                    cpfDefensor, cnhDefensor, nomePermissionario, cpfPermissionario, null
             ).size();
 
             List<DefensorResponseDTO> listaDefensorResponseDTO = new ArrayList<>();
@@ -256,6 +259,9 @@ public class DefensorServiceImpl {
             defensorResponseDTO.setCpfDefensor(defensor.getCpfDefensor());
             defensorResponseDTO.setRgDefensor(defensor.getRgDefensor());
             defensorResponseDTO.setOrgaoEmissor(defensor.getOrgaoEmissor());
+            defensorResponseDTO.setSexo(defensor.getSexo());
+            defensorResponseDTO.setEstadoCivil(defensor.getEstadoCivil());
+            defensorResponseDTO.setDataNascimento(defensor.getDataNascimento().toString());
             defensorResponseDTO.setCnhDefensor(defensor.getCnhDefensor());
             defensorResponseDTO.setCategoriaCnhDefensor(defensor.getCategoriaCnhDefensor());
             defensorResponseDTO.setUfDefensor(defensor.getUfDefensor());
@@ -307,6 +313,20 @@ public class DefensorServiceImpl {
 
             defensor.setRgDefensor(defensorRequestDTO.getRgDefensor());
             defensor.setOrgaoEmissor(defensorRequestDTO.getOrgaoEmissor());
+            defensor.setSexo(defensorRequestDTO.getSexo());
+            defensor.setEstadoCivil(defensorRequestDTO.getEstadoCivil());
+            if(Objects.nonNull(defensorRequestDTO.getDataNascimento())) {
+                String data = defensorRequestDTO.getDataNascimento();
+                Integer indexChar = data.indexOf('T');
+                if(indexChar > 0){
+                    data = data.substring(0, indexChar);
+                    if(tipo == 1){
+                        defensor.setDataNascimento(LocalDate.parse(data));
+                    }else{
+                        defensor.setDataNascimento(LocalDate.parse(data).minusDays(1));
+                    }
+                }
+            }
             defensor.setUfDefensor(defensorRequestDTO.getUfDefensor());
             defensor.setCidadeDefensor(defensorRequestDTO.getCidadeDefensor());
             defensor.setBairroDefensor(defensorRequestDTO.getBairroDefensor());
@@ -354,6 +374,112 @@ public class DefensorServiceImpl {
             auditoriaRepository.save(auditoria);
         } catch (Exception e){
             logger.error("salvarAuditoria: " + e.getMessage());
+        }
+    }
+
+    public byte[] gerarRegistroCondutor(String numeroPermissao) {
+        logger.info("Início Gerar Registro Condutor Busca dos Dados");
+        try{
+            Permissao permissao = permissaoRepository.findPermissaoByNumeroPermissao(numeroPermissao);
+            if(Objects.isNull(permissao))
+                throw new RuntimeException("400");
+
+            Veiculo veiculo = veiculoRepository.findVeiculoByNumeroPermissao(permissao.getNumeroPermissao());
+            if(Objects.isNull(veiculo))
+                throw new RuntimeException("401");
+
+            Defensor defensor = defensorRepository.findDefensorByNumeroPermissao(permissao.getNumeroPermissao());
+            if(Objects.isNull(defensor))
+                throw new RuntimeException("403");
+
+            byte[] bytes = gerarRegistroCondutorJasper(permissao, veiculo, defensor);
+            return bytes;
+        } catch (Exception e){
+            logger.error("gerarPermissaoTaxi - Permissionário: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public byte[] gerarRegistroCondutorJasper(Permissao permissao, Veiculo veiculo, Defensor defensor) {
+        logger.info("Início Gerar Registro Condutor Jasper");
+        try{
+            ClassPathResource resource = new ClassPathResource("reports/registroCondutor.jrxml");
+            JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
+            FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoRegistroCondutor.png" ).getAbsolutePath());
+            FileInputStream  rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeRegistroCondutor.png" ).getAbsolutePath());
+
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("imagemCabecalho", cabecalhoStream);
+            parameters.put("imagemRodape", rodapeStream);
+
+            //REGISTRO DO CONDUTOR
+            parameters.put("numeroRc", defensor.getNumeroCertificadoCondutor());
+            parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao()));
+            parameters.put("tipoCondutor", "[x] Defensor");
+            parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
+            parameters.put("validadeRegistroCondutor", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao()) +
+                    " até " + "");
+            //PERMISSIONÁRIO
+            parameters.put("nome", defensor.getNomeDefensor());
+            parameters.put("cpf", defensor.getCpfDefensor());
+            parameters.put("rg", defensor.getRgDefensor());
+            parameters.put("cnh", defensor.getCnhDefensor());
+            parameters.put("categoriaCnh", CarregarTipos.carregarCategoriaCnh(defensor.getCategoriaCnhDefensor()));
+            parameters.put("dataNascimento", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataNascimento()));
+            parameters.put("sexo", defensor.getSexo().equals("1") ? "Masculino" : "Feminino");
+            parameters.put("estadoCivil", CarregarTipos.carregarEstadoCivilPermissionario(defensor.getEstadoCivil()));
+            parameters.put("endereco", defensor.getEnderecoDefensor());
+            parameters.put("celular", defensor.getCelularDefensor());
+            parameters.put("email", Objects.nonNull(defensor.getEmailDefensor()) ? defensor.getEmailDefensor() : "");
+            //DOCUMENTAÇÃO EXIGIDA
+            String documentacaoExigida = "[x] CPF " + "[x] RG " + "[x] CNH ";
+            if(Objects.nonNull(defensor.getNumeroQuitacaoMilitar()) && !defensor.getNumeroQuitacaoMilitar().isEmpty())
+                documentacaoExigida = documentacaoExigida + "[x] Quitação Militar ";
+            else
+                documentacaoExigida = documentacaoExigida + "[ ] Quitação Militar ";
+
+            if(Objects.nonNull(defensor.getNumeroQuitacaoEleitoral()) && !defensor.getNumeroQuitacaoEleitoral().isEmpty())
+                documentacaoExigida = documentacaoExigida + "[x] Quitação Eleitoral ";
+            else
+                documentacaoExigida = documentacaoExigida + "[ ] Quitação Eleitoral ";
+
+            if(Objects.nonNull(defensor.getNumeroInscricaoInss()) && !defensor.getNumeroInscricaoInss().isEmpty())
+                documentacaoExigida = documentacaoExigida + "[x] INSS ";
+            else
+                documentacaoExigida = documentacaoExigida + "[ ] INSS ";
+
+            if(Objects.nonNull(defensor.getCertificadoCondutor()))
+                documentacaoExigida = documentacaoExigida + "[x] Curso Transporte Público ";
+            else
+                documentacaoExigida = documentacaoExigida + "[ ] Curso Transporte Público ";
+
+            documentacaoExigida = documentacaoExigida + "[ ] Atestado Médico ";
+
+            documentacaoExigida = documentacaoExigida + "[ ] Comprovação Residência ";
+
+            if(Objects.nonNull(defensor.getCertidaoNegativaCriminal()) && Objects.nonNull(defensor.getCertidaoNegativaMunicipal()))
+                documentacaoExigida = documentacaoExigida + "[x] Certidões Negativas ";
+            else
+                documentacaoExigida = documentacaoExigida + "[ ] Certidões Negativas ";
+
+            parameters.put("documentacaoExigida", documentacaoExigida);
+
+            //VEÍCULO
+            parameters.put("nomePermissionario", defensor.getNomeDefensor());
+            parameters.put("numeroPermissao", permissao.getNumeroPermissao());
+            parameters.put("placa", veiculo.getPlaca());
+            parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
+            parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
+            parameters.put("cor", veiculo.getCor().equals("1") ? "Branca" : "Prata");
+            parameters.put("capacidade", veiculo.getCapacidade());
+
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+
+            byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
+            return bytes;
+        } catch (Exception e){
+            logger.error("gerarRegistroCondutorJasper: " + e.getMessage());
+            throw new RuntimeException("500");
         }
     }
 }

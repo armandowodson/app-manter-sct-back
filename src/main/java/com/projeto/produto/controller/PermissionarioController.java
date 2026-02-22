@@ -48,15 +48,13 @@ public class PermissionarioController {
     public Page<PermissionarioResponseDTO> buscarPermissionariosFiltros(@RequestParam(required = false) String numeroPermissao,
                                                                         @RequestParam(required = false) String nomePermissionario,
                                                                         @RequestParam(required = false) String cpfPermissionario,
-                                                                        @RequestParam(required = false) String cnpjEmpresa,
                                                                         @RequestParam(required = false) String cnhPermissionario,
                                                                         @RequestParam(required = true) Integer pageIndex,
                                                                         @RequestParam(required = true) Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
         try{
             Page<PermissionarioResponseDTO> permissionarios = service.listarTodosPermissionarioFiltros(
-                    numeroPermissao, nomePermissionario, cpfPermissionario, cnpjEmpresa,
-                    cnhPermissionario, pageRequest
+                    numeroPermissao, nomePermissionario, cpfPermissionario, cnhPermissionario, pageRequest
             );
 
             return permissionarios;
@@ -104,12 +102,12 @@ public class PermissionarioController {
         return service.excluirPermissionario(idPermissionario, usuario);
     }
 
-    @GetMapping("/gerar-permissao-taxi")
-    public ResponseEntity<byte[]> gerarAutorizacaoTrafego( @RequestParam(required = true) String numeroPermissao) {
+    @GetMapping("/gerar-registro-condutor")
+    public ResponseEntity<byte[]> gerarRegistroCondutor( @RequestParam(required = true) String numeroPermissao) {
         try{
-            byte[] fileBytes = service.gerarPermissaoTaxi(numeroPermissao);
+            byte[] fileBytes = service.gerarRegistroCondutor(numeroPermissao);
 
-            String fileName = "permissaoTaxi-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
+            String fileName = "registroCondutor-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentDispositionFormData("attachment", fileName);

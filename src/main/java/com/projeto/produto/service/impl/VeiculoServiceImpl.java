@@ -3,31 +3,30 @@ package com.projeto.produto.service.impl;
 import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.dto.VeiculoRequestDTO;
 import com.projeto.produto.dto.VeiculoResponseDTO;
-import com.projeto.produto.entity.Auditoria;
-import com.projeto.produto.entity.PontoTaxi;
-import com.projeto.produto.entity.Veiculo;
-import com.projeto.produto.repository.AuditoriaRepository;
-import com.projeto.produto.repository.PermissionarioRepository;
-import com.projeto.produto.repository.PontosTaxiRepository;
-import com.projeto.produto.repository.VeiculoRepository;
+import com.projeto.produto.entity.*;
+import com.projeto.produto.repository.*;
+import com.projeto.produto.utils.CarregarTipos;
+import net.sf.jasperreports.engine.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class VeiculoServiceImpl {
@@ -42,6 +41,11 @@ public class VeiculoServiceImpl {
 
     @Autowired
     private PontosTaxiRepository pontosTaxiRepository;
+
+    @Autowired
+    private PermissaoRepository permissaoRepository;
+
+    private static final Logger logger = LogManager.getLogger(VeiculoServiceImpl.class);
 
     @Transactional
     public VeiculoResponseDTO inserirVeiculo(VeiculoRequestDTO veiculoRequestDTO,
@@ -313,6 +317,74 @@ public class VeiculoServiceImpl {
         }
 
         return "";
+    }
+
+    public byte[] gerarAutorizacaoTrafego(String numeroPermissao) {
+        logger.info("Início Gerar Autorização Tráfego Busca dos Dados");
+        try{
+            Permissao permissao = permissaoRepository.findPermissaoByNumeroPermissao(numeroPermissao);
+            if(Objects.isNull(permissao))
+                throw new RuntimeException("400");
+
+            Veiculo veiculo = veiculoRepository.findVeiculoByNumeroPermissao(permissao.getNumeroPermissao());
+            if(Objects.isNull(veiculo))
+                throw new RuntimeException("401");
+
+            PontoTaxi pontoTaxi = pontosTaxiRepository.findByIdPontoTaxi(veiculo.getPontoTaxi().getIdPontoTaxi());
+            if(Objects.isNull(pontoTaxi))
+                throw new RuntimeException("402");
+
+            Permissionario permissionario = permissionarioRepository.findPermissionarioByNumeroPermissao(permissao.getNumeroPermissao());
+            if(Objects.isNull(pontoTaxi))
+                throw new RuntimeException("403");
+
+            byte[] bytes = gerarAutorizacaoTrafegoJasper(permissao, veiculo, pontoTaxi, permissionario);
+            return bytes;
+        } catch (Exception e){
+            logger.error("gerarAutorizacaoTrafego - Permissão: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public byte[] gerarAutorizacaoTrafegoJasper(Permissao permissao, Veiculo veiculo, PontoTaxi pontoTaxi, Permissionario permissionario) {
+        logger.info("Início Gerar Autorização Tráfego Jasper");
+        try{
+            ClassPathResource resource = new ClassPathResource("reports/autorizacaoTrafego.jrxml");
+            JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
+            FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoAutorizacaoTrafego.png" ).getAbsolutePath());
+            FileInputStream  rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeAutorizacaoTrafego.png" ).getAbsolutePath());
+
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("imagemCabecalho", cabecalhoStream);
+            parameters.put("imagemRodape", rodapeStream);
+            parameters.put("numeroAutorizacao", permissao.getAutorizacaoTrafego());
+            parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(LocalDate.now()));
+            parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
+            parameters.put("validadeAutorizacao", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataCriacao()) +
+                    " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataValidadePermissao()));
+            parameters.put("placa", veiculo.getPlaca());
+            parameters.put("renavam", veiculo.getRenavam());
+            parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
+            parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
+            parameters.put("tipoCombustivel", CarregarTipos.carregarTipoCombustivelVeiculo(veiculo.getCombustivel()));
+            parameters.put("cor", veiculo.getCor().equals("1") ? "Branca" : "Prata");
+            parameters.put("capacidade", veiculo.getCapacidade());
+            parameters.put("pet", pontoTaxi.getDescricaoPonto());
+            parameters.put("numeroPermissao", permissao.getNumeroPermissao());
+            parameters.put("permissionario", permissionario.getNomePermissionario());
+            parameters.put("ultimaVistoria", Objects.nonNull(veiculo.getDataVistoria()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataVistoria()) : "");
+            parameters.put("quilometragem", veiculo.getQuilometragem());
+            parameters.put("proximaVistoria", Objects.nonNull(veiculo.getDataRetorno()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataRetorno()) : "");
+            parameters.put("statusVistoria", CarregarTipos.carregarStatusVistoriaVeiculo(veiculo.getStatusVistoria()));
+
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+
+            byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
+            return bytes;
+        } catch (Exception e){
+            logger.error("gerarAutorizacaoTrafegoJasper: " + e.getMessage());
+            throw new RuntimeException("500");
+        }
     }
 
 }

@@ -42,9 +42,6 @@ public class PermissionarioServiceImpl {
     @Autowired
     private VeiculoRepository veiculoRepository;
 
-    @Autowired
-    private PontosTaxiRepository pontosTaxiRepository;
-
     private static final Logger logger = LogManager.getLogger(Permissionario.class);
 
     @Transactional
@@ -145,19 +142,18 @@ public class PermissionarioServiceImpl {
         return permissionarioResponseDTO;
     }
 
-    public Page<PermissionarioResponseDTO> listarTodosPermissionarioFiltros(String numeroPermissao, String nomePermissionario,
-                                                                           String cpfPermissionario, String cnpjEmpresa,
-                                                                           String cnhPermissionario, PageRequest pageRequest) {
+    public Page<PermissionarioResponseDTO> listarTodosPermissionarioFiltros(String numeroPermissao, String nomePermissionario, String cpfPermissionario,
+                                                                            String cnhPermissionario, PageRequest pageRequest) {
         logger.error("Início da Listagem de Todos os Dados do Permissionário");
         try{
             List<Permissionario> listaPermissionario = permissionarioRepository.listarTodosPermissionariosFiltros(
                     numeroPermissao, nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
-                    cpfPermissionario, cnpjEmpresa, cnhPermissionario, pageRequest
+                    cpfPermissionario, cnhPermissionario, pageRequest
             );
 
             Integer countRegistros = permissionarioRepository.listarTodosPermissionariosFiltros(
                     numeroPermissao, nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
-                    cpfPermissionario, cnpjEmpresa, cnhPermissionario, null
+                    cpfPermissionario, cnhPermissionario, null
             ).size();
 
             List<PermissionarioResponseDTO> listaPermissionarioResponseDTO = new ArrayList<>();
@@ -356,8 +352,8 @@ public class PermissionarioServiceImpl {
         auditoriaRepository.save(auditoria);
     }
 
-    public byte[] gerarPermissaoTaxi(String numeroPermissao) {
-        logger.info("Início Gerar Permissão de Táxi Busca dos Dados");
+    public byte[] gerarRegistroCondutor(String numeroPermissao) {
+        logger.info("Início Gerar Registro Condutor Busca dos Dados");
         try{
             Permissao permissao = permissaoRepository.findPermissaoByNumeroPermissao(numeroPermissao);
             if(Objects.isNull(permissao))
@@ -367,15 +363,11 @@ public class PermissionarioServiceImpl {
             if(Objects.isNull(veiculo))
                 throw new RuntimeException("401");
 
-            PontoTaxi pontoTaxi = pontosTaxiRepository.findByIdPontoTaxi(veiculo.getPontoTaxi().getIdPontoTaxi());
-            if(Objects.isNull(pontoTaxi))
-                throw new RuntimeException("402");
-
             Permissionario permissionario = permissionarioRepository.findPermissionarioByNumeroPermissao(permissao.getNumeroPermissao());
-            if(Objects.isNull(pontoTaxi))
+            if(Objects.isNull(permissionario))
                 throw new RuntimeException("403");
 
-            byte[] bytes = gerarPermissaoTaxiJasper(permissao, veiculo, pontoTaxi, permissionario);
+            byte[] bytes = gerarRegistroCondutorJasper(permissao, veiculo, permissionario);
             return bytes;
         } catch (Exception e){
             logger.error("gerarPermissaoTaxi - Permissionário: " + e.getMessage());
@@ -383,25 +375,25 @@ public class PermissionarioServiceImpl {
         }
     }
 
-    public byte[] gerarPermissaoTaxiJasper(Permissao permissao, Veiculo veiculo, PontoTaxi pontoTaxi, Permissionario permissionario) {
-        logger.info("Início Gerar Permissão de Táxi Jasper");
+    public byte[] gerarRegistroCondutorJasper(Permissao permissao, Veiculo veiculo, Permissionario permissionario) {
+        logger.info("Início Gerar Registro Condutor Jasper");
         try{
-            ClassPathResource resource = new ClassPathResource("reports/permissaoTaxi.jrxml");
+            ClassPathResource resource = new ClassPathResource("reports/registroCondutor.jrxml");
             JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
-            FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoPermissaoTaxi.png" ).getAbsolutePath());
-            FileInputStream  rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapePermissaoTaxi.png" ).getAbsolutePath());
+            FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoRegistroCondutor.png" ).getAbsolutePath());
+            FileInputStream  rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeRegistroCondutor.png" ).getAbsolutePath());
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("imagemCabecalho", cabecalhoStream);
             parameters.put("imagemRodape", rodapeStream);
-            //PERMISSÃO
-            parameters.put("numeroPermissao", permissao.getNumeroPermissao());
-            parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(LocalDate.now()));
+
+            //REGISTRO DO CONDUTOR
+            parameters.put("numeroRc", permissionario.getNumeroCertificadoCondutor());
+            parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao()));
+            parameters.put("tipoCondutor", "[x] Permissionário");
             parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
-            parameters.put("pet", pontoTaxi.getDescricaoPonto());
-            parameters.put("statusPermissao", CarregarTipos.carregarStatusPermissao(permissao.getStatusPermissao()));
-            parameters.put("validadePermissao", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataCriacao()) +
-                    " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataValidadePermissao()));
+            parameters.put("validadeRegistroCondutor", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao()) +
+                    " até " + "");
             //PERMISSIONÁRIO
             parameters.put("nome", permissionario.getNomePermissionario());
             parameters.put("cpf", permissionario.getCpfPermissionario());
@@ -413,17 +405,47 @@ public class PermissionarioServiceImpl {
             parameters.put("estadoCivil", CarregarTipos.carregarEstadoCivilPermissionario(permissionario.getEstadoCivil()));
             parameters.put("endereco", permissionario.getEnderecoPermissionario());
             parameters.put("celular", permissionario.getCelularPermissionario());
-            parameters.put("email", permissionario.getEmailPermissionario());
+            parameters.put("email", Objects.nonNull(permissionario.getEmailPermissionario()) ? permissionario.getEmailPermissionario() : "");
+            //DOCUMENTAÇÃO EXIGIDA
+            String documentacaoExigida = "[x] CPF " + "[x] RG " + "[x] CNH ";
+            if(Objects.nonNull(permissionario.getNumeroQuitacaoMilitar()) && !permissionario.getNumeroQuitacaoMilitar().isEmpty())
+                documentacaoExigida = documentacaoExigida + "[x] Quitação Militar ";
+            else
+                documentacaoExigida = documentacaoExigida + "[ ] Quitação Militar ";
+
+            if(Objects.nonNull(permissionario.getNumeroQuitacaoEleitoral()) && !permissionario.getNumeroQuitacaoEleitoral().isEmpty())
+                documentacaoExigida = documentacaoExigida + "[x] Quitação Eleitoral ";
+            else
+                documentacaoExigida = documentacaoExigida + "[ ] Quitação Eleitoral ";
+
+            if(Objects.nonNull(permissionario.getNumeroInscricaoInss()) && !permissionario.getNumeroInscricaoInss().isEmpty())
+                documentacaoExigida = documentacaoExigida + "[x] INSS ";
+            else
+                documentacaoExigida = documentacaoExigida + "[ ] INSS ";
+
+            if(Objects.nonNull(permissionario.getCertificadoCondutor()))
+                documentacaoExigida = documentacaoExigida + "[x] Curso Transporte Público ";
+            else
+                documentacaoExigida = documentacaoExigida + "[ ] Curso Transporte Público ";
+
+            documentacaoExigida = documentacaoExigida + "[ ] Atestado Médico ";
+
+            documentacaoExigida = documentacaoExigida + "[ ] Comprovação Residência ";
+
+            if(Objects.nonNull(permissionario.getCertidaoNegativaCriminal()) && Objects.nonNull(permissionario.getCertidaoNegativaMunicipal()))
+                documentacaoExigida = documentacaoExigida + "[x] Certidões Negativas ";
+            else
+                documentacaoExigida = documentacaoExigida + "[ ] Certidões Negativas ";
+
+            parameters.put("documentacaoExigida", documentacaoExigida);
+
             //VEÍCULO
+            parameters.put("nomePermissionario", permissionario.getNomePermissionario());
+            parameters.put("numeroPermissao", permissao.getNumeroPermissao());
             parameters.put("placa", veiculo.getPlaca());
-            parameters.put("renavam", veiculo.getRenavam());
             parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
             parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
-            parameters.put("tipoCombustivel", CarregarTipos.carregarTipoCombustivelVeiculo(veiculo.getCombustivel()));
             parameters.put("cor", veiculo.getCor().equals("1") ? "Branca" : "Prata");
-            parameters.put("chassi", veiculo.getChassi());
-            parameters.put("dataVistoriaKilometragem", Objects.nonNull(veiculo.getDataVistoria()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataVistoria()) + " -- " + veiculo.getQuilometragem() + "km" : "");
-            parameters.put("quilometragem", veiculo.getQuilometragem());
             parameters.put("capacidade", veiculo.getCapacidade());
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
@@ -431,7 +453,7 @@ public class PermissionarioServiceImpl {
             byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
             return bytes;
         } catch (Exception e){
-            logger.error("gerarPermissaoTaxiJasper: " + e.getMessage());
+            logger.error("gerarRegistroCondutorJasper: " + e.getMessage());
             throw new RuntimeException("500");
         }
     }

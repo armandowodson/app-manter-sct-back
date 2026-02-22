@@ -7,11 +7,14 @@ import com.projeto.produto.service.impl.DefensorServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -53,7 +56,6 @@ public class DefensorController {
     public Page<DefensorResponseDTO> buscarDefensorsFiltros(   @RequestParam(required = false) String numeroPermissao,
                                                                @RequestParam(required = false) String nomeDefensor,
                                                                @RequestParam(required = false) String cpfDefensor,
-                                                               @RequestParam(required = false) String cnpjEmpresa,
                                                                @RequestParam(required = false) String cnhDefensor,
                                                                @RequestParam(required = false) String nomePermissionario,
                                                                @RequestParam(required = false) String cpfPermissionario,
@@ -62,8 +64,7 @@ public class DefensorController {
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
         try{
             Page<DefensorResponseDTO> defensores = service.listarTodosDefensorFiltros(
-                    numeroPermissao, nomeDefensor, cpfDefensor, cnpjEmpresa, cnhDefensor, nomePermissionario,
-                    cpfPermissionario, pageRequest
+                    numeroPermissao, nomeDefensor, cpfDefensor, cnhDefensor, nomePermissionario, cpfPermissionario, pageRequest
             );
 
             return defensores;
@@ -111,4 +112,32 @@ public class DefensorController {
         return service.excluirDefensor(idDefensor, usuario);
     }
 
+    @GetMapping("/gerar-registro-condutor")
+    public ResponseEntity<byte[]> gerarRegistroCondutor( @RequestParam(required = true) String numeroPermissao) {
+        try{
+            byte[] fileBytes = service.gerarRegistroCondutor(numeroPermissao);
+
+            String fileName = "registroCondutor-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDispositionFormData("attachment", fileName);
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentLength(fileBytes.length);
+
+            return ResponseEntity.ok().headers(headers).body(fileBytes);
+        } catch (Exception e){
+            if(e.getMessage().equals("400"))
+                return ResponseEntity.status(400).body(null);
+            if(e.getMessage().equals("401"))
+                return ResponseEntity.status(401).body(null);
+            if(e.getMessage().equals("402"))
+                return ResponseEntity.status(402).body(null);
+            if(e.getMessage().equals("403"))
+                return ResponseEntity.status(403).body(null);
+            if(e.getMessage().equals("500"))
+                return ResponseEntity.status(500).body(null);
+        }
+
+        return null;
+    }
 }

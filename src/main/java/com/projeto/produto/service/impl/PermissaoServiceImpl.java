@@ -499,10 +499,10 @@ public class PermissaoServiceImpl {
         }
     }
 
-    public byte[] gerarAutorizacaoTrafego(Long idPermissao) {
-        logger.info("Início Gerar Autorização Tráfego Busca dos Dados");
+    public byte[] gerarPermissaoTaxi(String numeroPermissao) {
+        logger.info("Início Gerar Permissão de Táxi Busca dos Dados");
         try{
-            Permissao permissao = permissaoRepository.findPermissaoByIdPermissao(idPermissao);
+            Permissao permissao = permissaoRepository.findPermissaoByNumeroPermissao(numeroPermissao);
             if(Objects.isNull(permissao))
                 throw new RuntimeException("400");
 
@@ -518,51 +518,63 @@ public class PermissaoServiceImpl {
             if(Objects.isNull(pontoTaxi))
                 throw new RuntimeException("403");
 
-            byte[] bytes = gerarAutorizacaoTrafegoJasper(permissao, veiculo, pontoTaxi, permissionario);
+            byte[] bytes = gerarPermissaoTaxiJasper(permissao, veiculo, pontoTaxi, permissionario);
             return bytes;
         } catch (Exception e){
-            logger.error("gerarAutorizacaoTrafego - Permissão: " + e.getMessage());
+            logger.error("gerarPermissaoTaxi - Permissionário: " + e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
     }
 
-    public byte[] gerarAutorizacaoTrafegoJasper(Permissao permissao, Veiculo veiculo, PontoTaxi pontoTaxi, Permissionario permissionario) {
-        logger.info("Início Gerar Autorização Tráfego Jasper");
+    public byte[] gerarPermissaoTaxiJasper(Permissao permissao, Veiculo veiculo, PontoTaxi pontoTaxi, Permissionario permissionario) {
+        logger.info("Início Gerar Permissão de Táxi Jasper");
         try{
-            ClassPathResource resource = new ClassPathResource("reports/autorizacaoTrafego.jrxml");
+            ClassPathResource resource = new ClassPathResource("reports/permissaoTaxi.jrxml");
             JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
-            FileInputStream  cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoAutorizacaoTrafego.png" ).getAbsolutePath());
-            FileInputStream  rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeAutorizacaoTrafego.png" ).getAbsolutePath());
+            FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoPermissaoTaxi.png" ).getAbsolutePath());
+            FileInputStream  rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapePermissaoTaxi.png" ).getAbsolutePath());
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("imagemCabecalho", cabecalhoStream);
             parameters.put("imagemRodape", rodapeStream);
-            parameters.put("numeroAutorizacao", permissao.getAutorizacaoTrafego());
+            //PERMISSÃO
+            parameters.put("numeroPermissao", permissao.getNumeroPermissao());
             parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(LocalDate.now()));
             parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
-            parameters.put("validadeAutorizacao", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataCriacao()) +
+            parameters.put("pet", pontoTaxi.getDescricaoPonto());
+            parameters.put("statusPermissao", CarregarTipos.carregarStatusPermissao(permissao.getStatusPermissao()));
+            parameters.put("validadePermissao", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataCriacao()) +
                     " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataValidadePermissao()));
+            //PERMISSIONÁRIO
+            parameters.put("nome", permissionario.getNomePermissionario());
+            parameters.put("cpf", permissionario.getCpfPermissionario());
+            parameters.put("rg", permissionario.getRgPermissionario());
+            parameters.put("cnh", permissionario.getCnhPermissionario());
+            parameters.put("categoriaCnh", CarregarTipos.carregarCategoriaCnh(permissionario.getCategoriaCnhPermissionario()));
+            parameters.put("dataNascimento", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataNascimento()));
+            parameters.put("sexo", permissionario.getSexo().equals("1") ? "Masculino" : "Feminino");
+            parameters.put("estadoCivil", CarregarTipos.carregarEstadoCivilPermissionario(permissionario.getEstadoCivil()));
+            parameters.put("endereco", permissionario.getEnderecoPermissionario());
+            parameters.put("celular", permissionario.getCelularPermissionario());
+            parameters.put("email", Objects.nonNull(permissionario.getEmailPermissionario()) ? permissionario.getEmailPermissionario() : "");
+            //VEÍCULO
             parameters.put("placa", veiculo.getPlaca());
             parameters.put("renavam", veiculo.getRenavam());
             parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
             parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
             parameters.put("tipoCombustivel", CarregarTipos.carregarTipoCombustivelVeiculo(veiculo.getCombustivel()));
             parameters.put("cor", veiculo.getCor().equals("1") ? "Branca" : "Prata");
-            parameters.put("capacidade", veiculo.getCapacidade());
-            parameters.put("pet", pontoTaxi.getDescricaoPonto());
-            parameters.put("numeroPermissao", permissao.getNumeroPermissao());
-            parameters.put("permissionario", permissionario.getNomePermissionario());
-            parameters.put("ultimaVistoria", Objects.nonNull(veiculo.getDataVistoria()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataVistoria()) : "");
+            parameters.put("chassi", veiculo.getChassi());
+            parameters.put("dataVistoriaKilometragem", Objects.nonNull(veiculo.getDataVistoria()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataVistoria()) + " -- " + veiculo.getQuilometragem() + "km" : "");
             parameters.put("quilometragem", veiculo.getQuilometragem());
-            parameters.put("proximaVistoria", Objects.nonNull(veiculo.getDataRetorno()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataRetorno()) : "");
-            parameters.put("statusVistoria", CarregarTipos.carregarStatusVistoriaVeiculo(veiculo.getStatusVistoria()));
+            parameters.put("capacidade", veiculo.getCapacidade());
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
 
             byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
             return bytes;
         } catch (Exception e){
-            logger.error("gerarAutorizacaoTrafegoJasper: " + e.getMessage());
+            logger.error("gerarPermissaoTaxiJasper: " + e.getMessage());
             throw new RuntimeException("500");
         }
     }

@@ -1,9 +1,7 @@
 package com.projeto.produto.controller;
 
 import com.projeto.produto.dto.PermissaoDTO;
-import com.projeto.produto.dto.PermissionarioResponseDTO;
 import com.projeto.produto.service.impl.PermissaoServiceImpl;
-import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -116,12 +114,12 @@ public class PermissaoController {
             return ResponseEntity.ok().headers(headers).body(fileBytes);
     }
 
-    @GetMapping("/gerar-autorizacao-trafego")
-    public ResponseEntity<byte[]> gerarAutorizacaoTrafego( @RequestParam(required = true) Long idPermissao) {
+    @GetMapping("/gerar-permissao-taxi")
+    public ResponseEntity<byte[]> gerarPermissaoTaxi( @RequestParam(required = true) String numeroPermissao) {
         try{
-            byte[] fileBytes = service.gerarAutorizacaoTrafego(idPermissao);
+            byte[] fileBytes = service.gerarPermissaoTaxi(numeroPermissao);
 
-            String fileName = "autorizacaoTrafego-" + LocalDate.now() + "Nº" + idPermissao + ".pdf";
+            String fileName = "permissaoTaxi-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentDispositionFormData("attachment", fileName);
@@ -141,7 +139,8 @@ public class PermissaoController {
             if(e.getMessage().equals("500"))
                 return ResponseEntity.status(500).body(null);
         }
-        return  null;
+
+        return null;
     }
 
 }

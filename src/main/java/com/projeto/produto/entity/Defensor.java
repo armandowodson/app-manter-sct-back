@@ -24,6 +24,12 @@ public class Defensor {
     private String rgDefensor;
     @Column(name = "ORGAO_EMISSOR")
     private String orgaoEmissor;
+    @Column(name = "DATA_NASCIMENTO")
+    private LocalDate dataNascimento;
+    @Column(name = "SEXO")
+    private String sexo;
+    @Column(name = "ESTADO_CIVIL")
+    private String estadoCivil;
     @Column(name = "UF_DEFENSOR")
     private String ufDefensor;
     @Column(name = "CIDADE_DEFENSOR")
