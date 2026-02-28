@@ -25,6 +25,7 @@ import javax.transaction.Transactional;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -261,6 +262,11 @@ public class PermissionarioServiceImpl {
         permissionarioResponseDTO.setNumeroQuitacaoEleitoral(permissionario.getNumeroQuitacaoEleitoral());
         permissionarioResponseDTO.setNumeroInscricaoInss(permissionario.getNumeroInscricaoInss());
         permissionarioResponseDTO.setNumeroCertificadoCondutor(permissionario.getNumeroCertificadoCondutor());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+        if(Objects.nonNull(permissionario.getDataValidadeCertificadoCondutor())){
+            String formattedDate = permissionario.getDataValidadeCertificadoCondutor().plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC).format(formatter);
+            permissionarioResponseDTO.setDataValidadeCertificadoCondutor(formattedDate);
+        }
         permissionarioResponseDTO.setCertidaoNegativaCriminal(permissionario.getCertidaoNegativaCriminal());
         permissionarioResponseDTO.setCertidaoNegativaMunicipal(permissionario.getCertidaoNegativaMunicipal());
         permissionarioResponseDTO.setFoto(permissionario.getFoto());
@@ -319,6 +325,18 @@ public class PermissionarioServiceImpl {
         permissionario.setNumeroQuitacaoMilitar(permissionarioRequestDTO.getNumeroQuitacaoMilitar());
         permissionario.setNumeroQuitacaoEleitoral(permissionarioRequestDTO.getNumeroQuitacaoEleitoral());
         permissionario.setNumeroCertificadoCondutor(permissionarioRequestDTO.getNumeroCertificadoCondutor());
+        if(Objects.nonNull(permissionarioRequestDTO.getDataValidadeCertificadoCondutor())) {
+            String data = permissionarioRequestDTO.getDataValidadeCertificadoCondutor();
+            Integer indexChar = data.indexOf('T');
+            if(indexChar > 0){
+                data = data.substring(0, indexChar);
+                if(tipo == 1){
+                    permissionario.setDataValidadeCertificadoCondutor(LocalDate.parse(data));
+                }else{
+                    permissionario.setDataValidadeCertificadoCondutor(LocalDate.parse(data).minusDays(1));
+                }
+            }
+        }
         permissionario.setNumeroInscricaoInss(permissionarioRequestDTO.getNumeroInscricaoInss());
 
         if(Objects.nonNull(certificadoCondutor))
@@ -393,7 +411,7 @@ public class PermissionarioServiceImpl {
             parameters.put("tipoCondutor", "[x] Permissionário");
             parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
             parameters.put("validadeRegistroCondutor", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao()) +
-                    " até " + "");
+                    " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataValidadeCertificadoCondutor()));
             //PERMISSIONÁRIO
             parameters.put("nome", permissionario.getNomePermissionario());
             parameters.put("cpf", permissionario.getCpfPermissionario());

@@ -27,6 +27,7 @@ public class PermissionarioRequestDTO {
     private String numeroQuitacaoEleitoral;
     private String numeroInscricaoInss;
     private String numeroCertificadoCondutor;
+    private String dataValidadeCertificadoCondutor;
     private String dataCriacao;
     private String usuario;
     private String aplicativoAlternativo;

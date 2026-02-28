@@ -24,6 +24,7 @@ import javax.transaction.Transactional;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -274,6 +275,11 @@ public class DefensorServiceImpl {
             defensorResponseDTO.setNumeroQuitacaoEleitoral(defensor.getNumeroQuitacaoEleitoral());
             defensorResponseDTO.setNumeroInscricaoInss(defensor.getNumeroInscricaoInss());
             defensorResponseDTO.setNumeroCertificadoCondutor(defensor.getNumeroCertificadoCondutor());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+            if(Objects.nonNull(defensor.getDataValidadeCertificadoCondutor())){
+                String formattedDate = defensor.getDataValidadeCertificadoCondutor().plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC).format(formatter);
+                defensorResponseDTO.setDataValidadeCertificadoCondutor(formattedDate);
+            }
             defensorResponseDTO.setCertificadoCondutor(defensor.getCertificadoCondutor());
             defensorResponseDTO.setCertidaoNegativaCriminal(defensor.getCertidaoNegativaCriminal());
             defensorResponseDTO.setCertidaoNegativaMunicipal(defensor.getCertidaoNegativaMunicipal());
@@ -338,6 +344,18 @@ public class DefensorServiceImpl {
             defensor.setNumeroQuitacaoMilitar(defensorRequestDTO.getNumeroQuitacaoMilitar());
             defensor.setNumeroQuitacaoEleitoral(defensorRequestDTO.getNumeroQuitacaoEleitoral());
             defensor.setNumeroCertificadoCondutor(defensorRequestDTO.getNumeroCertificadoCondutor());
+            if(Objects.nonNull(defensorRequestDTO.getDataValidadeCertificadoCondutor())) {
+                String data = defensorRequestDTO.getDataValidadeCertificadoCondutor();
+                Integer indexChar = data.indexOf('T');
+                if(indexChar > 0){
+                    data = data.substring(0, indexChar);
+                    if(tipo == 1){
+                        defensor.setDataValidadeCertificadoCondutor(LocalDate.parse(data));
+                    }else{
+                        defensor.setDataValidadeCertificadoCondutor(LocalDate.parse(data).minusDays(1));
+                    }
+                }
+            }
             defensor.setNumeroInscricaoInss(defensorRequestDTO.getNumeroInscricaoInss());
 
             if(Objects.nonNull(certificadoCondutor))

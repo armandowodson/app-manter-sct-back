@@ -54,6 +54,8 @@ public class Defensor {
     private String numeroInscricaoInss;
     @Column(name = "NUMERO_CERTIFICADO_CONDUTOR")
     private String numeroCertificadoCondutor;
+    @Column(name = "DATA_VALIDADE_CER_CON")
+    private LocalDate dataValidadeCertificadoCondutor;
     @Lob
     @Column(name = "CERTIFICADO_CONDUTOR")
     private byte[] certificadoCondutor;

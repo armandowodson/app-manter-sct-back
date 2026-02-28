@@ -28,6 +28,7 @@ public class PermissionarioResponseDTO {
     private String numeroQuitacaoEleitoral;
     private String numeroInscricaoInss;
     private String numeroCertificadoCondutor;
+    private String dataValidadeCertificadoCondutor;
     private byte[] certificadoCondutor;
     private byte[] certidaoNegativaCriminal;
     private byte[] certidaoNegativaMunicipal;

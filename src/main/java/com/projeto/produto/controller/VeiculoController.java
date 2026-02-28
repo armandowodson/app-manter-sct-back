@@ -123,4 +123,32 @@ public class VeiculoController {
         return  null;
     }
 
+    @GetMapping("/gerar-laudo-vistoria")
+    public ResponseEntity<byte[]> gerarLaudoVistoria( @RequestParam(required = true) String numeroPermissao) {
+        try{
+            byte[] fileBytes = service.gerarLaudoVistoria(numeroPermissao);
+
+            String fileName = "laudoVistoria-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDispositionFormData("attachment", fileName);
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentLength(fileBytes.length);
+
+            return ResponseEntity.ok().headers(headers).body(fileBytes);
+        } catch (Exception e){
+            if(e.getMessage().equals("400"))
+                return ResponseEntity.status(400).body(null);
+            if(e.getMessage().equals("401"))
+                return ResponseEntity.status(401).body(null);
+            if(e.getMessage().equals("402"))
+                return ResponseEntity.status(402).body(null);
+            if(e.getMessage().equals("403"))
+                return ResponseEntity.status(403).body(null);
+            if(e.getMessage().equals("500"))
+                return ResponseEntity.status(500).body(null);
+        }
+        return  null;
+    }
+
 }

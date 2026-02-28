@@ -335,7 +335,7 @@ public class VeiculoServiceImpl {
                 throw new RuntimeException("402");
 
             Permissionario permissionario = permissionarioRepository.findPermissionarioByNumeroPermissao(permissao.getNumeroPermissao());
-            if(Objects.isNull(pontoTaxi))
+            if(Objects.isNull(permissionario))
                 throw new RuntimeException("403");
 
             byte[] bytes = gerarAutorizacaoTrafegoJasper(permissao, veiculo, pontoTaxi, permissionario);
@@ -384,6 +384,87 @@ public class VeiculoServiceImpl {
         } catch (Exception e){
             logger.error("gerarAutorizacaoTrafegoJasper: " + e.getMessage());
             throw new RuntimeException("500");
+        }
+    }
+
+    public byte[] gerarLaudoVistoria(String numeroPermissao) {
+        logger.info("Início Gerar Laudo Vistoria Busca dos Dados");
+        try{
+            Permissao permissao = permissaoRepository.findPermissaoByNumeroPermissao(numeroPermissao);
+            if(Objects.isNull(permissao))
+                throw new RuntimeException("400");
+
+            Veiculo veiculo = veiculoRepository.findVeiculoByNumeroPermissao(permissao.getNumeroPermissao());
+            if(Objects.isNull(veiculo))
+                throw new RuntimeException("401");
+
+            Permissionario permissionario = permissionarioRepository.findPermissionarioByNumeroPermissao(permissao.getNumeroPermissao());
+            if(Objects.isNull(permissionario))
+                throw new RuntimeException("403");
+
+            byte[] bytes = gerarLaudoVistoriaJasper(permissao, veiculo, permissionario);
+            return bytes;
+        } catch (Exception e){
+            logger.error("gerarAutorizacaoTrafego - Permissão: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public byte[] gerarLaudoVistoriaJasper(Permissao permissao, Veiculo veiculo, Permissionario permissionario) {
+        logger.info("Início Gerar Laudo Vistoria Jasper");
+        try{
+            ClassPathResource resource = new ClassPathResource("reports/laudoVistoria.jrxml");
+            JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
+            FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoLaudoVistoria.png" ).getAbsolutePath());
+            FileInputStream  itensAvaliacaoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/itensAvaliacaoVeiculo.png" ).getAbsolutePath());
+            FileInputStream  rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeLaudoVistoria.png" ).getAbsolutePath());
+
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("imagemCabecalho", cabecalhoStream);
+            parameters.put("imagemItensAvaliacaoVeiculo", itensAvaliacaoStream);
+            parameters.put("imagemRodape", rodapeStream);
+            parameters.put("numeroProcesso", veiculo.getIdVeiculo().toString());
+            LocalDate localDate = LocalDate.now();
+            parameters.put("diaMesAno", localDate.getDayOfMonth() + " de " + mesDoAno(localDate.getMonthValue())  + " de " + localDate.getYear());
+            parameters.put("nomePermissionario", permissionario.getNomePermissionario());
+            parameters.put("numeroPermissao", permissao.getNumeroPermissao());
+            parameters.put("placa", veiculo.getPlaca());
+            parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
+            parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
+            parameters.put("tipoCombustivel", CarregarTipos.carregarTipoCombustivelVeiculo(veiculo.getCombustivel()));
+            parameters.put("cor", veiculo.getCor().equals("1") ? "Branca" : "Prata");
+            parameters.put("renavam", veiculo.getRenavam());
+            parameters.put("capacidade", veiculo.getCapacidade());
+            parameters.put("quilometragem", veiculo.getQuilometragem());
+            parameters.put("statusVistoria", CarregarTipos.carregarStatusVistoriaVeiculo(veiculo.getStatusVistoria()));
+            parameters.put("proximaVistoria", Objects.nonNull(veiculo.getDataRetorno()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataRetorno()) : "");
+            parameters.put("observacoes", "OBSERVAÇÕES:\n"+veiculo.getObservacao());
+
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+
+            byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
+            return bytes;
+        } catch (Exception e){
+            logger.error("gerarLaudoVistoriaJasper: " + e.getMessage());
+            throw new RuntimeException("500");
+        }
+    }
+
+    public String mesDoAno(Integer mes){
+        switch (mes){
+            case 1: return "Janeiro";
+            case 2: return "Fevereiro";
+            case 3: return "Março";
+            case 4: return "Abril";
+            case 5: return "Maio";
+            case 6: return "Junho";
+            case 7: return "Julho";
+            case 8: return "Agosto";
+            case 9: return "Setembro";
+            case 10: return "Outubro";
+            case 11: return "Novembro";
+            case 12: return "Dezembro";
+            default: return "";
         }
     }
 

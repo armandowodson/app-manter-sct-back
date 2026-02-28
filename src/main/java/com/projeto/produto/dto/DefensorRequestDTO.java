@@ -3,6 +3,9 @@ package com.projeto.produto.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
+import java.time.LocalDate;
+
 @Getter
 @Setter
 public class DefensorRequestDTO {
@@ -27,6 +30,7 @@ public class DefensorRequestDTO {
     private String numeroQuitacaoEleitoral;
     private String numeroInscricaoInss;
     private String numeroCertificadoCondutor;
+    private String dataValidadeCertificadoCondutor;
     private String dataCriacao;
     private String usuario;
 
