@@ -113,9 +113,10 @@ public class DefensorController {
     }
 
     @GetMapping("/gerar-registro-condutor")
-    public ResponseEntity<byte[]> gerarRegistroCondutor( @RequestParam(required = true) String numeroPermissao) {
+    public ResponseEntity<byte[]> gerarRegistroCondutor( @RequestParam(required = true) String numeroPermissao,
+                                                         @RequestParam(required = true) String modulo) {
         try{
-            byte[] fileBytes = service.gerarRegistroCondutor(numeroPermissao);
+            byte[] fileBytes = service.gerarRegistroCondutor(numeroPermissao, modulo);
 
             String fileName = "registroCondutor-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
 

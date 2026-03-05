@@ -96,9 +96,10 @@ public class VeiculoController {
     }
 
     @GetMapping("/gerar-autorizacao-trafego")
-    public ResponseEntity<byte[]> gerarAutorizacaoTrafego( @RequestParam(required = true) String numeroPermissao) {
+    public ResponseEntity<byte[]> gerarAutorizacaoTrafego(@RequestParam(required = true) String numeroPermissao,
+                                                          @RequestParam(required = true) String modulo) {
         try{
-            byte[] fileBytes = service.gerarAutorizacaoTrafego(numeroPermissao);
+            byte[] fileBytes = service.gerarAutorizacaoTrafego(numeroPermissao, modulo);
 
             String fileName = "autorizacaoTrafego-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
 
@@ -124,9 +125,10 @@ public class VeiculoController {
     }
 
     @GetMapping("/gerar-laudo-vistoria")
-    public ResponseEntity<byte[]> gerarLaudoVistoria( @RequestParam(required = true) String numeroPermissao) {
+    public ResponseEntity<byte[]> gerarLaudoVistoria( @RequestParam(required = true) String numeroPermissao,
+                                                      @RequestParam(required = true) String modulo) {
         try{
-            byte[] fileBytes = service.gerarLaudoVistoria(numeroPermissao);
+            byte[] fileBytes = service.gerarLaudoVistoria(numeroPermissao, modulo);
 
             String fileName = "laudoVistoria-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
 

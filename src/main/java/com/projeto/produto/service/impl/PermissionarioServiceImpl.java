@@ -370,7 +370,7 @@ public class PermissionarioServiceImpl {
         auditoriaRepository.save(auditoria);
     }
 
-    public byte[] gerarRegistroCondutor(String numeroPermissao) {
+    public byte[] gerarRegistroCondutor(String numeroPermissao, String modulo) {
         logger.info("Início Gerar Registro Condutor Busca dos Dados");
         try{
             Permissao permissao = permissaoRepository.findPermissaoByNumeroPermissao(numeroPermissao);
@@ -385,7 +385,7 @@ public class PermissionarioServiceImpl {
             if(Objects.isNull(permissionario))
                 throw new RuntimeException("403");
 
-            byte[] bytes = gerarRegistroCondutorJasper(permissao, veiculo, permissionario);
+            byte[] bytes = gerarRegistroCondutorJasper(permissao, veiculo, permissionario, modulo);
             return bytes;
         } catch (Exception e){
             logger.error("gerarPermissaoTaxi - Permissionário: " + e.getMessage());
@@ -393,13 +393,25 @@ public class PermissionarioServiceImpl {
         }
     }
 
-    public byte[] gerarRegistroCondutorJasper(Permissao permissao, Veiculo veiculo, Permissionario permissionario) {
+    public byte[] gerarRegistroCondutorJasper(Permissao permissao, Veiculo veiculo, Permissionario permissionario, String modulo) {
         logger.info("Início Gerar Registro Condutor Jasper");
         try{
-            ClassPathResource resource = new ClassPathResource("reports/registroCondutor.jrxml");
+            ClassPathResource resource;
+            if(modulo.equals("1"))
+                resource = new ClassPathResource("reports/registroCondutor.jrxml");
+            else
+                resource = new ClassPathResource("reports/registroCondutorMoto.jrxml");
             JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
-            FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoRegistroCondutor.png" ).getAbsolutePath());
-            FileInputStream  rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeRegistroCondutor.png" ).getAbsolutePath());
+
+            FileInputStream cabecalhoStream;
+            FileInputStream rodapeStream;
+            if(modulo.equals("1")){
+                cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoRegistroCondutor.png" ).getAbsolutePath());
+                rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeRegistroCondutor.png" ).getAbsolutePath());
+            }else{
+                cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoRegistroCondutorMoto.png" ).getAbsolutePath());
+                rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeRegistroCondutorMoto.png" ).getAbsolutePath());
+            }
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("imagemCabecalho", cabecalhoStream);
@@ -408,7 +420,11 @@ public class PermissionarioServiceImpl {
             //REGISTRO DO CONDUTOR
             parameters.put("numeroRc", permissionario.getNumeroCertificadoCondutor());
             parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao()));
-            parameters.put("tipoCondutor", "[x] Permissionário");
+            if(modulo.equals("1"))
+                parameters.put("tipoCondutor", "[x] Permissionário");
+            else
+                parameters.put("tipoCondutor", "[x] Autorizatário");
+
             parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
             parameters.put("validadeRegistroCondutor", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao()) +
                     " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataValidadeCertificadoCondutor()));

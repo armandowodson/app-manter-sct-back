@@ -499,7 +499,7 @@ public class PermissaoServiceImpl {
         }
     }
 
-    public byte[] gerarPermissaoTaxi(String numeroPermissao) {
+    public byte[] gerarPermissaoTaxi(String numeroPermissao, String modulo) {
         logger.info("Início Gerar Permissão de Táxi Busca dos Dados");
         try{
             Permissao permissao = permissaoRepository.findPermissaoByNumeroPermissao(numeroPermissao);
@@ -518,7 +518,7 @@ public class PermissaoServiceImpl {
             if(Objects.isNull(pontoTaxi))
                 throw new RuntimeException("403");
 
-            byte[] bytes = gerarPermissaoTaxiJasper(permissao, veiculo, pontoTaxi, permissionario);
+            byte[] bytes = gerarPermissaoTaxiJasper(permissao, veiculo, pontoTaxi, permissionario, modulo);
             return bytes;
         } catch (Exception e){
             logger.error("gerarPermissaoTaxi - Permissionário: " + e.getMessage());
@@ -526,13 +526,26 @@ public class PermissaoServiceImpl {
         }
     }
 
-    public byte[] gerarPermissaoTaxiJasper(Permissao permissao, Veiculo veiculo, PontoTaxi pontoTaxi, Permissionario permissionario) {
+    public byte[] gerarPermissaoTaxiJasper(Permissao permissao, Veiculo veiculo, PontoTaxi pontoTaxi,
+                                           Permissionario permissionario, String modulo) {
         logger.info("Início Gerar Permissão de Táxi Jasper");
         try{
-            ClassPathResource resource = new ClassPathResource("reports/permissaoTaxi.jrxml");
+            ClassPathResource resource;
+            if(modulo.equals("1"))
+                resource = new ClassPathResource("reports/permissaoTaxi.jrxml");
+            else
+                resource = new ClassPathResource("reports/permissaoMoto.jrxml");
             JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
-            FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoPermissaoTaxi.png" ).getAbsolutePath());
-            FileInputStream  rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapePermissaoTaxi.png" ).getAbsolutePath());
+
+            FileInputStream cabecalhoStream;
+            FileInputStream  rodapeStream;
+            if(modulo.equals("1")){
+                cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoPermissaoTaxi.png" ).getAbsolutePath());
+                rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapePermissaoTaxi.png" ).getAbsolutePath());
+            }else{
+                cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoPermissaoMoto.png" ).getAbsolutePath());
+                rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapePermissaoMoto.png" ).getAbsolutePath());
+            }
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("imagemCabecalho", cabecalhoStream);

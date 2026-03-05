@@ -115,11 +115,16 @@ public class PermissaoController {
     }
 
     @GetMapping("/gerar-permissao-taxi")
-    public ResponseEntity<byte[]> gerarPermissaoTaxi( @RequestParam(required = true) String numeroPermissao) {
+    public ResponseEntity<byte[]> gerarPermissaoTaxi( @RequestParam(required = true) String numeroPermissao,
+                                                      @RequestParam(required = true) String modulo) {
         try{
-            byte[] fileBytes = service.gerarPermissaoTaxi(numeroPermissao);
+            byte[] fileBytes = service.gerarPermissaoTaxi(numeroPermissao, modulo);
 
-            String fileName = "permissaoTaxi-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
+            String fileName = "";
+            if(modulo.equals(""))
+                fileName = "permissaoTaxi-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
+            else
+                fileName = "permissaoMoto-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentDispositionFormData("attachment", fileName);
