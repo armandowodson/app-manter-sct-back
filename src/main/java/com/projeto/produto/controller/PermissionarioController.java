@@ -31,7 +31,7 @@ public class PermissionarioController {
             Page<PermissionarioResponseDTO> permissionarios = service.listarTodosPermissionarios(pageRequest);
             return permissionarios;
         } catch (Exception e){
-            throw new RuntimeException("Não foi possível consultar todos os Permissionários cadastrados!");
+            throw new RuntimeException("Não foi possível consultar todos os Autorizatários cadastrados!");
         }
     }
 
@@ -40,7 +40,7 @@ public class PermissionarioController {
         try{
             return ResponseEntity.ok(service.buscarPermissionarioId(idPermissionario));
         } catch (Exception e){
-            throw new RuntimeException("Não foi possível consultar o Permissionário pelo ID!");
+            throw new RuntimeException("Não foi possível consultar o Autorizatário pelo ID!");
         }
     }
 
@@ -59,7 +59,7 @@ public class PermissionarioController {
 
             return permissionarios;
         } catch (Exception e){
-            throw new RuntimeException("Não foi possível consultar os Permissionários com os filtros informados!");
+            throw new RuntimeException("Não foi possível consultar os Autorizatários com os filtros informados!");
         }
     }
 
@@ -76,25 +76,41 @@ public class PermissionarioController {
     @PostMapping("/inserir")
     public ResponseEntity<PermissionarioResponseDTO> inserirPermissionario(
             @RequestParam("permissionario") String permissionario,
-            @RequestParam("certificadoCondutor") MultipartFile certificadoCondutor,
-            @RequestParam("certidaoNegativaCriminal") MultipartFile certidaoNegativaCriminal,
+            @RequestParam("anexoRg") MultipartFile anexoRg,
+            @RequestParam("anexoCpf") MultipartFile anexoCpf,
+            @RequestParam("anexoCnh") MultipartFile anexoCnh,
+            @RequestParam("comprovanteResidencia") MultipartFile comprovanteResidencia,
             @RequestParam("certidaoNegativaMunicipal") MultipartFile certidaoNegativaMunicipal,
+            @RequestParam("certidaoNegativaCriminal") MultipartFile certidaoNegativaCriminal,
+            @RequestParam("certificadoPropriedade") MultipartFile certificadoPropriedade,
+            @RequestParam("certificadoCondutor") MultipartFile certificadoCondutor,
+            @RequestParam("apoliceSeguroVida") MultipartFile apoliceSeguroVida,
+            @RequestParam("apoliceSeguroMotocicleta") MultipartFile apoliceSeguroMotocicleta,
             @RequestParam("foto") MultipartFile foto
     ) throws IOException {
         PermissionarioRequestDTO permissionarioDTO = new ObjectMapper().readValue(permissionario, PermissionarioRequestDTO.class);
-        return ResponseEntity.ok(service.inserirPermissionario(permissionarioDTO, certidaoNegativaCriminal, certificadoCondutor,
-                certidaoNegativaMunicipal, foto));
+        return ResponseEntity.ok(service.inserirPermissionario(permissionarioDTO, anexoRg, anexoCpf, anexoCnh, comprovanteResidencia,
+                certidaoNegativaMunicipal, certidaoNegativaCriminal, certificadoPropriedade, certificadoCondutor,
+                apoliceSeguroVida, apoliceSeguroMotocicleta, foto));
     }
 
     @PostMapping("/alterar")
     public ResponseEntity<PermissionarioResponseDTO> atualizarPermissionario(@RequestParam("permissionario") String permissionario,
-                                                                             @RequestParam(value = "certificadoCondutor", required = false) MultipartFile certificadoCondutor,
-                                                                             @RequestParam(value = "certidaoNegativaCriminal", required = false) MultipartFile certidaoNegativaCriminal,
+                                                                             @RequestParam(value = "anexoRg", required = false) MultipartFile anexoRg,
+                                                                             @RequestParam(value = "anexoCpf", required = false) MultipartFile anexoCpf,
+                                                                             @RequestParam(value = "anexoCnh", required = false) MultipartFile anexoCnh,
+                                                                             @RequestParam(value = "comprovanteResidencia", required = false) MultipartFile comprovanteResidencia,
                                                                              @RequestParam(value = "certidaoNegativaMunicipal", required = false) MultipartFile certidaoNegativaMunicipal,
+                                                                             @RequestParam(value = "certidaoNegativaCriminal", required = false) MultipartFile certidaoNegativaCriminal,
+                                                                             @RequestParam(value = "certificadoPropriedade", required = false) MultipartFile certificadoPropriedade,
+                                                                             @RequestParam(value = "certificadoCondutor", required = false) MultipartFile certificadoCondutor,
+                                                                             @RequestParam(value = "apoliceSeguroVida", required = false) MultipartFile apoliceSeguroVida,
+                                                                             @RequestParam(value = "apoliceSeguroMotocicleta", required = false) MultipartFile apoliceSeguroMotocicleta,
                                                                              @RequestParam(value = "foto", required = false) MultipartFile foto) throws IOException {
         PermissionarioRequestDTO permissionarioDTO = new ObjectMapper().readValue(permissionario, PermissionarioRequestDTO.class);
-        return ResponseEntity.ok(service.atualizarPermissionario(permissionarioDTO, certificadoCondutor, certidaoNegativaCriminal,
-                certidaoNegativaMunicipal, foto));
+        return ResponseEntity.ok(service.atualizarPermissionario(permissionarioDTO, anexoRg, anexoCpf, anexoCnh, comprovanteResidencia,
+                certidaoNegativaMunicipal, certidaoNegativaCriminal, certificadoPropriedade, certificadoCondutor,
+                apoliceSeguroVida, apoliceSeguroMotocicleta, foto));
     }
 
     @DeleteMapping("/excluir/{idPermissionario}/usuario/{usuario}")

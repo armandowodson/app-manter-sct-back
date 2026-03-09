@@ -21,6 +21,7 @@ public class VeiculoResponseDTO {
     private String combustivel;
     private String capacidade;
     private String quilometragem;
+    private String cilindrada;
     private byte[] crlv;
     private String numeroTaximetro;
     private String anoRenovacao;

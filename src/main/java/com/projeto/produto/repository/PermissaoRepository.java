@@ -25,7 +25,7 @@ public interface PermissaoRepository extends JpaRepository<Permissao, Long> {
     List<Permissao> buscarTodas(Pageable pageable);
 
     @Query(
-            value = "SELECT MAX(NUMERO_PERMISSAO) " +
+            value = "SELECT MAX(NVL(NUMERO_PERMISSAO,0)) " +
                     "FROM proj.permissao " +
                     "WHERE 1 = 1 " +
                     "ORDER BY NUMERO_PERMISSAO ASC" ,

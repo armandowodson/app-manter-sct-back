@@ -26,6 +26,10 @@ public class Defensor {
     private String orgaoEmissor;
     @Column(name = "DATA_NASCIMENTO")
     private LocalDate dataNascimento;
+    @Column(name = "FILIACAO_MAE")
+    private String filiacaoMae;
+    @Column(name = "FILIACAO_PAI")
+    private String filiacaoPai;
     @Column(name = "SEXO")
     private String sexo;
     @Column(name = "ESTADO_CIVIL")
@@ -38,6 +42,8 @@ public class Defensor {
     private String bairroDefensor;
     @Column(name = "ENDERECO_DEFENSOR")
     private String enderecoDefensor;
+    @Column(name = "CEP")
+    private String cep;
     @Column(name = "CELULAR_DEFENSOR")
     private String celularDefensor;
     @Column(name = "EMAIL_DEFENSOR")
@@ -46,6 +52,8 @@ public class Defensor {
     private String cnhDefensor;
     @Column(name = "CATEGORIA_CNH_DEFENSOR")
     private String categoriaCnhDefensor;
+    @Column(name = "DATA_VALIDADE_CNH")
+    private LocalDate dataValidadeCnh;
     @Column(name = "NUMERO_QUITACAO_MILITAR")
     private String numeroQuitacaoMilitar;
     @Column(name = "NUMERO_QUITACAO_ELEITORAL")
@@ -57,14 +65,35 @@ public class Defensor {
     @Column(name = "DATA_VALIDADE_CER_CON")
     private LocalDate dataValidadeCertificadoCondutor;
     @Lob
-    @Column(name = "CERTIFICADO_CONDUTOR")
-    private byte[] certificadoCondutor;
+    @Column(name = "ANEXO_RG")
+    private byte[] anexoRg;
+    @Lob
+    @Column(name = "ANEXO_CPF")
+    private byte[] anexoCpf;
+    @Lob
+    @Column(name = "ANEXO_CNH")
+    private byte[] anexoCnh;
+    @Lob
+    @Column(name = "COMPROVANTE_RESIDENCIA")
+    private byte[] comprovanteResidencia;
+    @Lob
+    @Column(name = "CERTIDAO_NEGATIVA_MUNICIPAL")
+    private byte[] certidaoNegativaMunicipal;
     @Lob
     @Column(name = "CERTIDAO_NEGATIVA_CRIMINAL")
     private byte[] certidaoNegativaCriminal;
     @Lob
-    @Column(name = "CERTIDAO_NEGATIVA_MUNICIPAL")
-    private byte[] certidaoNegativaMunicipal;
+    @Column(name = "CERTIFICADO_PROPRIEDADE")
+    private byte[] certificadoPropriedade;
+    @Lob
+    @Column(name = "CERTIFICADO_CONDUTOR")
+    private byte[] certificadoCondutor;
+    @Lob
+    @Column(name = "APOLICE_SEGURO_VIDA")
+    private byte[] apoliceSeguroVida;
+    @Lob
+    @Column(name = "APOLICE_SEGURO_MOTOCICLETA")
+    private byte[] apoliceSeguroMotocicleta;
     @Lob
     @Column(name = "FOTO")
     private byte[] foto;

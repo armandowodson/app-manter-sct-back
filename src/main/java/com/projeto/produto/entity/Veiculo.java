@@ -44,6 +44,8 @@ public class Veiculo {
     private String capacidade;
     @Column(name = "QUILOMETRAGEM")
     private String quilometragem;
+    @Column(name = "CILINDRADA")
+    private String cilindrada;
     @Lob
     @Column(name = "CRLV")
     private byte[] crlv;

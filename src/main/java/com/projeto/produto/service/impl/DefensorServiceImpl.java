@@ -46,9 +46,16 @@ public class DefensorServiceImpl {
 
     @Transactional
     public DefensorResponseDTO inserirDefensor(    DefensorRequestDTO defensorRequestDTO,
-                                                   MultipartFile certificadoCondutor,
-                                                   MultipartFile certidaoNegativaCriminal,
+                                                   MultipartFile anexoRg,
+                                                   MultipartFile anexoCpf,
+                                                   MultipartFile anexoCnh,
+                                                   MultipartFile comprovanteResidencia,
                                                    MultipartFile certidaoNegativaMunicipal,
+                                                   MultipartFile certidaoNegativaCriminal,
+                                                   MultipartFile certificadoPropriedade,
+                                                   MultipartFile certificadoCondutor,
+                                                   MultipartFile apoliceSeguroVida,
+                                                   MultipartFile apoliceSeguroMotocicleta,
                                                    MultipartFile foto) {
         logger.info("Início Inserir Defensor");
         try {
@@ -66,7 +73,9 @@ public class DefensorServiceImpl {
             Defensor defensor = new Defensor();
 
             defensor = converterDefensorDTOToDefensor(
-                    defensorRequestDTO, certificadoCondutor, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 1
+                    defensorRequestDTO, anexoRg, anexoCpf, anexoCnh, comprovanteResidencia, certidaoNegativaMunicipal,
+                    certidaoNegativaCriminal, certificadoPropriedade, certificadoCondutor, apoliceSeguroVida,
+                    apoliceSeguroMotocicleta, foto, 1
             );
             defensor = defensorRepository.save(defensor);
 
@@ -82,9 +91,16 @@ public class DefensorServiceImpl {
 
     @Transactional
     public DefensorResponseDTO atualizarDefensor(DefensorRequestDTO defensorRequestDTO,
-                                                 MultipartFile certificadoCondutor,
-                                                 MultipartFile certidaoNegativaCriminal,
+                                                 MultipartFile anexoRg,
+                                                 MultipartFile anexoCpf,
+                                                 MultipartFile anexoCnh,
+                                                 MultipartFile comprovanteResidencia,
                                                  MultipartFile certidaoNegativaMunicipal,
+                                                 MultipartFile certidaoNegativaCriminal,
+                                                 MultipartFile certificadoPropriedade,
+                                                 MultipartFile certificadoCondutor,
+                                                 MultipartFile apoliceSeguroVida,
+                                                 MultipartFile apoliceSeguroMotocicleta,
                                                  MultipartFile foto) {
         logger.info("Início Atualizar Defensor");
         try{
@@ -102,7 +118,9 @@ public class DefensorServiceImpl {
             Defensor defensor = new Defensor();
 
             defensor = converterDefensorDTOToDefensor(
-                    defensorRequestDTO, certificadoCondutor, certidaoNegativaCriminal, certidaoNegativaMunicipal, foto, 2
+                    defensorRequestDTO, anexoRg, anexoCpf, anexoCnh, comprovanteResidencia, certidaoNegativaMunicipal,
+                    certidaoNegativaCriminal, certificadoPropriedade, certificadoCondutor, apoliceSeguroVida,
+                    apoliceSeguroMotocicleta, foto, 2
             );
 
             defensor = defensorRepository.save(defensor);
@@ -260,15 +278,19 @@ public class DefensorServiceImpl {
             defensorResponseDTO.setCpfDefensor(defensor.getCpfDefensor());
             defensorResponseDTO.setRgDefensor(defensor.getRgDefensor());
             defensorResponseDTO.setOrgaoEmissor(defensor.getOrgaoEmissor());
+            defensorResponseDTO.setFiliacaoMae(defensor.getFiliacaoMae());
+            defensorResponseDTO.setFiliacaoPai(defensor.getFiliacaoPai());
             defensorResponseDTO.setSexo(defensor.getSexo());
             defensorResponseDTO.setEstadoCivil(defensor.getEstadoCivil());
             defensorResponseDTO.setDataNascimento(defensor.getDataNascimento().toString());
             defensorResponseDTO.setCnhDefensor(defensor.getCnhDefensor());
             defensorResponseDTO.setCategoriaCnhDefensor(defensor.getCategoriaCnhDefensor());
+            defensorResponseDTO.setDataValidadeCnh(defensor.getDataValidadeCnh().toString());
             defensorResponseDTO.setUfDefensor(defensor.getUfDefensor());
             defensorResponseDTO.setCidadeDefensor(defensor.getCidadeDefensor());
             defensorResponseDTO.setBairroDefensor(defensor.getBairroDefensor());
             defensorResponseDTO.setEnderecoDefensor(defensor.getEnderecoDefensor());
+            defensorResponseDTO.setCep(defensor.getCep());
             defensorResponseDTO.setCelularDefensor(defensor.getCelularDefensor());
             defensorResponseDTO.setEmailDefensor(defensor.getEmailDefensor());
             defensorResponseDTO.setNumeroQuitacaoMilitar(defensor.getNumeroQuitacaoMilitar());
@@ -280,9 +302,16 @@ public class DefensorServiceImpl {
                 String formattedDate = defensor.getDataValidadeCertificadoCondutor().plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC).format(formatter);
                 defensorResponseDTO.setDataValidadeCertificadoCondutor(formattedDate);
             }
-            defensorResponseDTO.setCertificadoCondutor(defensor.getCertificadoCondutor());
-            defensorResponseDTO.setCertidaoNegativaCriminal(defensor.getCertidaoNegativaCriminal());
+            defensorResponseDTO.setAnexoRg(defensor.getAnexoRg());
+            defensorResponseDTO.setAnexoCpf(defensor.getAnexoCpf());
+            defensorResponseDTO.setAnexoCnh(defensor.getAnexoCnh());
+            defensorResponseDTO.setComprovanteResidencia(defensor.getComprovanteResidencia());
             defensorResponseDTO.setCertidaoNegativaMunicipal(defensor.getCertidaoNegativaMunicipal());
+            defensorResponseDTO.setCertidaoNegativaCriminal(defensor.getCertidaoNegativaCriminal());
+            defensorResponseDTO.setCertificadoPropriedade(defensor.getCertificadoPropriedade());
+            defensorResponseDTO.setCertificadoCondutor(defensor.getCertificadoCondutor());
+            defensorResponseDTO.setApoliceSeguroVida(defensor.getApoliceSeguroVida());
+            defensorResponseDTO.setApoliceSeguroMotocicleta(defensor.getApoliceSeguroMotocicleta());
             defensorResponseDTO.setFoto(defensor.getFoto());
             defensorResponseDTO.setDataCriacao(defensor.getDataCriacao().toString());
             defensorResponseDTO.setStatus(defensor.getStatus());
@@ -295,9 +324,16 @@ public class DefensorServiceImpl {
     }
 
     public Defensor converterDefensorDTOToDefensor(DefensorRequestDTO defensorRequestDTO,
-                                                   MultipartFile certificadoCondutor,
-                                                   MultipartFile certidaoNegativaCriminal,
+                                                   MultipartFile anexoRg,
+                                                   MultipartFile anexoCpf,
+                                                   MultipartFile anexoCnh,
+                                                   MultipartFile comprovanteResidencia,
                                                    MultipartFile certidaoNegativaMunicipal,
+                                                   MultipartFile certidaoNegativaCriminal,
+                                                   MultipartFile certificadoPropriedade,
+                                                   MultipartFile certificadoCondutor,
+                                                   MultipartFile apoliceSeguroVida,
+                                                   MultipartFile apoliceSeguroMotocicleta,
                                                    MultipartFile foto, Integer tipo) throws IOException {
         logger.info("Início Converter DTO para Defensor");
 
@@ -319,6 +355,8 @@ public class DefensorServiceImpl {
 
             defensor.setRgDefensor(defensorRequestDTO.getRgDefensor());
             defensor.setOrgaoEmissor(defensorRequestDTO.getOrgaoEmissor());
+            defensor.setFiliacaoMae(defensorRequestDTO.getFiliacaoMae());
+            defensor.setFiliacaoPai(defensorRequestDTO.getFiliacaoPai());
             defensor.setSexo(defensorRequestDTO.getSexo());
             defensor.setEstadoCivil(defensorRequestDTO.getEstadoCivil());
             if(Objects.nonNull(defensorRequestDTO.getDataNascimento())) {
@@ -337,10 +375,23 @@ public class DefensorServiceImpl {
             defensor.setCidadeDefensor(defensorRequestDTO.getCidadeDefensor());
             defensor.setBairroDefensor(defensorRequestDTO.getBairroDefensor());
             defensor.setEnderecoDefensor(defensorRequestDTO.getEnderecoDefensor());
+            defensor.setCep(defensorRequestDTO.getCep());
             defensor.setCelularDefensor(defensorRequestDTO.getCelularDefensor());
             defensor.setEmailDefensor(defensorRequestDTO.getEmailDefensor());
             defensor.setCnhDefensor(defensorRequestDTO.getCnhDefensor());
             defensor.setCategoriaCnhDefensor(defensorRequestDTO.getCategoriaCnhDefensor());
+            if(Objects.nonNull(defensorRequestDTO.getDataValidadeCnh())) {
+                String data = defensorRequestDTO.getDataValidadeCnh();
+                Integer indexChar = data.indexOf('T');
+                if(indexChar > 0){
+                    data = data.substring(0, indexChar);
+                    if(tipo == 1){
+                        defensor.setDataValidadeCnh(LocalDate.parse(data));
+                    }else{
+                        defensor.setDataValidadeCnh(LocalDate.parse(data).minusDays(1));
+                    }
+                }
+            }
             defensor.setNumeroQuitacaoMilitar(defensorRequestDTO.getNumeroQuitacaoMilitar());
             defensor.setNumeroQuitacaoEleitoral(defensorRequestDTO.getNumeroQuitacaoEleitoral());
             defensor.setNumeroCertificadoCondutor(defensorRequestDTO.getNumeroCertificadoCondutor());
@@ -358,12 +409,26 @@ public class DefensorServiceImpl {
             }
             defensor.setNumeroInscricaoInss(defensorRequestDTO.getNumeroInscricaoInss());
 
-            if(Objects.nonNull(certificadoCondutor))
-                defensor.setCertificadoCondutor(certificadoCondutor.getBytes());
-            if(Objects.nonNull(certidaoNegativaCriminal))
-                defensor.setCertidaoNegativaCriminal(certidaoNegativaCriminal.getBytes());
+            if(Objects.nonNull(anexoRg))
+                defensor.setAnexoRg(anexoRg.getBytes());
+            if(Objects.nonNull(anexoCpf))
+                defensor.setAnexoCpf(anexoCpf.getBytes());
+            if(Objects.nonNull(anexoCnh))
+                defensor.setAnexoCnh(anexoCnh.getBytes());
+            if(Objects.nonNull(comprovanteResidencia))
+                defensor.setComprovanteResidencia(comprovanteResidencia.getBytes());
             if(Objects.nonNull(certidaoNegativaMunicipal))
                 defensor.setCertidaoNegativaMunicipal(certidaoNegativaMunicipal.getBytes());
+            if(Objects.nonNull(certidaoNegativaCriminal))
+                defensor.setCertidaoNegativaCriminal(certidaoNegativaCriminal.getBytes());
+            if(Objects.nonNull(certificadoPropriedade))
+                defensor.setCertificadoPropriedade(certificadoPropriedade.getBytes());
+            if(Objects.nonNull(certificadoCondutor))
+                defensor.setCertificadoCondutor(certificadoCondutor.getBytes());
+            if(Objects.nonNull(apoliceSeguroVida))
+                defensor.setApoliceSeguroVida(apoliceSeguroVida.getBytes());
+            if(Objects.nonNull(apoliceSeguroMotocicleta))
+                defensor.setApoliceSeguroMotocicleta(apoliceSeguroMotocicleta.getBytes());
             if(Objects.nonNull(foto))
                 defensor.setFoto(foto.getBytes());
 
@@ -413,7 +478,7 @@ public class DefensorServiceImpl {
             byte[] bytes = gerarRegistroCondutorJasper(permissao, veiculo, defensor, modulo);
             return bytes;
         } catch (Exception e){
-            logger.error("gerarPermissaoTaxi - Permissionário: " + e.getMessage());
+            logger.error("gerarPermissaoTaxi - Autorizatário: " + e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
     }
@@ -445,63 +510,87 @@ public class DefensorServiceImpl {
             //REGISTRO DO CONDUTOR
             parameters.put("numeroRc", defensor.getNumeroCertificadoCondutor());
             parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao()));
-            parameters.put("tipoCondutor", "[x] Defensor");
+            if(modulo.equals("1"))
+                parameters.put("tipoCondutor", "[x] Permissionário");
+            else
+                parameters.put("tipoCondutor", "[x] Autorizatário");
+
             parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
             parameters.put("validadeRegistroCondutor", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao()) +
-                    " até " + "");
-            //PERMISSIONÁRIO
+                    " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataValidadeCertificadoCondutor()));
+            //PERMISSIONÁRIO/AUTORIZATÁRIO
             parameters.put("nome", defensor.getNomeDefensor());
             parameters.put("cpf", defensor.getCpfDefensor());
             parameters.put("rg", defensor.getRgDefensor());
+            parameters.put("orgao", defensor.getOrgaoEmissor());
             parameters.put("cnh", defensor.getCnhDefensor());
             parameters.put("categoriaCnh", CarregarTipos.carregarCategoriaCnh(defensor.getCategoriaCnhDefensor()));
+            parameters.put("dataValidadeCnh", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataValidadeCnh()));
             parameters.put("dataNascimento", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataNascimento()));
             parameters.put("sexo", defensor.getSexo().equals("1") ? "Masculino" : "Feminino");
-            parameters.put("estadoCivil", CarregarTipos.carregarEstadoCivilPermissionario(defensor.getEstadoCivil()));
-            parameters.put("endereco", defensor.getEnderecoDefensor());
+            parameters.put("estadoCivil", CarregarTipos.carregarEstadoCivil(defensor.getEstadoCivil()));
+            parameters.put("filiacao", defensor.getFiliacaoMae() + "/" + (Objects.nonNull(defensor.getFiliacaoPai()) ? defensor.getFiliacaoPai() : ""));
+            parameters.put("endereco", defensor.getEnderecoDefensor() + " - CEP: " + defensor.getCep());
             parameters.put("celular", defensor.getCelularDefensor());
             parameters.put("email", Objects.nonNull(defensor.getEmailDefensor()) ? defensor.getEmailDefensor() : "");
+
             //DOCUMENTAÇÃO EXIGIDA
-            String documentacaoExigida = "[x] CPF " + "[x] RG " + "[x] CNH ";
-            if(Objects.nonNull(defensor.getNumeroQuitacaoMilitar()) && !defensor.getNumeroQuitacaoMilitar().isEmpty())
-                documentacaoExigida = documentacaoExigida + "[x] Quitação Militar ";
+            String documentacaoExigida1 = "";
+            if(Objects.nonNull(defensor.getAnexoRg()))
+                documentacaoExigida1 = documentacaoExigida1 + "[x] RG (Carteira de Identidade)\n";
             else
-                documentacaoExigida = documentacaoExigida + "[ ] Quitação Militar ";
-
-            if(Objects.nonNull(defensor.getNumeroQuitacaoEleitoral()) && !defensor.getNumeroQuitacaoEleitoral().isEmpty())
-                documentacaoExigida = documentacaoExigida + "[x] Quitação Eleitoral ";
+                documentacaoExigida1 = documentacaoExigida1 + "[ ] RG (Carteira de Identidade)\n";
+            if(Objects.nonNull(defensor.getAnexoCpf()))
+                documentacaoExigida1 = documentacaoExigida1 + "[x] CPF\n";
             else
-                documentacaoExigida = documentacaoExigida + "[ ] Quitação Eleitoral ";
-
-            if(Objects.nonNull(defensor.getNumeroInscricaoInss()) && !defensor.getNumeroInscricaoInss().isEmpty())
-                documentacaoExigida = documentacaoExigida + "[x] INSS ";
+                documentacaoExigida1 = documentacaoExigida1 + "[ ] CPF\n";
+            if(Objects.nonNull(defensor.getAnexoCnh()))
+                documentacaoExigida1 = documentacaoExigida1 + "[x] CNH Categoria 'A' (mín. 2 anos de experiência)\n";
             else
-                documentacaoExigida = documentacaoExigida + "[ ] INSS ";
+                documentacaoExigida1 = documentacaoExigida1 + "[ ] CNH Categoria 'A' (mín. 2 anos de experiência)\n";
+            if(Objects.nonNull(defensor.getComprovanteResidencia()))
+                documentacaoExigida1 = documentacaoExigida1 + "[x] Comprovante residência em Barreirinhas (mín. 3 anos)\n";
+            else
+                documentacaoExigida1 = documentacaoExigida1 + "[ ] Comprovante residência em Barreirinhas (mín. 3 anos)\n";
+            if(Objects.nonNull(defensor.getCertidaoNegativaMunicipal()))
+                documentacaoExigida1 = documentacaoExigida1 + "[x] Certidão negativa de multas e ocorrências DETRAN-MA\n";
+            else
+                documentacaoExigida1 = documentacaoExigida1 + "[ ] Certidão negativa de multas e ocorrências DETRAN-MA\n";
 
+            parameters.put("documentacaoExigida1", documentacaoExigida1);
+
+            String documentacaoExigida2 = "";
+            if(Objects.nonNull(defensor.getCertidaoNegativaCriminal()))
+                documentacaoExigida2 = documentacaoExigida2 + "[x] Certidão negativa de antecedentes criminais\n";
+            else
+                documentacaoExigida2 = documentacaoExigida2 + "[ ] Certidão negativa de antecedentes criminais\n";
+            if(Objects.nonNull(defensor.getCertificadoPropriedade()))
+                documentacaoExigida2 = documentacaoExigida2 + "[x] Certificado de propriedade da motocicleta\n";
+            else
+                documentacaoExigida2 = documentacaoExigida2 + "[ ] Certificado de propriedade da motocicleta\n";
             if(Objects.nonNull(defensor.getCertificadoCondutor()))
-                documentacaoExigida = documentacaoExigida + "[x] Curso Transporte Público ";
+                documentacaoExigida2 = documentacaoExigida2 + "[x] Certificado de curso específico (emitido máx. 2 anos)\n";
             else
-                documentacaoExigida = documentacaoExigida + "[ ] Curso Transporte Público ";
-
-            documentacaoExigida = documentacaoExigida + "[ ] Atestado Médico ";
-
-            documentacaoExigida = documentacaoExigida + "[ ] Comprovação Residência ";
-
-            if(Objects.nonNull(defensor.getCertidaoNegativaCriminal()) && Objects.nonNull(defensor.getCertidaoNegativaMunicipal()))
-                documentacaoExigida = documentacaoExigida + "[x] Certidões Negativas ";
+                documentacaoExigida2 = documentacaoExigida2 + "[ ] Certificado de curso específico (emitido máx. 2 anos)\n";
+            if(Objects.nonNull(defensor.getApoliceSeguroVida()))
+                documentacaoExigida2 = documentacaoExigida2 + "[x] Apólice de seguro de vida\n";
             else
-                documentacaoExigida = documentacaoExigida + "[ ] Certidões Negativas ";
+                documentacaoExigida2 = documentacaoExigida2 + "[ ] Apólice de seguro de vida\n";
+            if(Objects.nonNull(defensor.getApoliceSeguroMotocicleta()))
+                documentacaoExigida2 = documentacaoExigida2 + "[x] Apólice de seguro da motocicleta (acidentes, furto, incêndio, terceiros)\n";
+            else
+                documentacaoExigida2 = documentacaoExigida2 + "[ ] Apólice de seguro da motocicleta (acidentes, furto, incêndio, terceiros)\n";
 
-            parameters.put("documentacaoExigida", documentacaoExigida);
+            parameters.put("documentacaoExigida2", documentacaoExigida2);
 
             //VEÍCULO
-            parameters.put("nomePermissionario", defensor.getNomeDefensor());
+            parameters.put("nomePermissionario", veiculo.getPermissionario().getNomePermissionario());
             parameters.put("numeroPermissao", permissao.getNumeroPermissao());
             parameters.put("placa", veiculo.getPlaca());
             parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
             parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
-            parameters.put("cor", veiculo.getCor().equals("1") ? "Branca" : "Prata");
-            parameters.put("capacidade", veiculo.getCapacidade());
+            parameters.put("cor", obterCor(veiculo.getCor()));
+            parameters.put("cilindrada", Objects.nonNull(veiculo.getCilindrada()) ? veiculo.getCilindrada() : "");
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
 
@@ -510,6 +599,21 @@ public class DefensorServiceImpl {
         } catch (Exception e){
             logger.error("gerarRegistroCondutorJasper: " + e.getMessage());
             throw new RuntimeException("500");
+        }
+    }
+
+    public String obterCor(String idCor){
+        switch (idCor){
+            case "1":
+                return "Amarela";
+            case "2":
+                return "Laranja";
+            case "3":
+                return "Branca";
+            case "4":
+                return "Preta";
+            default:
+                return "";
         }
     }
 }

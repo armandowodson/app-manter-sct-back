@@ -89,7 +89,7 @@ public class CarregarTipos {
         return strStatus;
     }
 
-    public static String carregarEstadoCivilPermissionario(String estado) {
+    public static String carregarEstadoCivil(String estado) {
         String strEstado = "";
         switch (estado) {
             case "1":

@@ -135,10 +135,16 @@ public class VeiculoServiceImpl {
 
         switch (veiculoList.get(0).getCor()){
             case "1":
-                veiculoList.get(0).setCor("BRANCA");
+                veiculoList.get(0).setCor("AMARELA");
                 break;
             case "2":
-                veiculoList.get(0).setCor("PRATA");
+                veiculoList.get(0).setCor("LARANJA");
+                break;
+            case "3":
+                veiculoList.get(0).setCor("BRANCA");
+                break;
+            case "4":
+                veiculoList.get(0).setCor("PRETA");
                 break;
             default:
                 veiculoList.get(0).setCor("");
@@ -196,6 +202,7 @@ public class VeiculoServiceImpl {
         veiculoResponseDTO.setCombustivel(veiculo.getCombustivel());
         veiculoResponseDTO.setCapacidade(veiculo.getCapacidade());
         veiculoResponseDTO.setQuilometragem(veiculo.getQuilometragem());
+        veiculoResponseDTO.setCilindrada(veiculo.getCilindrada());
         veiculoResponseDTO.setCrlv(veiculo.getCrlv());
         veiculoResponseDTO.setNumeroTaximetro(veiculo.getNumeroTaximetro());
         veiculoResponseDTO.setAnoRenovacao(veiculo.getAnoRenovacao());
@@ -238,6 +245,7 @@ public class VeiculoServiceImpl {
         veiculo.setCombustivel(veiculoRequestDTO.getCombustivel());
         veiculo.setCapacidade(veiculoRequestDTO.getCapacidade());
         veiculo.setQuilometragem(veiculoRequestDTO.getQuilometragem());
+        veiculo.setCilindrada(veiculoRequestDTO.getCilindrada());
         veiculo.setNumeroTaximetro(veiculoRequestDTO.getNumeroTaximetro());
         veiculo.setAnoRenovacao(veiculoRequestDTO.getAnoRenovacao());
 
@@ -308,17 +316,6 @@ public class VeiculoServiceImpl {
         auditoriaRepository.save(auditoria);
     }
 
-    public String converterNomeCor(String cor){
-        switch (cor){
-            case "BRANCA":
-                return "1";
-            case "PRATA":
-                return "2";
-        }
-
-        return "";
-    }
-
     public byte[] gerarAutorizacaoTrafego(String numeroPermissao, String modulo) {
         logger.info("Início Gerar Autorização Tráfego Busca dos Dados");
         try{
@@ -380,7 +377,7 @@ public class VeiculoServiceImpl {
             parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
             parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
             parameters.put("tipoCombustivel", CarregarTipos.carregarTipoCombustivelVeiculo(veiculo.getCombustivel()));
-            parameters.put("cor", veiculo.getCor().equals("1") ? "Branca" : "Prata");
+            parameters.put("cor", obterCor(veiculo.getCor()));
             parameters.put("capacidade", veiculo.getCapacidade());
             parameters.put("pet", pontoTaxi.getDescricaoPonto());
             parameters.put("numeroPermissao", permissao.getNumeroPermissao());
@@ -460,7 +457,7 @@ public class VeiculoServiceImpl {
             parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
             parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
             parameters.put("tipoCombustivel", CarregarTipos.carregarTipoCombustivelVeiculo(veiculo.getCombustivel()));
-            parameters.put("cor", veiculo.getCor().equals("1") ? "Branca" : "Prata");
+            parameters.put("cor", obterCor(veiculo.getCor()));
             parameters.put("renavam", veiculo.getRenavam());
             parameters.put("capacidade", veiculo.getCapacidade());
             parameters.put("quilometragem", veiculo.getQuilometragem());
@@ -493,6 +490,21 @@ public class VeiculoServiceImpl {
             case 11: return "Novembro";
             case 12: return "Dezembro";
             default: return "";
+        }
+    }
+
+    public String obterCor(String idCor){
+        switch (idCor){
+            case "1":
+                return "Amarela";
+            case "2":
+                return "Laranja";
+            case "3":
+                return "Branca";
+            case "4":
+                return "Preta";
+            default:
+                return "";
         }
     }
 

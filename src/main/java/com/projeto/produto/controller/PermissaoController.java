@@ -124,7 +124,7 @@ public class PermissaoController {
             if(modulo.equals(""))
                 fileName = "permissaoTaxi-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
             else
-                fileName = "permissaoMoto-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
+                fileName = "termoAutorizacaoMoto-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentDispositionFormData("attachment", fileName);

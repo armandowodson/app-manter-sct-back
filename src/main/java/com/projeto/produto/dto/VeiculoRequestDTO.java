@@ -21,6 +21,7 @@ public class VeiculoRequestDTO {
     private String combustivel;
     private String capacidade;
     private String quilometragem;
+    private String cilindrada;
     private String numeroTaximetro;
     private String anoRenovacao;
     private String dataVistoria;

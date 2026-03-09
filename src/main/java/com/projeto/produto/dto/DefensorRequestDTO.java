@@ -15,6 +15,8 @@ public class DefensorRequestDTO {
     private String cpfDefensor;
     private String rgDefensor;
     private String orgaoEmissor;
+    private String filiacaoMae;
+    private String filiacaoPai;
     private String sexo;
     private String estadoCivil;
     private String dataNascimento;
@@ -22,10 +24,12 @@ public class DefensorRequestDTO {
     private String cidadeDefensor;
     private String bairroDefensor;
     private String enderecoDefensor;
+    private String cep;
     private String celularDefensor;
     private String emailDefensor;
     private String cnhDefensor;
     private String categoriaCnhDefensor;
+    private String dataValidadeCnh;
     private String numeroQuitacaoMilitar;
     private String numeroQuitacaoEleitoral;
     private String numeroInscricaoInss;

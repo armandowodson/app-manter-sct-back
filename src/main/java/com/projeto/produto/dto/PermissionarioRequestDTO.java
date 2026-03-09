@@ -12,6 +12,8 @@ public class PermissionarioRequestDTO {
     private String cpfPermissionario;
     private String rgPermissionario;
     private String orgaoEmissor;
+    private String filiacaoMae;
+    private String filiacaoPai;
     private String sexo;
     private String estadoCivil;
     private String dataNascimento;
@@ -19,10 +21,12 @@ public class PermissionarioRequestDTO {
     private String cidadePermissionario;
     private String bairroPermissionario;
     private String enderecoPermissionario;
+    private String cep;
     private String celularPermissionario;
     private String emailPermissionario;
     private String cnhPermissionario;
     private String categoriaCnhPermissionario;
+    private String dataValidadeCnh;
     private String numeroQuitacaoMilitar;
     private String numeroQuitacaoEleitoral;
     private String numeroInscricaoInss;
