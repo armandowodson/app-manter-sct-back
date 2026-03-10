@@ -53,15 +53,6 @@ public class Veiculo {
     private String numeroTaximetro;
     @Column(name = "ANO_RENOVACAO")
     private String anoRenovacao;
-    @Column(name = "DATA_VISTORIA")
-    private LocalDate dataVistoria;
-    @Column(name = "DATA_RETORNO")
-    private LocalDate dataRetorno;
-    @Column(name = "STATUS_VISTORIA")
-    private String statusVistoria;
-    @Lob
-    @Column(name = "COMPROVANTE_VISTORIA")
-    private byte[] comprovanteVistoria;
     @Column(name = "SITUACAO_VEICULO")
     private String situacaoVeiculo;
     @Column(name = "NUMERO_CRLV")

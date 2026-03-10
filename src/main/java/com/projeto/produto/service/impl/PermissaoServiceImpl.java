@@ -48,6 +48,9 @@ public class PermissaoServiceImpl {
     @Autowired
     private DefensorRepository defensorRepository;
 
+    @Autowired
+    private VistoriaRepository vistoriaRepository;
+
     private static final Logger logger = LogManager.getLogger(PermissaoServiceImpl.class);
 
     @Transactional
@@ -513,19 +516,17 @@ public class PermissaoServiceImpl {
             if(Objects.isNull(veiculo))
                 throw new RuntimeException("401");
 
-            PontoTaxi pontoTaxi = pontosTaxiRepository.findByIdPontoTaxi(veiculo.getPontoTaxi().getIdPontoTaxi());
-            if(Objects.isNull(pontoTaxi))
-                throw new RuntimeException("402");
-
             Permissionario permissionario = permissionarioRepository.findPermissionarioByNumeroPermissao(permissao.getNumeroPermissao());
             if(Objects.isNull(permissionario))
-                throw new RuntimeException("403");
+                throw new RuntimeException("402");
 
             Defensor defensor = defensorRepository.findDefensorByNumeroPermissao(permissao.getNumeroPermissao());
             if(Objects.isNull(defensor))
                 throw new RuntimeException("403");
 
-            byte[] bytes = gerarPermissaoTaxiJasper(permissao, veiculo, pontoTaxi, permissionario, defensor, modulo);
+            Vistoria vistoria = vistoriaRepository.findVistoriaByVeiculo(veiculo);
+
+            byte[] bytes = gerarPermissaoTaxiJasper(permissao, veiculo, permissionario, defensor, vistoria, modulo);
             return bytes;
         } catch (Exception e){
             logger.error("gerarPermissaoTaxi - Autorizatário: " + e.getMessage());
@@ -533,8 +534,8 @@ public class PermissaoServiceImpl {
         }
     }
 
-    public byte[] gerarPermissaoTaxiJasper(Permissao permissao, Veiculo veiculo, PontoTaxi pontoTaxi,
-                                           Permissionario permissionario, Defensor defensor, String modulo) {
+    public byte[] gerarPermissaoTaxiJasper(Permissao permissao, Veiculo veiculo, Permissionario permissionario,
+                                           Defensor defensor, Vistoria vistoria, String modulo) {
         logger.info("Início Gerar Permissão de Táxi Jasper");
         try{
             ClassPathResource resource;
@@ -587,7 +588,7 @@ public class PermissaoServiceImpl {
             parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
             parameters.put("cor", obterCor(veiculo.getCor()));
             parameters.put("chassi", veiculo.getChassi());
-            parameters.put("dataVistoria", Objects.nonNull(veiculo.getDataVistoria()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataVistoria()) : "");
+            parameters.put("dataVistoria", (Objects.nonNull(vistoria) && Objects.nonNull(vistoria.getDataVistoria())) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(vistoria.getDataVistoria()) : "");
             parameters.put("quilometragem", Objects.nonNull(veiculo.getQuilometragem()) ? veiculo.getQuilometragem() : "");
             parameters.put("cilindrada", Objects.nonNull(veiculo.getCilindrada()) ? veiculo.getCilindrada() : "");
             //DEFENSOR

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 @RestController
-@RequestMapping("/permissao")
+@RequestMapping("/permissaomoto")
 public class PermissaoController {
     @Autowired
     public PermissaoServiceImpl service;

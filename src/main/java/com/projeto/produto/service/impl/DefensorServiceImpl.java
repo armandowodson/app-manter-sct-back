@@ -511,9 +511,9 @@ public class DefensorServiceImpl {
             parameters.put("numeroRc", defensor.getNumeroCertificadoCondutor());
             parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao()));
             if(modulo.equals("1"))
-                parameters.put("tipoCondutor", "[x] Permissionário");
-            else
                 parameters.put("tipoCondutor", "[x] Autorizatário");
+            else
+                parameters.put("tipoCondutor", "[x] Defensor");
 
             parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
             parameters.put("validadeRegistroCondutor", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao()) +
