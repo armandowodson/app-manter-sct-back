@@ -53,6 +53,18 @@ public class Veiculo {
     private String numeroTaximetro;
     @Column(name = "ANO_RENOVACAO")
     private String anoRenovacao;
+    @Column(name = "DATA_VISTORIA")
+    private LocalDate dataVistoria;
+    @Column(name = "DATA_RETORNO")
+    private LocalDate dataRetorno;
+    @Column(name = "STATUS_VISTORIA")
+    private String statusVistoria;
+    @Column(name = "RESSALVAS")
+    private String ressalvas;
+    @Column(name = "MATRICULA_VISTORIADOR")
+    private String matriculaVistoriador;
+    @Column(name = "NUMERO_CAV_EMITIDO")
+    private String numeroCavEmitido;
     @Column(name = "SITUACAO_VEICULO")
     private String situacaoVeiculo;
     @Column(name = "NUMERO_CRLV")

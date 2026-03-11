@@ -25,6 +25,12 @@ public class VeiculoResponseDTO {
     private byte[] crlv;
     private String numeroTaximetro;
     private String anoRenovacao;
+    private String dataVistoria;
+    private String dataRetorno;
+    private String statusVistoria;
+    private String ressalvas;
+    private String matriculaVistoriador;
+    private String numeroCavEmitido;
     private String situacaoVeiculo;
     private String numeroCrlv;
     private String anoCrlv;

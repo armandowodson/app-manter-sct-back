@@ -1,7 +1,6 @@
 package com.projeto.produto.repository;
 
 import com.projeto.produto.entity.Permissionario;
-import com.projeto.produto.entity.PontoTaxi;
 import com.projeto.produto.entity.Veiculo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -43,7 +42,8 @@ public interface VeiculoRepository extends JpaRepository<Veiculo,Integer> {
     @Query(
             value = "SELECT * " +
                     "FROM proj.veiculo " +
-                    "WHERE PLACA = :placa ",
+                    "WHERE PLACA = :placa " +
+                    "AND STATUS = 'ATIVO' ",
             nativeQuery = true
     )
     List<Veiculo> buscarVeiculoPlaca(String placa);
