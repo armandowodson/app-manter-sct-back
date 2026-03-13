@@ -43,18 +43,17 @@ public class DefensorController {
         }
     }
 
-    @GetMapping("/buscar-permissao/{numeroPermissao}")
-    public ResponseEntity<DefensorResponseDTO> buscarDefensorId(@PathVariable String numeroPermissao) {
+    @GetMapping("/buscar-permissionario/{idPermissionario}")
+    public ResponseEntity<DefensorResponseDTO> buscarDefensorIdPermissionario(@PathVariable String idPermissionario) {
         try{
-            return ResponseEntity.ok(service.buscarDefensorNumeroPermissao(numeroPermissao));
+            return ResponseEntity.ok(service.buscarDefensorIdPermissionario(idPermissionario));
         } catch (Exception e){
             throw new RuntimeException("Não foi possível consultar o Defensor pelo ID!");
         }
     }
 
     @GetMapping("/buscar-filtros")
-    public Page<DefensorResponseDTO> buscarDefensorsFiltros(   @RequestParam(required = false) String numeroPermissao,
-                                                               @RequestParam(required = false) String nomeDefensor,
+    public Page<DefensorResponseDTO> buscarDefensorsFiltros(   @RequestParam(required = false) String nomeDefensor,
                                                                @RequestParam(required = false) String cpfDefensor,
                                                                @RequestParam(required = false) String cnhDefensor,
                                                                @RequestParam(required = false) String nomePermissionario,
@@ -64,7 +63,7 @@ public class DefensorController {
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
         try{
             Page<DefensorResponseDTO> defensores = service.listarTodosDefensorFiltros(
-                    numeroPermissao, nomeDefensor, cpfDefensor, cnhDefensor, nomePermissionario, cpfPermissionario, pageRequest
+                    nomeDefensor, cpfDefensor, cnhDefensor, nomePermissionario, cpfPermissionario, pageRequest
             );
 
             return defensores;
@@ -129,12 +128,12 @@ public class DefensorController {
     }
 
     @GetMapping("/gerar-registro-condutor")
-    public ResponseEntity<byte[]> gerarRegistroCondutor( @RequestParam(required = true) String numeroPermissao,
+    public ResponseEntity<byte[]> gerarRegistroCondutor( @RequestParam(required = true) String idPermissionario,
                                                          @RequestParam(required = true) String modulo) {
         try{
-            byte[] fileBytes = service.gerarRegistroCondutor(numeroPermissao, modulo);
+            byte[] fileBytes = service.gerarRegistroCondutor(idPermissionario, modulo);
 
-            String fileName = "registroCondutor-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
+            String fileName = "registroCondutor-" + LocalDate.now() + "Nº" + idPermissionario + ".pdf";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentDispositionFormData("attachment", fileName);

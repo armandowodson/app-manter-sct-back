@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class DefensorResponseDTO {
     private Long idDefensor;
-    private String numeroPermissao;
+    private Long idPermissionario;
     private String nomeDefensor;
     private String cpfDefensor;
     private String rgDefensor;

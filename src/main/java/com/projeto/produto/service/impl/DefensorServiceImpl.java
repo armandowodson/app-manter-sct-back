@@ -8,6 +8,7 @@ import com.projeto.produto.utils.CarregarTipos;
 import com.projeto.produto.utils.ValidaCPF;
 import com.projeto.produto.utils.ValidaEmail;
 import net.sf.jasperreports.engine.*;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,10 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -40,7 +43,7 @@ public class DefensorServiceImpl {
     private VeiculoRepository veiculoRepository;
 
     @Autowired
-    private PermissaoRepository permissaoRepository;
+    private PermissionarioRepository permissionarioRepository;
 
     private static final Logger logger = LogManager.getLogger(AuditoriaServiceImpl.class);
 
@@ -163,33 +166,46 @@ public class DefensorServiceImpl {
         }
     }
 
-    public DefensorResponseDTO buscarDefensorNumeroPermissao(String numeroPermissao) {
+    public DefensorResponseDTO buscarDefensorIdPermissionario(String idPermissionario) {
         logger.info("Início Buscar Defensor por Número de Permissão");
+        String msg = "";
         try{
-            Defensor defensor = defensorRepository.findDefensorByNumeroPermissao(numeroPermissao);
+            Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(Long.valueOf(idPermissionario));
+            if(Objects.isNull(permissionario))
+                msg = "Não foi possível encontrar o Autorizatário!";
+
+            Defensor defensor = defensorRepository.findDefensorByPermissionario(permissionario);
             DefensorResponseDTO defensorResponseDTO = new DefensorResponseDTO();
             if (defensor != null){
                 defensorResponseDTO = converterDefensorToDefensorDTO(defensor);
             }
             return defensorResponseDTO;
         } catch (Exception e){
-            logger.error("buscarDefensorNumeroPermissao: " + e.getMessage());
-            throw new RuntimeException("Erro ao Buscar Defensor por Número de Permissão!");
+            if(msg.equals(""))
+                msg = "Erro ao Buscar Defensor por Identificador do Autorizatário!";
+            logger.error("buscarDefensorIdPermissionario: " + e.getMessage());
+            throw new RuntimeException(msg);
         }
     }
 
-    public Page<DefensorResponseDTO> listarTodosDefensorFiltros(   String numeroPermissao, String nomeDefensor, String cpfDefensor,
+    public Page<DefensorResponseDTO> listarTodosDefensorFiltros(   String nomeDefensor, String cpfDefensor,
                                                                    String cnhDefensor, String nomePermissionario,
                                                                    String cpfPermissionario, PageRequest pageRequest) {
         logger.info("Início Listar Todos os Defensores por Filtros");
         try{
+            if(Objects.nonNull(cpfDefensor) && !cpfDefensor.equals(""))
+                cpfDefensor = StringUtils.leftPad(cpfDefensor, 11, "0");
+
+            if(Objects.nonNull(cpfPermissionario) && !cpfPermissionario.equals(""))
+                cpfPermissionario = StringUtils.leftPad(cpfPermissionario, 11, "0");
+
             List<Defensor> listaDefensor = defensorRepository.listarTodosDefensorsFiltros(
-                    numeroPermissao,  nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
+                    nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
                     cpfDefensor, cnhDefensor, nomePermissionario, cpfPermissionario, pageRequest
             );
 
             Integer countRegistros = defensorRepository.listarTodosDefensorsFiltros(
-                    numeroPermissao,  nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
+                    nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
                     cpfDefensor, cnhDefensor, nomePermissionario, cpfPermissionario, null
             ).size();
 
@@ -258,6 +274,8 @@ public class DefensorServiceImpl {
     public List<DefensorResponseDTO> converterEntityToDTO(List<Defensor> listaDefensor){
         List<DefensorResponseDTO> listaDefensorResponseDTO = new ArrayList<>();
         for(Defensor defensor : listaDefensor){
+            defensor.setDataNascimento(defensor.getDataNascimento().plusDays(1));
+            defensor.setDataValidadeCnh(defensor.getDataValidadeCnh().plusDays(1));
             DefensorResponseDTO defensorResponseDTO = converterDefensorToDefensorDTO(defensor);
             listaDefensorResponseDTO.add(defensorResponseDTO);
         }
@@ -273,7 +291,7 @@ public class DefensorServiceImpl {
                 defensorResponseDTO.setIdDefensor(defensor.getIdDefensor());
             }
 
-            defensorResponseDTO.setNumeroPermissao(defensor.getNumeroPermissao());
+            defensorResponseDTO.setIdPermissionario(defensor.getPermissionario().getIdPermissionario());
             defensorResponseDTO.setNomeDefensor(defensor.getNomeDefensor());
             defensorResponseDTO.setCpfDefensor(defensor.getCpfDefensor());
             defensorResponseDTO.setRgDefensor(defensor.getRgDefensor());
@@ -343,14 +361,18 @@ public class DefensorServiceImpl {
                 defensor = defensorRepository.findDefensorByIdDefensor(defensorRequestDTO.getIdDefensor());
             }
 
-            defensor.setNumeroPermissao(defensorRequestDTO.getNumeroPermissao());
+            Permissionario permissionario = new Permissionario();
+            if(Objects.nonNull(defensorRequestDTO.getIdPermissionario()))
+                permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(defensorRequestDTO.getIdPermissionario());
+            defensor.setPermissionario(permissionario);
+
             defensor.setNomeDefensor(defensorRequestDTO.getNomeDefensor());
 
             if(Objects.nonNull(defensorRequestDTO.getCpfDefensor()) && !defensorRequestDTO.getCpfDefensor().isEmpty()){
                 defensorRequestDTO.setCpfDefensor(
                         defensorRequestDTO.getCpfDefensor().replace(".", "").replace("-", "").replace("/", "")
                 );
-                defensor.setCpfDefensor(defensorRequestDTO.getCpfDefensor());
+                defensor.setCpfDefensor(StringUtils.leftPad(defensorRequestDTO.getCpfDefensor(), 11, "0"));
             }
 
             defensor.setRgDefensor(defensorRequestDTO.getRgDefensor());
@@ -360,16 +382,7 @@ public class DefensorServiceImpl {
             defensor.setSexo(defensorRequestDTO.getSexo());
             defensor.setEstadoCivil(defensorRequestDTO.getEstadoCivil());
             if(Objects.nonNull(defensorRequestDTO.getDataNascimento())) {
-                String data = defensorRequestDTO.getDataNascimento();
-                Integer indexChar = data.indexOf('T');
-                if(indexChar > 0){
-                    data = data.substring(0, indexChar);
-                    if(tipo == 1){
-                        defensor.setDataNascimento(LocalDate.parse(data));
-                    }else{
-                        defensor.setDataNascimento(LocalDate.parse(data).minusDays(1));
-                    }
-                }
+                defensor.setDataNascimento(LocalDate.parse(defensorRequestDTO.getDataNascimento()));
             }
             defensor.setUfDefensor(defensorRequestDTO.getUfDefensor());
             defensor.setCidadeDefensor(defensorRequestDTO.getCidadeDefensor());
@@ -381,32 +394,11 @@ public class DefensorServiceImpl {
             defensor.setCnhDefensor(defensorRequestDTO.getCnhDefensor());
             defensor.setCategoriaCnhDefensor(defensorRequestDTO.getCategoriaCnhDefensor());
             if(Objects.nonNull(defensorRequestDTO.getDataValidadeCnh())) {
-                String data = defensorRequestDTO.getDataValidadeCnh();
-                Integer indexChar = data.indexOf('T');
-                if(indexChar > 0){
-                    data = data.substring(0, indexChar);
-                    if(tipo == 1){
-                        defensor.setDataValidadeCnh(LocalDate.parse(data));
-                    }else{
-                        defensor.setDataValidadeCnh(LocalDate.parse(data).minusDays(1));
-                    }
-                }
+                defensor.setDataValidadeCnh(LocalDate.parse(defensorRequestDTO.getDataValidadeCnh()));
             }
             defensor.setNumeroQuitacaoMilitar(defensorRequestDTO.getNumeroQuitacaoMilitar());
             defensor.setNumeroQuitacaoEleitoral(defensorRequestDTO.getNumeroQuitacaoEleitoral());
             defensor.setNumeroCertificadoCondutor(defensorRequestDTO.getNumeroCertificadoCondutor());
-            if(Objects.nonNull(defensorRequestDTO.getDataValidadeCertificadoCondutor())) {
-                String data = defensorRequestDTO.getDataValidadeCertificadoCondutor();
-                Integer indexChar = data.indexOf('T');
-                if(indexChar > 0){
-                    data = data.substring(0, indexChar);
-                    if(tipo == 1){
-                        defensor.setDataValidadeCertificadoCondutor(LocalDate.parse(data));
-                    }else{
-                        defensor.setDataValidadeCertificadoCondutor(LocalDate.parse(data).minusDays(1));
-                    }
-                }
-            }
             defensor.setNumeroInscricaoInss(defensorRequestDTO.getNumeroInscricaoInss());
 
             if(Objects.nonNull(anexoRg))
@@ -460,64 +452,58 @@ public class DefensorServiceImpl {
         }
     }
 
-    public byte[] gerarRegistroCondutor(String numeroPermissao, String modulo) {
+    public byte[] gerarRegistroCondutor(String idPermissionario, String modulo) {
         logger.info("Início Gerar Registro Condutor Busca dos Dados");
         try{
-            Permissao permissao = permissaoRepository.findPermissaoByNumeroPermissao(numeroPermissao);
-            if(Objects.isNull(permissao))
+            Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(Long.valueOf(idPermissionario));
+            if(Objects.isNull(permissionario))
                 throw new RuntimeException("400");
 
-            Veiculo veiculo = veiculoRepository.findVeiculoByNumeroPermissao(permissao.getNumeroPermissao());
+            Veiculo veiculo = veiculoRepository.findVeiculoByPermissionarioAndStatus(permissionario, "ATIVO");
             if(Objects.isNull(veiculo))
                 throw new RuntimeException("401");
 
-            Defensor defensor = defensorRepository.findDefensorByNumeroPermissao(permissao.getNumeroPermissao());
+            Defensor defensor = defensorRepository.findDefensorByPermissionario(permissionario);
             if(Objects.isNull(defensor))
                 throw new RuntimeException("403");
 
-            byte[] bytes = gerarRegistroCondutorJasper(permissao, veiculo, defensor, modulo);
+            byte[] bytes = gerarRegistroCondutorJasper(permissionario, veiculo, defensor, modulo);
             return bytes;
         } catch (Exception e){
-            logger.error("gerarPermissaoTaxi - Autorizatário: " + e.getMessage());
+            logger.error("gerarRegistroCondutor - Defensor: " + e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
     }
 
-    public byte[] gerarRegistroCondutorJasper(Permissao permissao, Veiculo veiculo, Defensor defensor, String modulo) {
+    public byte[] gerarRegistroCondutorJasper(Permissionario permissionario, Veiculo veiculo, Defensor defensor, String modulo) {
         logger.info("Início Gerar Registro Condutor Jasper");
         try{
-            ClassPathResource resource;
-            if(modulo.equals("1"))
-                resource = new ClassPathResource("reports/registroCondutor.jrxml");
-            else
-                resource = new ClassPathResource("reports/registroCondutorMoto.jrxml");
+            ClassPathResource resource = new ClassPathResource("reports/registroCondutorMoto.jrxml");
             JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
 
-            FileInputStream cabecalhoStream;
-            FileInputStream rodapeStream;
-            if(modulo.equals("1")){
-                cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoRegistroCondutor.png" ).getAbsolutePath());
-                rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeRegistroCondutor.png" ).getAbsolutePath());
-            }else{
-                cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoRegistroCondutorMoto.png" ).getAbsolutePath());
-                rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeRegistroCondutorMoto.png" ).getAbsolutePath());
-            }
+            FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoRegistroCondutorMoto.png" ).getAbsolutePath());
+            FileInputStream rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeRegistroCondutorMoto.png" ).getAbsolutePath());
+            InputStream fotoStream = new ByteArrayInputStream(defensor.getFoto());
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("imagemCabecalho", cabecalhoStream);
             parameters.put("imagemRodape", rodapeStream);
+            parameters.put("imagemFoto", fotoStream);
 
             //REGISTRO DO CONDUTOR
-            parameters.put("numeroRc", defensor.getNumeroCertificadoCondutor());
+            parameters.put("numeroRcmt", defensor.getDataCriacao().getYear() + " / " + defensor.getIdDefensor());
             parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao()));
-            if(modulo.equals("1"))
-                parameters.put("tipoCondutor", "[x] Autorizatário");
-            else
-                parameters.put("tipoCondutor", "[x] Defensor");
+            parameters.put("tipoCondutor", "[ ] Autorizatário [x] Defensor");
+            parameters.put("numeroTas", defensor.getDataCriacao().getYear() + " / " + veiculo.getIdVeiculo());
+            parameters.put("numeroCcmt", String.valueOf(defensor.getIdDefensor()));
+            parameters.put("numeroCvmt", String.valueOf(veiculo.getIdVeiculo()));
+            parameters.put("numeroCav", Objects.nonNull(veiculo.getNumeroCavEmitido()) ? veiculo.getNumeroCavEmitido() : "");
+            parameters.put("statusRegistro", defensor.getStatus());
 
             parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
             parameters.put("validadeRegistroCondutor", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao()) +
                     " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataValidadeCertificadoCondutor()));
+
             //PERMISSIONÁRIO/AUTORIZATÁRIO
             parameters.put("nome", defensor.getNomeDefensor());
             parameters.put("cpf", defensor.getCpfDefensor());
@@ -584,10 +570,10 @@ public class DefensorServiceImpl {
             parameters.put("documentacaoExigida2", documentacaoExigida2);
 
             //VEÍCULO
-            parameters.put("nomePermissionario", veiculo.getPermissionario().getNomePermissionario());
-            parameters.put("numeroPermissao", permissao.getNumeroPermissao());
+            parameters.put("nomePermissionario", defensor.getNomeDefensor());
             parameters.put("placa", veiculo.getPlaca());
             parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
+            parameters.put("renavam", veiculo.getRenavam());
             parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
             parameters.put("cor", obterCor(veiculo.getCor()));
             parameters.put("cilindrada", Objects.nonNull(veiculo.getCilindrada()) ? veiculo.getCilindrada() : "");

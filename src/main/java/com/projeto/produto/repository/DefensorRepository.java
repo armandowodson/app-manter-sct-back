@@ -1,6 +1,7 @@
 package com.projeto.produto.repository;
 
 import com.projeto.produto.entity.Defensor;
+import com.projeto.produto.entity.Permissionario;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,13 +20,12 @@ public interface DefensorRepository extends JpaRepository<Defensor, Integer> {
 
     Defensor findDefensorByIdDefensor(Long idDefensor);
 
-    Defensor findDefensorByNumeroPermissao(String numeroPermissao);
+    Defensor findDefensorByPermissionario(Permissionario permissionario);
 
     @Query(
             value = "SELECT d.* " +
                     "FROM proj.defensor d, proj.permissionario p " +
-                    "WHERE d.NUMERO_PERMISSAO = p.NUMERO_PERMISSAO " +
-                    "AND (:numeroPermissao IS NULL OR d.NUMERO_PERMISSAO = :numeroPermissao) " +
+                    "WHERE d.ID_PERMISSIONARIO = p.ID_PERMISSIONARIO " +
                     "AND (:nomeDefensor IS NULL OR UPPER(d.NOME_DEFENSOR) LIKE %:nomeDefensor%) " +
                     "AND (:cpfDefensor IS NULL OR d.CPF_DEFENSOR = :cpfDefensor) " +
                     "AND (:cnhDefensor IS NULL OR d.CNH_DEFENSOR = :cnhDefensor) " +
@@ -34,7 +34,7 @@ public interface DefensorRepository extends JpaRepository<Defensor, Integer> {
             nativeQuery = true
     )
     List<Defensor> listarTodosDefensorsFiltros(
-            String numeroPermissao, String nomeDefensor, String cpfDefensor,
+            String nomeDefensor, String cpfDefensor,
             String cnhDefensor, String nomePermissionario, String cpfPermissionario, Pageable pageable
     );
 

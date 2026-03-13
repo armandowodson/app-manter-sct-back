@@ -59,7 +59,7 @@ public class CarregarTipos {
         String strStatus = "";
         switch (status) {
             case "1":
-                strStatus = "Gerada";
+                strStatus = "Ativo";
                 break;
             case "2":
                 strStatus = "Em Uso";

@@ -41,7 +41,7 @@
 		<band splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="624" splitType="Stretch">
+		<band height="648" splitType="Stretch">
 			<rectangle>
 				<reportElement x="3" y="13" width="546" height="87" uuid="99003071-0221-486a-b6ae-e2774c061589">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -117,7 +117,7 @@
 				<textFieldExpression><![CDATA[$P{cor}]]></textFieldExpression>
 			</textField>
 			<image hAlign="Left">
-				<reportElement x="6" y="493" width="533" height="111" uuid="886cf715-2a31-43fb-8fbd-56bbc50ca539"/>
+				<reportElement x="6" y="533" width="533" height="111" uuid="886cf715-2a31-43fb-8fbd-56bbc50ca539"/>
 				<imageExpression><![CDATA[$P{imagemRodape}]]></imageExpression>
 			</image>
 			<staticText>
@@ -217,14 +217,14 @@
 				<textFieldExpression><![CDATA[$P{quilometragem}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="7" y="386" width="99" height="17" uuid="b610484f-fe8d-45e0-a9b8-768b44e467e4"/>
+				<reportElement x="7" y="426" width="99" height="17" uuid="b610484f-fe8d-45e0-a9b8-768b44e467e4"/>
 				<textElement>
 					<font fontName="Times New Roman" size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Status Vistoria:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="106" y="386" width="174" height="17" uuid="f2fd4867-37ea-4919-b234-5da10361c101">
+				<reportElement x="106" y="426" width="174" height="17" uuid="f2fd4867-37ea-4919-b234-5da10361c101">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -233,7 +233,7 @@
 				<textFieldExpression><![CDATA[$P{statusVistoria}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="455" y="386" width="93" height="17" uuid="7cc01fde-7320-4dad-9b40-8837211d57f0">
+				<reportElement x="455" y="426" width="93" height="17" uuid="7cc01fde-7320-4dad-9b40-8837211d57f0">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -242,14 +242,14 @@
 				<textFieldExpression><![CDATA[$P{proximaVistoria}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="285" y="386" width="168" height="17" uuid="8ebcdecb-9306-436e-8a67-25aa6fbb95d4"/>
+				<reportElement x="285" y="426" width="168" height="17" uuid="8ebcdecb-9306-436e-8a67-25aa6fbb95d4"/>
 				<textElement>
 					<font fontName="Times New Roman" size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Próxima Vistoria Obrigatória:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="4" y="465" width="544" height="24" uuid="94e78a46-b6b9-497e-92ec-61fd41046e3e">
+				<reportElement x="4" y="505" width="544" height="24" uuid="94e78a46-b6b9-497e-92ec-61fd41046e3e">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -276,19 +276,19 @@
 			<staticText>
 				<reportElement mode="Opaque" x="2" y="-27" width="547" height="17" forecolor="#FFFFFF" backcolor="#2F1491" uuid="57416efc-ad08-40aa-830d-4472032a3eff"/>
 				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[IDENTIFICAÇÃO DO AUTORIZATÁRIO E DO VEÍCULO]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="3" y="360" width="547" height="17" forecolor="#FFFFFF" backcolor="#2F1491" uuid="6f5ff4eb-5ca9-43a5-9a3f-dd47e0efea28"/>
+				<reportElement mode="Opaque" x="3" y="400" width="547" height="17" forecolor="#FFFFFF" backcolor="#2F1491" uuid="6f5ff4eb-5ca9-43a5-9a3f-dd47e0efea28"/>
 				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[RESULTADO DA VISTORIA]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="176" y="406" width="134" height="17" uuid="8b3a3e8c-b666-4c91-a639-ffd1dccaf8b9">
+				<reportElement x="176" y="446" width="134" height="17" uuid="8b3a3e8c-b666-4c91-a639-ffd1dccaf8b9">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -297,14 +297,14 @@
 				<textFieldExpression><![CDATA[$P{numeroCavEmitido}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="6" y="406" width="168" height="17" uuid="346faa9c-fc79-449e-bbfd-4268f070bbe9"/>
+				<reportElement x="6" y="446" width="168" height="17" uuid="346faa9c-fc79-449e-bbfd-4268f070bbe9"/>
 				<textElement>
 					<font fontName="Times New Roman" size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Nº CAV Emitido (se aprovado):]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="176" y="426" width="372" height="17" uuid="a4f12c15-80e8-47d5-9f53-9c2a23424c11">
+				<reportElement x="176" y="466" width="372" height="17" uuid="a4f12c15-80e8-47d5-9f53-9c2a23424c11">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -313,21 +313,21 @@
 				<textFieldExpression><![CDATA[$P{ressalvas}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="6" y="426" width="168" height="17" uuid="3a7848a4-6817-4962-9191-60f5b0efd1b7"/>
+				<reportElement x="6" y="466" width="168" height="17" uuid="3a7848a4-6817-4962-9191-60f5b0efd1b7"/>
 				<textElement>
 					<font fontName="Times New Roman" size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Ressalvas / Itens a regularizar: ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="3" y="446" width="547" height="17" forecolor="#FFFFFF" backcolor="#2F1491" uuid="409e1fbc-0aa5-4342-ae93-a225a0b3b2f5"/>
+				<reportElement mode="Opaque" x="3" y="486" width="547" height="17" forecolor="#FFFFFF" backcolor="#2F1491" uuid="409e1fbc-0aa5-4342-ae93-a225a0b3b2f5"/>
 				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[OBSERVAÇÕES]]></text>
 			</staticText>
-			<image hAlign="Center">
-				<reportElement x="4" y="103" width="542" height="247" uuid="52e54036-6faf-408a-b25f-a64d00460549"/>
+			<image scaleImage="FillFrame" hAlign="Center">
+				<reportElement x="3" y="103" width="542" height="287" uuid="52e54036-6faf-408a-b25f-a64d00460549"/>
 				<imageExpression><![CDATA[$P{imagemItensAvaliacaoVeiculo}]]></imageExpression>
 			</image>
 		</band>

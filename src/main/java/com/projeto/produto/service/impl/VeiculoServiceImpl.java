@@ -257,15 +257,7 @@ public class VeiculoServiceImpl {
         veiculo.setMatriculaVistoriador(veiculoRequestDTO.getMatriculaVistoriador());
 
         if(Objects.nonNull(veiculoRequestDTO.getDataVistoria())) {
-            String data = veiculoRequestDTO.getDataVistoria();
-            Integer indexChar = data.indexOf('(');
-            if(indexChar > 0){
-                data = data.substring(0, indexChar);
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss 'GMT'Z", Locale.ENGLISH);
-                ZonedDateTime zonedDateTime = ZonedDateTime.parse(data.trim(), formatter);
-                LocalDate localDateVistoria = zonedDateTime.toLocalDate();
-                veiculo.setDataVistoria(localDateVistoria);
-            }
+            veiculo.setDataVistoria(LocalDate.parse(veiculoRequestDTO.getDataVistoria()));
         }
 
         if(Objects.nonNull(veiculoRequestDTO.getDataRetorno()) && veiculoRequestDTO.getDataRetorno().equals("null")){
@@ -274,15 +266,7 @@ public class VeiculoServiceImpl {
         }
 
         if(Objects.nonNull(veiculoRequestDTO.getDataRetorno())) {
-            String data = veiculoRequestDTO.getDataRetorno();
-            Integer indexChar = data.indexOf('(');
-            if(indexChar > 0){
-                data = data.substring(0, indexChar);
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss 'GMT'Z", Locale.ENGLISH);
-                ZonedDateTime zonedDateTime = ZonedDateTime.parse(data.trim(), formatter);
-                LocalDate localDateRetorno = zonedDateTime.toLocalDate();
-                veiculo.setDataRetorno(localDateRetorno);
-            }
+            veiculo.setDataRetorno(LocalDate.parse(veiculoRequestDTO.getDataRetorno()));
         }
 
         if(Objects.nonNull(crlv))
@@ -315,26 +299,21 @@ public class VeiculoServiceImpl {
         auditoriaRepository.save(auditoria);
     }
 
-    public byte[] gerarAutorizacaoTrafego(String numeroPermissao, String modulo) {
+    public byte[] gerarCertificadoAnualVistoria(String idVeiculo, String modulo) {
         logger.info("Início Gerar Autorização Tráfego Busca dos Dados");
         try{
-            Permissao permissao = permissaoRepository.findPermissaoByNumeroPermissao(numeroPermissao);
-            if(Objects.isNull(permissao))
+            Veiculo veiculo = veiculoRepository.findVeiculoByIdVeiculo(Long.valueOf(idVeiculo));
+            if(Objects.isNull(veiculo))
                 throw new RuntimeException("400");
 
-            Veiculo veiculo = veiculoRepository.findVeiculoByNumeroPermissao(permissao.getNumeroPermissao());
-            if(Objects.isNull(veiculo))
+            if(Objects.isNull(veiculo.getDataVistoria()) || veiculo.getDataVistoria().equals(""))
                 throw new RuntimeException("401");
 
-            PontoTaxi pontoTaxi = pontosTaxiRepository.findByIdPontoTaxi(veiculo.getPontoTaxi().getIdPontoTaxi());
-            if(Objects.isNull(pontoTaxi))
+            Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(veiculo.getPermissionario().getIdPermissionario());
+            if(Objects.isNull(permissionario))
                 throw new RuntimeException("402");
 
-            Permissionario permissionario = permissionarioRepository.findPermissionarioByNumeroPermissao(permissao.getNumeroPermissao());
-            if(Objects.isNull(permissionario))
-                throw new RuntimeException("403");
-
-            byte[] bytes = gerarAutorizacaoTrafegoJasper(permissao, veiculo, pontoTaxi, permissionario, modulo);
+            byte[] bytes = gerarCertificadoAnualVistoriaJasper(veiculo, permissionario, modulo);
             return bytes;
         } catch (Exception e){
             logger.error("gerarAutorizacaoTrafego - Permissão: " + e.getMessage());
@@ -342,76 +321,77 @@ public class VeiculoServiceImpl {
         }
     }
 
-    public byte[] gerarAutorizacaoTrafegoJasper(Permissao permissao, Veiculo veiculo, PontoTaxi pontoTaxi,
-                                                Permissionario permissionario, String modulo) {
-        logger.info("Início Gerar Autorização Tráfego Jasper");
+    public byte[] gerarCertificadoAnualVistoriaJasper(Veiculo veiculo, Permissionario permissionario, String modulo) {
+        logger.info("Início Gerar Certificado Anual Vistoria Jasper");
         try{
             ClassPathResource resource;
-            if(modulo.equals("1"))
-                resource = new ClassPathResource("reports/permissaoTaxi.jrxml");
-            else
-                resource = new ClassPathResource("reports/autorizacaoTrafego.jrxml");
-            JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
+            resource = new ClassPathResource("reports/certificadoAnualVistoriaMoto.jrxml");
 
-            FileInputStream cabecalhoStream;
-            FileInputStream rodapeStream;
-            if(modulo.equals("1")){
-                cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoPermissaoTaxi.png" ).getAbsolutePath());
-                rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapePermissaoTaxi.png" ).getAbsolutePath());
-            }else{
-                cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoAutorizacaoTrafego.png" ).getAbsolutePath());
-                rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeAutorizacaoTrafego.png" ).getAbsolutePath());
-            }
+            JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
+            FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoCertificadoAnualVistoriaMoto.png" ).getAbsolutePath());
+            FileInputStream rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeCertificadoAnualVistoriaMoto.png" ).getAbsolutePath());
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("imagemCabecalho", cabecalhoStream);
             parameters.put("imagemRodape", rodapeStream);
-            parameters.put("numeroAutorizacao", permissao.getAutorizacaoTrafego());
-            parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(LocalDate.now()));
-            parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
-            parameters.put("validadeAutorizacao", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataCriacao()) +
-                    " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissao.getDataValidadePermissao()));
+
+            //CERTIFICADO
+            parameters.put("numeroCavEmitido", Objects.nonNull(veiculo.getNumeroCavEmitido()) ? veiculo.getNumeroCavEmitido() : LocalDate.now().getYear() + "/" + veiculo.getIdVeiculo());
+            LocalDate localDate = LocalDate.now();
+            parameters.put("dataEmissao", localDate.getDayOfMonth() + "/" + mesDoAno(localDate.getMonthValue())  + "/" + localDate.getYear());
+            parameters.put("numeroPermissao", "");
+            parameters.put("dataValidadeCav", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataVistoria()) + " até " +
+                    DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataVistoria().plusYears(1L)));
+
+            //VEÍCULO
             parameters.put("placa", veiculo.getPlaca());
             parameters.put("renavam", veiculo.getRenavam());
             parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
             parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
-            parameters.put("tipoCombustivel", CarregarTipos.carregarTipoCombustivelVeiculo(veiculo.getCombustivel()));
+            parameters.put("cilindrada", Objects.nonNull(veiculo.getCilindrada()) ? veiculo.getCilindrada() : "");
             parameters.put("cor", obterCor(veiculo.getCor()));
-            parameters.put("capacidade", veiculo.getCapacidade());
-            parameters.put("pet", pontoTaxi.getDescricaoPonto());
-            parameters.put("numeroPermissao", permissao.getNumeroPermissao());
-            parameters.put("permissionario", permissionario.getNomePermissionario());
-            parameters.put("ultimaVistoria", Objects.nonNull(veiculo.getDataVistoria()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataVistoria()) : "");
-            parameters.put("quilometragem", veiculo.getQuilometragem());
+            parameters.put("chassi", veiculo.getChassi());
+            parameters.put("nomePermissionario", permissionario.getNomePermissionario());
+
+            //VISTORIA
+            parameters.put("dataVistoria", Objects.nonNull(veiculo.getDataVistoria()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataVistoria()) : "");
+            parameters.put("quilometragem", Objects.nonNull(veiculo.getQuilometragem()) ? veiculo.getQuilometragem() : "");
+            parameters.put("numeroLaudoVistoria", veiculo.getIdVeiculo().toString());
             parameters.put("proximaVistoria", Objects.nonNull(veiculo.getDataRetorno()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataRetorno()) : "");
+            parameters.put("matriculaVistoriador", Objects.nonNull(veiculo.getMatriculaVistoriador()) ? veiculo.getMatriculaVistoriador() : "");
             parameters.put("statusVistoria", CarregarTipos.carregarStatusVistoriaVeiculo(veiculo.getStatusVistoria()));
+            parameters.put("ressalvas", Objects.nonNull(veiculo.getRessalvas()) ? veiculo.getRessalvas() : "");
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
 
             byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
+            if(Objects.isNull(veiculo.getNumeroCavEmitido()) || veiculo.getNumeroCavEmitido().equals("")){
+                veiculo.setNumeroCavEmitido(LocalDate.now().getYear() + "/" + veiculo.getIdVeiculo());
+                veiculoRepository.save(veiculo);
+            }
+
             return bytes;
         } catch (Exception e){
-            logger.error("gerarAutorizacaoTrafegoJasper: " + e.getMessage());
+            logger.error("gerarCertificadoAnualVistoriaJasper: " + e.getMessage());
             throw new RuntimeException("500");
         }
     }
 
-    public byte[] gerarLaudoVistoria(String numeroPermissao, String modulo) {
+    public byte[] gerarLaudoVistoria(String idVeiculo, String modulo) {
         logger.info("Início Gerar Laudo Vistoria Busca dos Dados");
         try{
-            Permissao permissao = permissaoRepository.findPermissaoByNumeroPermissao(numeroPermissao);
-            if(Objects.isNull(permissao))
+            Veiculo veiculo = veiculoRepository.findVeiculoByIdVeiculo(Long.valueOf(idVeiculo));
+            if(Objects.isNull(veiculo))
                 throw new RuntimeException("400");
 
-            Veiculo veiculo = veiculoRepository.findVeiculoByNumeroPermissao(permissao.getNumeroPermissao());
-            if(Objects.isNull(veiculo))
+            if(Objects.isNull(veiculo.getDataVistoria()) || veiculo.getDataVistoria().equals(""))
                 throw new RuntimeException("401");
 
-            Permissionario permissionario = permissionarioRepository.findPermissionarioByNumeroPermissao(permissao.getNumeroPermissao());
+            Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(veiculo.getPermissionario().getIdPermissionario());
             if(Objects.isNull(permissionario))
-                throw new RuntimeException("403");
+                throw new RuntimeException("402");
 
-            byte[] bytes = gerarLaudoVistoriaJasper(permissao, veiculo, permissionario, modulo);
+            byte[] bytes = gerarLaudoVistoriaJasper(veiculo, permissionario, modulo);
             return bytes;
         } catch (Exception e){
             logger.error("gerarAutorizacaoTrafego - Permissão: " + e.getMessage());
@@ -419,7 +399,7 @@ public class VeiculoServiceImpl {
         }
     }
 
-    public byte[] gerarLaudoVistoriaJasper(Permissao permissao, Veiculo veiculo, Permissionario permissionario, String modulo) {
+    public byte[] gerarLaudoVistoriaJasper(Veiculo veiculo, Permissionario permissionario, String modulo) {
         logger.info("Início Gerar Laudo Vistoria Jasper");
         try{
             ClassPathResource resource;
@@ -451,7 +431,7 @@ public class VeiculoServiceImpl {
             LocalDate localDate = LocalDate.now();
             parameters.put("diaMesAno", localDate.getDayOfMonth() + " de " + mesDoAno(localDate.getMonthValue())  + " de " + localDate.getYear());
             parameters.put("nomePermissionario", permissionario.getNomePermissionario());
-            parameters.put("numeroPermissao", permissao.getNumeroPermissao());
+            parameters.put("numeroPermissao", "");
             parameters.put("placa", veiculo.getPlaca());
             parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
             parameters.put("anoFabricacao", veiculo.getAnoFabricacao());

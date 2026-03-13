@@ -14,8 +14,9 @@ public class Defensor {
     @Column(name = "ID_DEFENSOR")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_defensor")
     private Long idDefensor;
-    @Column(name = "NUMERO_PERMISSAO")
-    private String numeroPermissao;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_PERMISSIONARIO")
+    private Permissionario permissionario;
     @Column(name = "NOME_DEFENSOR")
     private String nomeDefensor;
     @Column(name = "CPF_DEFENSOR")

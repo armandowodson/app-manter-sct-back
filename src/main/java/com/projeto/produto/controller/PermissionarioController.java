@@ -3,7 +3,6 @@ package com.projeto.produto.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projeto.produto.dto.PermissionarioRequestDTO;
 import com.projeto.produto.dto.PermissionarioResponseDTO;
-import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.service.impl.PermissionarioServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -45,8 +44,7 @@ public class PermissionarioController {
     }
 
     @GetMapping("/buscar-filtros")
-    public Page<PermissionarioResponseDTO> buscarPermissionariosFiltros(@RequestParam(required = false) String numeroPermissao,
-                                                                        @RequestParam(required = false) String nomePermissionario,
+    public Page<PermissionarioResponseDTO> buscarPermissionariosFiltros(@RequestParam(required = false) String nomePermissionario,
                                                                         @RequestParam(required = false) String cpfPermissionario,
                                                                         @RequestParam(required = false) String cnhPermissionario,
                                                                         @RequestParam(required = true) Integer pageIndex,
@@ -54,7 +52,7 @@ public class PermissionarioController {
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
         try{
             Page<PermissionarioResponseDTO> permissionarios = service.listarTodosPermissionarioFiltros(
-                    numeroPermissao, nomePermissionario, cpfPermissionario, cnhPermissionario, pageRequest
+                   nomePermissionario, cpfPermissionario, cnhPermissionario, pageRequest
             );
 
             return permissionarios;
@@ -66,6 +64,11 @@ public class PermissionarioController {
     @GetMapping("/buscar-disponiveis")
     public ResponseEntity<List<PermissionarioResponseDTO>> buscarPermissionariosDisponiveis() {
         return ResponseEntity.ok(service.listarPermissionariosDisponiveis(null));
+    }
+
+    @GetMapping("/buscar-disponiveis-defensor")
+    public ResponseEntity<List<PermissionarioResponseDTO>> buscarPermissionariosDisponiveisDefensor() {
+        return ResponseEntity.ok(service.listarPermissionariosDisponiveisDefensor(null));
     }
 
     @GetMapping("/buscar-disponiveis/{idPermissionario}")
@@ -119,12 +122,12 @@ public class PermissionarioController {
     }
 
     @GetMapping("/gerar-registro-condutor")
-    public ResponseEntity<byte[]> gerarRegistroCondutor( @RequestParam(required = true) String numeroPermissao,
+    public ResponseEntity<byte[]> gerarRegistroCondutor( @RequestParam(required = true) String cpfPermissionario,
                                                          @RequestParam(required = true) String modulo) {
         try{
-            byte[] fileBytes = service.gerarRegistroCondutor(numeroPermissao, modulo);
+            byte[] fileBytes = service.gerarRegistroCondutor(cpfPermissionario, modulo);
 
-            String fileName = "registroCondutor-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
+            String fileName = "registroCondutor-" + LocalDate.now() + "Nº" + cpfPermissionario + ".pdf";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentDispositionFormData("attachment", fileName);

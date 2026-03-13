@@ -509,7 +509,7 @@ public class PermissaoServiceImpl {
             if(Objects.isNull(permissao))
                 throw new RuntimeException("400");
 
-            Veiculo veiculo = veiculoRepository.findVeiculoByNumeroPermissao(permissao.getNumeroPermissao());
+            /*Veiculo veiculo = veiculoRepository.findVeiculoByNumeroPermissao(permissao.getNumeroPermissao());
             if(Objects.isNull(veiculo))
                 throw new RuntimeException("401");
 
@@ -519,9 +519,9 @@ public class PermissaoServiceImpl {
 
             Defensor defensor = defensorRepository.findDefensorByNumeroPermissao(permissao.getNumeroPermissao());
             if(Objects.isNull(defensor))
-                throw new RuntimeException("403");
+                throw new RuntimeException("403");*/
 
-            byte[] bytes = gerarPermissaoTaxiJasper(permissao, veiculo, permissionario, defensor, modulo);
+            byte[] bytes = gerarPermissaoTaxiJasper(permissao, null, null, null, modulo);
             return bytes;
         } catch (Exception e){
             logger.error("gerarPermissaoTaxi - Autorizatário: " + e.getMessage());
@@ -585,7 +585,8 @@ public class PermissaoServiceImpl {
             parameters.put("chassi", veiculo.getChassi());
             parameters.put("dataVistoria", (Objects.nonNull(veiculo.getDataVistoria()) && Objects.nonNull(veiculo.getDataVistoria())) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataVistoria()) : "");
             parameters.put("quilometragem", Objects.nonNull(veiculo.getQuilometragem()) ? veiculo.getQuilometragem() : "");
-            parameters.put("cilindrada", Objects.nonNull(veiculo.getCilindrada()) ? veiculo.getCilindrada() : "");
+            if(modulo.equals("2"))
+                parameters.put("cilindrada", Objects.nonNull(veiculo.getCilindrada()) ? veiculo.getCilindrada() : "");
             //DEFENSOR
             parameters.put("idDefensor", Objects.nonNull(defensor.getIdDefensor()) ? defensor.getIdDefensor().toString() : "");
             parameters.put("nomeDefensor", Objects.nonNull(defensor.getNomeDefensor()) ? defensor.getNomeDefensor() : "");
@@ -626,7 +627,7 @@ public class PermissaoServiceImpl {
         String strStatus = "";
         switch (status) {
             case "1":
-                strStatus = "GERADA";
+                strStatus = "ATIVO";
                 break;
             case "2":
                 strStatus = "EM USO";

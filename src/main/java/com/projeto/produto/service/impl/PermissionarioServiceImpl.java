@@ -22,10 +22,13 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -42,6 +45,9 @@ public class PermissionarioServiceImpl {
 
     @Autowired
     private VeiculoRepository veiculoRepository;
+
+    @Autowired
+    private DefensorRepository defensorRepository;
 
     private static final Logger logger = LogManager.getLogger(Permissionario.class);
 
@@ -161,17 +167,19 @@ public class PermissionarioServiceImpl {
         return permissionarioResponseDTO;
     }
 
-    public Page<PermissionarioResponseDTO> listarTodosPermissionarioFiltros(String numeroPermissao, String nomePermissionario, String cpfPermissionario,
+    public Page<PermissionarioResponseDTO> listarTodosPermissionarioFiltros(String nomePermissionario, String cpfPermissionario,
                                                                             String cnhPermissionario, PageRequest pageRequest) {
         logger.error("Início da Listagem de Todos os Dados do Autorizatário");
         try{
+            if(Objects.nonNull(cpfPermissionario) && !cpfPermissionario.equals(""))
+                cpfPermissionario = StringUtils.leftPad(cpfPermissionario, 11, "0");
             List<Permissionario> listaPermissionario = permissionarioRepository.listarTodosPermissionariosFiltros(
-                    numeroPermissao, nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
+                    nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
                     cpfPermissionario, cnhPermissionario, pageRequest
             );
 
             Integer countRegistros = permissionarioRepository.listarTodosPermissionariosFiltros(
-                    numeroPermissao, nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
+                    nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
                     cpfPermissionario, cnhPermissionario, null
             ).size();
 
@@ -191,7 +199,7 @@ public class PermissionarioServiceImpl {
     }
 
     public List<PermissionarioResponseDTO> listarPermissionariosDisponiveis(Long idPermissionario) {
-        logger.info("Início da Listagem dos Autorizatários disponíveis");
+        logger.info("Início da Listagem dos Autorizatários disponíveis para o Veículo/Defensor");
         try{
             List<PermissionarioResponseDTO> listaPermissionarioResponseDTO = new ArrayList<>();
             List<Permissionario> listaPermissionario = permissionarioRepository.listarPermissionariosDisponiveis();
@@ -211,7 +219,32 @@ public class PermissionarioServiceImpl {
             return listaPermissionarioResponseDTO;
         } catch (Exception e){
             logger.error("listarTodosPermissionarioFiltros - " + e.getMessage());
-            throw new RuntimeException("Não foi possível listar os Autorizatários disponíveis!");
+            throw new RuntimeException("Não foi possível listar os Autorizatários disponíveis para o Veículo/Defensor!");
+        }
+    }
+
+    public List<PermissionarioResponseDTO> listarPermissionariosDisponiveisDefensor(Long idPermissionario) {
+        logger.info("Início da Listagem dos Autorizatários disponíveis para o Defensor");
+        try{
+            List<PermissionarioResponseDTO> listaPermissionarioResponseDTO = new ArrayList<>();
+            List<Permissionario> listaPermissionario = permissionarioRepository.listarPermissionariosDisponiveisDefensor();
+            if(Objects.nonNull(idPermissionario)){
+                Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(idPermissionario);
+                PermissionarioResponseDTO permissionarioResponseDTORetornado = converterPermissionarioToPermissionarioDTO(permissionario);
+                listaPermissionarioResponseDTO.add(permissionarioResponseDTORetornado);
+            }
+
+            if (!listaPermissionario.isEmpty()){
+                for (Permissionario permissionarioDisponivel : listaPermissionario) {
+                    PermissionarioResponseDTO permissionarioResponseDTORetornado = converterPermissionarioToPermissionarioDTO(permissionarioDisponivel);
+                    listaPermissionarioResponseDTO.add(permissionarioResponseDTORetornado);
+                }
+            }
+
+            return listaPermissionarioResponseDTO;
+        } catch (Exception e){
+            logger.error("listarTodosPermissionarioFiltros - " + e.getMessage());
+            throw new RuntimeException("Não foi possível listar os Autorizatários disponíveis para o Defensor!");
         }
     }
 
@@ -224,7 +257,7 @@ public class PermissionarioServiceImpl {
                 throw new RuntimeException("Usuário não logado ou não identificado!");
 
             Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(idPermissionario);
-            Veiculo veiculo = veiculoRepository.findVeiculoByPermissionario(permissionario);
+            Veiculo veiculo = veiculoRepository.findVeiculoByPermissionarioAndStatus(permissionario, "ATIVO");
             if(Objects.nonNull(veiculo)){
                 msgErro = "Existe um Veículo associado a este Autorizatário";
                 logger.error("excluirPermissionario - " + msgErro);
@@ -247,6 +280,8 @@ public class PermissionarioServiceImpl {
     public List<PermissionarioResponseDTO> converterEntityToDTO(List<Permissionario> listaPermissionario){
         List<PermissionarioResponseDTO> listaPermissionarioResponseDTO = new ArrayList<>();
         for(Permissionario permissionario : listaPermissionario){
+            permissionario.setDataNascimento(permissionario.getDataNascimento().plusDays(1));
+            permissionario.setDataValidadeCnh(permissionario.getDataValidadeCnh().plusDays(1));
             PermissionarioResponseDTO permissionarioResponseDTO = converterPermissionarioToPermissionarioDTO(permissionario);
             listaPermissionarioResponseDTO.add(permissionarioResponseDTO);
         }
@@ -284,11 +319,6 @@ public class PermissionarioServiceImpl {
         permissionarioResponseDTO.setNumeroQuitacaoEleitoral(permissionario.getNumeroQuitacaoEleitoral());
         permissionarioResponseDTO.setNumeroInscricaoInss(permissionario.getNumeroInscricaoInss());
         permissionarioResponseDTO.setNumeroCertificadoCondutor(permissionario.getNumeroCertificadoCondutor());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-        if(Objects.nonNull(permissionario.getDataValidadeCertificadoCondutor())){
-            String formattedDate = permissionario.getDataValidadeCertificadoCondutor().plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC).format(formatter);
-            permissionarioResponseDTO.setDataValidadeCertificadoCondutor(formattedDate);
-        }
         permissionarioResponseDTO.setAnexoRg(permissionario.getAnexoRg());
         permissionarioResponseDTO.setAnexoCpf(permissionario.getAnexoCpf());
         permissionarioResponseDTO.setAnexoCnh(permissionario.getAnexoCnh());
@@ -332,7 +362,7 @@ public class PermissionarioServiceImpl {
             permissionarioRequestDTO.setCpfPermissionario(
                     permissionarioRequestDTO.getCpfPermissionario().replace(".", "").replace("-", "").replace("/", "")
             );
-            permissionario.setCpfPermissionario(permissionarioRequestDTO.getCpfPermissionario());
+            permissionario.setCpfPermissionario(StringUtils.leftPad(permissionarioRequestDTO.getCpfPermissionario(), 11, "0"));
         }
 
         permissionario.setRgPermissionario(permissionarioRequestDTO.getRgPermissionario());
@@ -342,16 +372,7 @@ public class PermissionarioServiceImpl {
         permissionario.setSexo(permissionarioRequestDTO.getSexo());
         permissionario.setEstadoCivil(permissionarioRequestDTO.getEstadoCivil());
         if(Objects.nonNull(permissionarioRequestDTO.getDataNascimento())) {
-            String data = permissionarioRequestDTO.getDataNascimento();
-            Integer indexChar = data.indexOf('T');
-            if(indexChar > 0){
-                data = data.substring(0, indexChar);
-                if(tipo == 1){
-                    permissionario.setDataNascimento(LocalDate.parse(data));
-                }else{
-                    permissionario.setDataNascimento(LocalDate.parse(data).minusDays(1));
-                }
-            }
+            permissionario.setDataNascimento(LocalDate.parse(permissionarioRequestDTO.getDataNascimento()));
         }
         permissionario.setUfPermissionario(permissionarioRequestDTO.getUfPermissionario());
         permissionario.setCidadePermissionario(permissionarioRequestDTO.getCidadePermissionario());
@@ -363,32 +384,11 @@ public class PermissionarioServiceImpl {
         permissionario.setCnhPermissionario(permissionarioRequestDTO.getCnhPermissionario());
         permissionario.setCategoriaCnhPermissionario(permissionarioRequestDTO.getCategoriaCnhPermissionario());
         if(Objects.nonNull(permissionarioRequestDTO.getDataValidadeCnh())) {
-            String data = permissionarioRequestDTO.getDataValidadeCnh();
-            Integer indexChar = data.indexOf('T');
-            if(indexChar > 0){
-                data = data.substring(0, indexChar);
-                if(tipo == 1){
-                    permissionario.setDataValidadeCnh(LocalDate.parse(data));
-                }else{
-                    permissionario.setDataValidadeCnh(LocalDate.parse(data).minusDays(1));
-                }
-            }
+            permissionario.setDataValidadeCnh(LocalDate.parse(permissionarioRequestDTO.getDataValidadeCnh()));
         }
         permissionario.setNumeroQuitacaoMilitar(permissionarioRequestDTO.getNumeroQuitacaoMilitar());
         permissionario.setNumeroQuitacaoEleitoral(permissionarioRequestDTO.getNumeroQuitacaoEleitoral());
         permissionario.setNumeroCertificadoCondutor(permissionarioRequestDTO.getNumeroCertificadoCondutor());
-        if(Objects.nonNull(permissionarioRequestDTO.getDataValidadeCertificadoCondutor())) {
-            String data = permissionarioRequestDTO.getDataValidadeCertificadoCondutor();
-            Integer indexChar = data.indexOf('T');
-            if(indexChar > 0){
-                data = data.substring(0, indexChar);
-                if(tipo == 1){
-                    permissionario.setDataValidadeCertificadoCondutor(LocalDate.parse(data));
-                }else{
-                    permissionario.setDataValidadeCertificadoCondutor(LocalDate.parse(data).minusDays(1));
-                }
-            }
-        }
         permissionario.setNumeroInscricaoInss(permissionarioRequestDTO.getNumeroInscricaoInss());
 
         if(Objects.nonNull(anexoRg))
@@ -436,64 +436,57 @@ public class PermissionarioServiceImpl {
         auditoriaRepository.save(auditoria);
     }
 
-    public byte[] gerarRegistroCondutor(String numeroPermissao, String modulo) {
+    public byte[] gerarRegistroCondutor(String cpfPermissionario, String modulo) {
         logger.info("Início Gerar Registro Condutor Busca dos Dados");
         try{
-            Permissao permissao = permissaoRepository.findPermissaoByNumeroPermissao(numeroPermissao);
-            if(Objects.isNull(permissao))
+            Permissionario permissionario = permissionarioRepository.findPermissionarioByCpfPermissionario(cpfPermissionario);
+            if(Objects.isNull(permissionario))
                 throw new RuntimeException("400");
 
-            Veiculo veiculo = veiculoRepository.findVeiculoByNumeroPermissao(permissao.getNumeroPermissao());
+
+            Veiculo veiculo = veiculoRepository.findVeiculoByPermissionarioAndStatus(permissionario, "ATIVO");
             if(Objects.isNull(veiculo))
                 throw new RuntimeException("401");
 
-            Permissionario permissionario = permissionarioRepository.findPermissionarioByNumeroPermissao(permissao.getNumeroPermissao());
-            if(Objects.isNull(permissionario))
-                throw new RuntimeException("403");
+            Defensor defensor = defensorRepository.findDefensorByPermissionario(permissionario);
 
-            byte[] bytes = gerarRegistroCondutorJasper(permissao, veiculo, permissionario, modulo);
+            byte[] bytes = gerarRegistroCondutorJasper(defensor, veiculo, permissionario, modulo);
             return bytes;
         } catch (Exception e){
-            logger.error("gerarPermissaoTaxi - Autorizatário: " + e.getMessage());
+            logger.error("gerarRegistroCondutor - Autorizatário: " + e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
     }
 
-    public byte[] gerarRegistroCondutorJasper(Permissao permissao, Veiculo veiculo, Permissionario permissionario, String modulo) {
+    public byte[] gerarRegistroCondutorJasper(Defensor defensor, Veiculo veiculo, Permissionario permissionario, String modulo) {
         logger.info("Início Gerar Registro Condutor Jasper");
         try{
-            ClassPathResource resource;
-            if(modulo.equals("1"))
-                resource = new ClassPathResource("reports/registroCondutor.jrxml");
-            else
-                resource = new ClassPathResource("reports/registroCondutorMoto.jrxml");
+            ClassPathResource resource = new ClassPathResource("reports/registroCondutorMoto.jrxml");
             JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
 
-            FileInputStream cabecalhoStream;
-            FileInputStream rodapeStream;
-            if(modulo.equals("1")){
-                cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoRegistroCondutor.png" ).getAbsolutePath());
-                rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeRegistroCondutor.png" ).getAbsolutePath());
-            }else{
-                cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoRegistroCondutorMoto.png" ).getAbsolutePath());
-                rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeRegistroCondutorMoto.png" ).getAbsolutePath());
-            }
+            FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoRegistroCondutorMoto.png" ).getAbsolutePath());
+            FileInputStream rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeRegistroCondutorMoto.png" ).getAbsolutePath());
+            InputStream fotoStream = new ByteArrayInputStream(permissionario.getFoto());
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("imagemCabecalho", cabecalhoStream);
             parameters.put("imagemRodape", rodapeStream);
+            parameters.put("imagemFoto", fotoStream);
 
             //REGISTRO DO CONDUTOR
-            parameters.put("numeroRc", permissionario.getNumeroCertificadoCondutor());
+            parameters.put("numeroRcmt", permissionario.getDataCriacao().getYear() + " / " + permissionario.getIdPermissionario());
             parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao()));
-            if(modulo.equals("1"))
-                parameters.put("tipoCondutor", "[x] Permissionário");
-            else
-                parameters.put("tipoCondutor", "[x] Autorizatário");
+            parameters.put("tipoCondutor", "[x] Autorizatário [ ] Defensor");
+            parameters.put("numeroTas", permissionario.getDataCriacao().getYear() + " / " + veiculo.getIdVeiculo());
+            parameters.put("numeroCcmt", String.valueOf(permissionario.getIdPermissionario()));
+            parameters.put("numeroCvmt", String.valueOf(veiculo.getIdVeiculo()));
+            parameters.put("numeroCav", Objects.nonNull(veiculo.getNumeroCavEmitido()) ? veiculo.getNumeroCavEmitido() : "");
+            parameters.put("statusRegistro", permissionario.getStatus());
 
             parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
             parameters.put("validadeRegistroCondutor", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao()) +
                     " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataValidadeCertificadoCondutor()));
+
             //PERMISSIONÁRIO/AUTORIZATÁRIO
             parameters.put("nome", permissionario.getNomePermissionario());
             parameters.put("cpf", permissionario.getCpfPermissionario());
@@ -561,9 +554,9 @@ public class PermissionarioServiceImpl {
 
             //VEÍCULO
             parameters.put("nomePermissionario", permissionario.getNomePermissionario());
-            parameters.put("numeroPermissao", permissao.getNumeroPermissao());
             parameters.put("placa", veiculo.getPlaca());
             parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
+            parameters.put("renavam", veiculo.getRenavam());
             parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
             parameters.put("cor", obterCor(veiculo.getCor()));
             parameters.put("cilindrada", Objects.nonNull(veiculo.getCilindrada()) ? veiculo.getCilindrada() : "");

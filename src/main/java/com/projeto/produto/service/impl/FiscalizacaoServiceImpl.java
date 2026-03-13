@@ -145,7 +145,8 @@ public class FiscalizacaoServiceImpl {
         if (!listaFiscalizacao.isEmpty()){
             for (Fiscalizacao fiscalizacao : listaFiscalizacao) {
                 FiscalizacaoDTO fiscalizacaoResponseDTORetornado = converterFiscalizacaoToFiscalizacaoDTO(fiscalizacao);
-                Defensor defensor = defensorRepository.findDefensorByNumeroPermissao(fiscalizacao.getVeiculo().getNumeroPermissao());
+                //Defensor defensor = defensorRepository.findDefensorByNumeroPermissao(fiscalizacao.getVeiculo().getNumeroPermissao());
+                Defensor defensor = new Defensor();
                 if(Objects.nonNull(defensor)){
                     fiscalizacaoResponseDTORetornado.setNomeDefensor(defensor.getNomeDefensor());
                     fiscalizacaoResponseDTORetornado.setCnhDefensor(defensor.getCnhDefensor());
@@ -181,7 +182,8 @@ public class FiscalizacaoServiceImpl {
         List<FiscalizacaoDTO> listaFiscalizacaoDTO = new ArrayList<>();
         for(Fiscalizacao fiscalizacao : listaFiscalizacao){
             FiscalizacaoDTO fiscalizacaoResponseDTO = converterFiscalizacaoToFiscalizacaoDTO(fiscalizacao);
-            Defensor defensor = defensorRepository.findDefensorByNumeroPermissao(fiscalizacao.getVeiculo().getNumeroPermissao());
+            //Defensor defensor = defensorRepository.findDefensorByNumeroPermissao(fiscalizacao.getVeiculo().getNumeroPermissao());
+            Defensor defensor = new Defensor();
             if(Objects.nonNull(defensor)){
                 fiscalizacaoResponseDTO.setNomeDefensor(defensor.getNomeDefensor());
                 fiscalizacaoResponseDTO.setCnhDefensor(defensor.getCnhDefensor());

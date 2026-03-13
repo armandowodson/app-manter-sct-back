@@ -95,13 +95,13 @@ public class VeiculoController {
         return service.excluirVeiculo(idVeiculo, usuario);
     }
 
-    @GetMapping("/gerar-autorizacao-trafego")
-    public ResponseEntity<byte[]> gerarAutorizacaoTrafego(@RequestParam(required = true) String numeroPermissao,
-                                                          @RequestParam(required = true) String modulo) {
+    @GetMapping("/gerar-certificado-anual-vistoria")
+    public ResponseEntity<byte[]> gerarCertificadoAnualVistoria(@RequestParam(required = true) String idVeiculo,
+                                                                @RequestParam(required = true) String modulo) {
         try{
-            byte[] fileBytes = service.gerarAutorizacaoTrafego(numeroPermissao, modulo);
+            byte[] fileBytes = service.gerarCertificadoAnualVistoria(idVeiculo, modulo);
 
-            String fileName = "autorizacaoTrafego-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
+            String fileName = "certificadoanualvistoria-" + LocalDate.now() + "Nº" + idVeiculo + ".pdf";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentDispositionFormData("attachment", fileName);
@@ -125,12 +125,12 @@ public class VeiculoController {
     }
 
     @GetMapping("/gerar-laudo-vistoria")
-    public ResponseEntity<byte[]> gerarLaudoVistoria( @RequestParam(required = true) String numeroPermissao,
+    public ResponseEntity<byte[]> gerarLaudoVistoria( @RequestParam(required = true) String idVeiculo,
                                                       @RequestParam(required = true) String modulo) {
         try{
-            byte[] fileBytes = service.gerarLaudoVistoria(numeroPermissao, modulo);
+            byte[] fileBytes = service.gerarLaudoVistoria(idVeiculo, modulo);
 
-            String fileName = "laudoVistoria-" + LocalDate.now() + "Nº" + numeroPermissao + ".pdf";
+            String fileName = "laudoVistoria-" + LocalDate.now() + "Nº" + idVeiculo + ".pdf";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentDispositionFormData("attachment", fileName);
