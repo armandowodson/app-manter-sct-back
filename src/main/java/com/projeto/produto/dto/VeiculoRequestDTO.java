@@ -27,6 +27,7 @@ public class VeiculoRequestDTO {
     private String dataVistoria;
     private String dataRetorno;
     private String statusVistoria;
+    private String tipoVistoria;
     private String ressalvas;
     private String matriculaVistoriador;
     private String numeroCavEmitido;

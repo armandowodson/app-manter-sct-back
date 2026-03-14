@@ -274,8 +274,10 @@ public class DefensorServiceImpl {
     public List<DefensorResponseDTO> converterEntityToDTO(List<Defensor> listaDefensor){
         List<DefensorResponseDTO> listaDefensorResponseDTO = new ArrayList<>();
         for(Defensor defensor : listaDefensor){
-            defensor.setDataNascimento(defensor.getDataNascimento().plusDays(1));
-            defensor.setDataValidadeCnh(defensor.getDataValidadeCnh().plusDays(1));
+            if(Objects.nonNull(defensor.getDataNascimento()) && !defensor.getDataNascimento().equals(""))
+                defensor.setDataNascimento(defensor.getDataNascimento().plusDays(1));
+            if(Objects.nonNull(defensor.getDataValidadeCnh()) && !defensor.getDataValidadeCnh().equals(""))
+                defensor.setDataValidadeCnh(defensor.getDataValidadeCnh().plusDays(1));
             DefensorResponseDTO defensorResponseDTO = converterDefensorToDefensorDTO(defensor);
             listaDefensorResponseDTO.add(defensorResponseDTO);
         }
@@ -316,7 +318,7 @@ public class DefensorServiceImpl {
             defensorResponseDTO.setNumeroInscricaoInss(defensor.getNumeroInscricaoInss());
             defensorResponseDTO.setNumeroCertificadoCondutor(defensor.getNumeroCertificadoCondutor());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-            if(Objects.nonNull(defensor.getDataValidadeCertificadoCondutor())){
+            if(Objects.nonNull(defensor.getDataValidadeCertificadoCondutor()) && !defensor.getDataValidadeCertificadoCondutor().equals("")){
                 String formattedDate = defensor.getDataValidadeCertificadoCondutor().plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC).format(formatter);
                 defensorResponseDTO.setDataValidadeCertificadoCondutor(formattedDate);
             }
@@ -381,7 +383,7 @@ public class DefensorServiceImpl {
             defensor.setFiliacaoPai(defensorRequestDTO.getFiliacaoPai());
             defensor.setSexo(defensorRequestDTO.getSexo());
             defensor.setEstadoCivil(defensorRequestDTO.getEstadoCivil());
-            if(Objects.nonNull(defensorRequestDTO.getDataNascimento())) {
+            if(Objects.nonNull(defensorRequestDTO.getDataNascimento()) && !defensorRequestDTO.getDataNascimento().isEmpty()) {
                 defensor.setDataNascimento(LocalDate.parse(defensorRequestDTO.getDataNascimento()));
             }
             defensor.setUfDefensor(defensorRequestDTO.getUfDefensor());
@@ -393,7 +395,7 @@ public class DefensorServiceImpl {
             defensor.setEmailDefensor(defensorRequestDTO.getEmailDefensor());
             defensor.setCnhDefensor(defensorRequestDTO.getCnhDefensor());
             defensor.setCategoriaCnhDefensor(defensorRequestDTO.getCategoriaCnhDefensor());
-            if(Objects.nonNull(defensorRequestDTO.getDataValidadeCnh())) {
+            if(Objects.nonNull(defensorRequestDTO.getDataValidadeCnh()) && !defensorRequestDTO.getDataValidadeCnh().isEmpty()) {
                 defensor.setDataValidadeCnh(LocalDate.parse(defensorRequestDTO.getDataValidadeCnh()));
             }
             defensor.setNumeroQuitacaoMilitar(defensorRequestDTO.getNumeroQuitacaoMilitar());
@@ -494,15 +496,15 @@ public class DefensorServiceImpl {
             parameters.put("numeroRcmt", defensor.getDataCriacao().getYear() + " / " + defensor.getIdDefensor());
             parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao()));
             parameters.put("tipoCondutor", "[ ] Autorizatário [x] Defensor");
-            parameters.put("numeroTas", defensor.getDataCriacao().getYear() + " / " + veiculo.getIdVeiculo());
+            parameters.put("numeroTas", StringUtils.leftPad(defensor.getIdDefensor().toString() + veiculo.getIdVeiculo().toString(), 8, "0") + "/" + defensor.getDataCriacao().getYear());
             parameters.put("numeroCcmt", String.valueOf(defensor.getIdDefensor()));
             parameters.put("numeroCvmt", String.valueOf(veiculo.getIdVeiculo()));
             parameters.put("numeroCav", Objects.nonNull(veiculo.getNumeroCavEmitido()) ? veiculo.getNumeroCavEmitido() : "");
-            parameters.put("statusRegistro", defensor.getStatus());
+            parameters.put("statusRegistro", "[x] " + defensor.getStatus());
 
             parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
             parameters.put("validadeRegistroCondutor", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao()) +
-                    " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataValidadeCertificadoCondutor()));
+                    " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao().plusYears(1)));
 
             //PERMISSIONÁRIO/AUTORIZATÁRIO
             parameters.put("nome", defensor.getNomeDefensor());

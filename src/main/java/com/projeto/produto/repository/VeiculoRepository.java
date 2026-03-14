@@ -27,16 +27,14 @@ public interface VeiculoRepository extends JpaRepository<Veiculo,Integer> {
             value = "SELECT * " +
                     "FROM proj.veiculo " +
                     "WHERE 1 = 1 " +
-                    "AND (:numeroPermissao IS NULL OR NUMERO_PERMISSAO = :numeroPermissao) " +
                     "AND (:placa IS NULL OR PLACA = :placa) " +
                     "AND (:renavam IS NULL OR RENAVAM = :renavam) " +
-                    "AND (:numeroTaximetro IS NULL OR NUMERO_TAXIMETRO = :numeroTaximetro) " +
+                    "AND (:cilindrada IS NULL OR CILINDRADA = :cilindrada) " +
                     "AND (:anoFabricacao IS NULL OR ANO_FABRICACAO = :anoFabricacao) ",
             nativeQuery = true
     )
-    List<Veiculo> listarTodosVeiculosFiltros(String numeroPermissao, String placa, String renavam,
-                                                 String numeroTaximetro, String anoFabricacao,
-                                                 Pageable pageable);
+    List<Veiculo> listarTodosVeiculosFiltros(String placa, String renavam, String cilindrada,
+                                             String anoFabricacao, Pageable pageable);
 
     @Query(
             value = "SELECT * " +

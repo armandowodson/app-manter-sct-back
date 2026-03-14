@@ -140,10 +140,32 @@ public class PermissionarioController {
                 return ResponseEntity.status(400).body(null);
             if(e.getMessage().equals("401"))
                 return ResponseEntity.status(401).body(null);
-            if(e.getMessage().equals("402"))
-                return ResponseEntity.status(402).body(null);
-            if(e.getMessage().equals("403"))
-                return ResponseEntity.status(403).body(null);
+            if(e.getMessage().equals("500"))
+                return ResponseEntity.status(500).body(null);
+        }
+
+        return null;
+    }
+
+    @GetMapping("/gerar-termo-autorizacao-servico")
+    public ResponseEntity<byte[]> gerarTermoAutorizacaoServico( @RequestParam(required = true) String cpfPermissionario,
+                                                         @RequestParam(required = true) String modulo) {
+        try{
+            byte[] fileBytes = service.gerarTermoAutorizacaoServico(cpfPermissionario, modulo);
+
+            String fileName = "termoAutorizacaoservico-" + LocalDate.now() + "Nº" + cpfPermissionario + ".pdf";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDispositionFormData("attachment", fileName);
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentLength(fileBytes.length);
+
+            return ResponseEntity.ok().headers(headers).body(fileBytes);
+        } catch (Exception e){
+            if(e.getMessage().equals("400"))
+                return ResponseEntity.status(400).body(null);
+            if(e.getMessage().equals("401"))
+                return ResponseEntity.status(401).body(null);
             if(e.getMessage().equals("500"))
                 return ResponseEntity.status(500).body(null);
         }

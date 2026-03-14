@@ -29,6 +29,11 @@
 	<parameter name="dataEmissao" class="java.lang.String"/>
 	<parameter name="chassi" class="java.lang.String"/>
 	<parameter name="matriculaVistoriador" class="java.lang.String"/>
+	<parameter name="numeroCvmt" class="java.lang.String"/>
+	<parameter name="numeroCcmt" class="java.lang.String"/>
+	<parameter name="tipoVistoria" class="java.lang.String"/>
+	<parameter name="numeroTas" class="java.lang.String"/>
+	<parameter name="cilindrada" class="java.lang.String"/>
 	<queryString language="SQL">
 		<![CDATA[]]>
 	</queryString>
@@ -47,56 +52,70 @@
 		<band splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="577" splitType="Stretch">
+		<band height="561" splitType="Stretch">
+			<rectangle>
+				<reportElement x="3" y="320" width="546" height="22" backcolor="#E0DADA" uuid="fd7f9fa3-5f20-42a2-ba92-d48e7e196bf2">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineColor="#FFFFFF"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="3" y="75" width="544" height="44" backcolor="#FCD8D7" uuid="608f85d2-b41a-47ef-ae05-29d392c6c6b1"/>
+				<graphicElement>
+					<pen lineColor="#FFFFFF"/>
+				</graphicElement>
+			</rectangle>
 			<image scaleImage="FillFrame" hAlign="Left">
-				<reportElement x="5" y="330" width="533" height="200" uuid="886cf715-2a31-43fb-8fbd-56bbc50ca539"/>
+				<reportElement x="5" y="350" width="533" height="200" uuid="886cf715-2a31-43fb-8fbd-56bbc50ca539"/>
 				<imageExpression><![CDATA[$P{imagemRodape}]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement x="5" y="198" width="94" height="17" uuid="4f0ae908-a716-4298-9dfa-0d53cffd8929"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Autorizatário:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="99" y="198" width="255" height="17" uuid="e3f10c0d-913b-4d62-93a9-d87a36a36ef6">
+				<reportElement x="99" y="198" width="249" height="17" uuid="e3f10c0d-913b-4d62-93a9-d87a36a36ef6">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement>
-					<font fontName="Times New Roman"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{nomePermissionario}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="3" y="280" width="99" height="17" uuid="b610484f-fe8d-45e0-a9b8-768b44e467e4"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Status Vistoria:]]></text>
+				<text><![CDATA[Tipo Vistoria:]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="103" y="280" width="174" height="17" uuid="f2fd4867-37ea-4919-b234-5da10361c101">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="false"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{statusVistoria}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{tipoVistoria}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="173" y="260" width="93" height="17" uuid="7cc01fde-7320-4dad-9b40-8837211d57f0">
+				<reportElement x="155" y="260" width="111" height="17" uuid="7cc01fde-7320-4dad-9b40-8837211d57f0">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="false"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{proximaVistoria}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="3" y="260" width="168" height="17" uuid="8ebcdecb-9306-436e-8a67-25aa6fbb95d4"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<reportElement x="3" y="260" width="152" height="17" uuid="8ebcdecb-9306-436e-8a67-25aa6fbb95d4"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Próxima Vistoria Obrigatória:]]></text>
 			</staticText>
@@ -115,20 +134,20 @@
 				<text><![CDATA[3. DADOS DA VISTORIA REALIZADA]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="81" y="300" width="372" height="17" uuid="a4f12c15-80e8-47d5-9f53-9c2a23424c11">
+				<reportElement x="140" y="300" width="410" height="17" uuid="a4f12c15-80e8-47d5-9f53-9c2a23424c11">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="false"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{ressalvas}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="4" y="300" width="74" height="17" uuid="3a7848a4-6817-4962-9191-60f5b0efd1b7"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<reportElement x="3" y="300" width="136" height="17" uuid="3a7848a4-6817-4962-9191-60f5b0efd1b7"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Ressalvas: ]]></text>
+				<text><![CDATA[Ressalvas/Irregularidades: ]]></text>
 			</staticText>
 			<rectangle>
 				<reportElement x="3" y="52" width="544" height="22" uuid="881bb5b6-bc3c-4d18-93f7-eb2875f42fc5"/>
@@ -138,54 +157,63 @@
 			</rectangle>
 			<staticText>
 				<reportElement x="324" y="34" width="169" height="17" uuid="23d45956-6aee-4d53-b3d9-c15d20fb7b24"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Nº TAS Vinculado]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="360" y="54" width="116" height="17" uuid="7175bda8-f44e-4e57-a49b-57acd9619d6e">
+				<reportElement x="351" y="54" width="141" height="17" uuid="7175bda8-f44e-4e57-a49b-57acd9619d6e">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$P{numeroPermissao}]]></textFieldExpression>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{numeroTas}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="198" y="34" width="103" height="17" uuid="46ecb737-8066-4fe6-94c3-ac48926eb792"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Data Emissão]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="198" y="54" width="99" height="17" uuid="5351743b-3c63-4e01-9fc5-fad499490916">
+				<reportElement x="198" y="54" width="103" height="17" uuid="5351743b-3c63-4e01-9fc5-fad499490916">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{dataEmissao}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="324" y="54" width="37" height="17" uuid="697f3875-6922-4ca0-a6eb-f5df6d4edaa8"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<reportElement x="324" y="54" width="27" height="17" uuid="697f3875-6922-4ca0-a6eb-f5df6d4edaa8"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[TAS-]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="10" y="54" width="37" height="17" uuid="f523d751-ff0d-4ccf-bd39-6a083a3af019"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<reportElement x="10" y="54" width="30" height="17" uuid="f523d751-ff0d-4ccf-bd39-6a083a3af019"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[CAV-]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="46" y="54" width="116" height="17" uuid="2eeeafc8-d199-428b-8d02-583ec2994723">
+				<reportElement x="40" y="54" width="138" height="17" uuid="2eeeafc8-d199-428b-8d02-583ec2994723">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{numeroCavEmitido}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="10" y="34" width="169" height="17" uuid="6f47ade6-1f96-477d-92a8-221fbb7dce59"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Nº CAV]]></text>
 			</staticText>
@@ -193,13 +221,15 @@
 				<reportElement x="140" y="97" width="290" height="17" uuid="4f2e1c3d-d5a8-47b1-9f02-0932e6f50c1f">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Center"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{dataValidadeCav}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="160" y="78" width="260" height="17" uuid="a3f31d35-ae13-4d29-9794-574c128d553f"/>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[VALIDADE DESTE CERTIFICADO (CAV)]]></text>
 			</staticText>
@@ -212,47 +242,56 @@
 			</staticText>
 			<staticText>
 				<reportElement x="4" y="139" width="84" height="17" uuid="180d54db-0da9-4561-842f-d6e3c41617cc"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Placa:]]></text>
+				<text><![CDATA[Placa Veículo:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="102" y="139" width="71" height="17" uuid="800741cc-5378-4329-9805-068d39da9686">
+				<reportElement x="88" y="139" width="71" height="17" uuid="800741cc-5378-4329-9805-068d39da9686">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{placa}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="183" y="139" width="76" height="17" uuid="ab9e6cac-8bf1-42d3-a172-88cc36ac687c"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<reportElement x="343" y="139" width="76" height="17" uuid="ab9e6cac-8bf1-42d3-a172-88cc36ac687c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[RENAVAM:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="260" y="139" width="116" height="17" uuid="226e6094-c60a-40b2-8e3d-c90578e3e90c">
+				<reportElement x="420" y="139" width="116" height="17" uuid="226e6094-c60a-40b2-8e3d-c90578e3e90c">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{renavam}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="4" y="158" width="93" height="17" uuid="4e37cdc2-9d74-44c6-9250-e74e68aab557"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<reportElement x="4" y="158" width="84" height="17" uuid="4e37cdc2-9d74-44c6-9250-e74e68aab557"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Marca/Modelo:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="102" y="158" width="148" height="17" uuid="2530bc3c-ef25-418f-895b-29307b48c9cb">
+				<reportElement x="88" y="158" width="148" height="17" uuid="2530bc3c-ef25-418f-895b-29307b48c9cb">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{marcaModelo}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="250" y="158" width="98" height="17" uuid="584b8575-e9d4-4cd3-8d98-fdd861a8ed61"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Ano Fabricação:]]></text>
 			</staticText>
@@ -260,107 +299,177 @@
 				<reportElement x="350" y="158" width="67" height="17" uuid="190c3583-d867-4b04-8b24-794cb36418b3">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{anoFabricacao}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="5" y="178" width="52" height="17" uuid="b6cd5c5f-8dae-45b6-8d97-ae5b120b3de5"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Cor:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="59" y="178" width="67" height="17" uuid="846d7c2a-1503-4a50-8077-3e48b286154e">
+				<reportElement x="88" y="178" width="67" height="17" uuid="846d7c2a-1503-4a50-8077-3e48b286154e">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{cor}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="250" y="177" width="84" height="17" uuid="2ca94b41-09e3-4bc3-bfd8-224bab53af71"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<reportElement x="250" y="177" width="98" height="17" uuid="2ca94b41-09e3-4bc3-bfd8-224bab53af71"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Chassi:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="350" y="177" width="90" height="17" uuid="e8971623-bdd0-42dc-8702-f200bafe2b78">
+				<reportElement x="350" y="177" width="158" height="17" uuid="e8971623-bdd0-42dc-8702-f200bafe2b78">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{chassi}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="510" y="157" width="40" height="17" uuid="42753183-dcc8-4612-acae-3b38428ce43c">
+				<reportElement x="510" y="158" width="40" height="17" uuid="42753183-dcc8-4612-acae-3b38428ce43c">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$P{anoFabricacao}]]></textFieldExpression>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{cilindrada}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="416" y="157" width="93" height="17" uuid="8a9167cf-0a8d-47a6-b244-a9cd169b25a7"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<reportElement x="416" y="158" width="93" height="17" uuid="8a9167cf-0a8d-47a6-b244-a9cd169b25a7"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Cilindrada (cc):]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="102" y="240" width="77" height="17" uuid="3e8a2266-37bb-4fcc-8c03-2a76c2ec00d8">
+				<reportElement x="81" y="240" width="70" height="17" uuid="3e8a2266-37bb-4fcc-8c03-2a76c2ec00d8">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="false"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{dataVistoria}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="3" y="240" width="99" height="17" uuid="03eb8dde-1a79-4359-9fae-eca4e63026f9"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<reportElement x="3" y="240" width="77" height="17" uuid="03eb8dde-1a79-4359-9fae-eca4e63026f9"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Data Vistoria:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="180" y="240" width="124" height="17" uuid="fea33bdf-0dad-4e79-bf64-ae0b549d5619"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<reportElement x="161" y="240" width="124" height="17" uuid="fea33bdf-0dad-4e79-bf64-ae0b549d5619"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Quilometragem (KM): ]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="303" y="240" width="51" height="17" uuid="f46449a3-d088-4706-a9b4-d4e7c0fbcf5f">
+				<reportElement x="285" y="240" width="51" height="17" uuid="f46449a3-d088-4706-a9b4-d4e7c0fbcf5f">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{quilometragem}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="472" y="240" width="75" height="17" uuid="3ea5336f-3b82-493c-8522-6d5b5450a79d">
+				<reportElement x="490" y="240" width="60" height="17" uuid="3ea5336f-3b82-493c-8522-6d5b5450a79d">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="false"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{numeroLaudoVistoria}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="354" y="240" width="113" height="17" uuid="675e0bde-8979-4d4a-9328-75a446555db4"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<reportElement x="339" y="240" width="151" height="17" uuid="675e0bde-8979-4d4a-9328-75a446555db4"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Nº do Laudo Vistoria: ]]></text>
+				<text><![CDATA[Nº do Laudo Vistoria (LVM): ]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="441" y="260" width="103" height="17" uuid="c578d22a-034e-4b8f-9ffb-53deb924ee60">
+				<reportElement x="420" y="260" width="130" height="17" uuid="c578d22a-034e-4b8f-9ffb-53deb924ee60">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="false"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{matriculaVistoriador}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="269" y="260" width="171" height="17" uuid="591c2c49-55de-47e6-9169-f938d2774a37"/>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true"/>
+				<reportElement x="269" y="260" width="151" height="17" uuid="591c2c49-55de-47e6-9169-f938d2774a37"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Vistoriador (Matrícula DMT): ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="166" y="139" width="50" height="17" uuid="d817607e-5ead-4ec0-9592-690a87cbe263"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CVMT:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="217" y="139" width="116" height="17" uuid="3618bcb8-5874-4efc-a130-e66deb95d967">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{numeroCvmt}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="351" y="198" width="50" height="17" uuid="586be122-ec01-4643-9be5-229e631a77fb"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CCMT:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="401" y="198" width="108" height="17" uuid="13ac0cd1-5318-4490-8aa5-4dae091ac39d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{numeroCcmt}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="379" y="280" width="171" height="17" uuid="c28f0266-d5ab-41c3-aaf9-f868df1f6f7d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{statusVistoria}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="279" y="280" width="99" height="17" uuid="b2901af6-cc30-4341-a6c5-a69d596a4561"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Status Vistoria:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="322" width="541" height="17" uuid="d7e50cb6-0a16-4c84-9a9e-b2c8548bad66"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Prazo p/ regularização das Ressalvas(max.30 dias)______/______/______ Regularizado em:______/______/_______]]></text>
 			</staticText>
 		</band>
 	</columnHeader>

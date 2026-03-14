@@ -39,6 +39,25 @@ public class CarregarTipos {
         return strStatus;
     }
 
+    public static String carregarTipoVistoriaVeiculo(String tipo) {
+        String strTipo = "";
+        switch (tipo) {
+            case "1":
+                strTipo = "Anual (CAV)";
+                break;
+            case "2":
+                strTipo = "Extraordinária";
+                break;
+            case "3":
+                strTipo = "Inicial (implantação)";
+                break;
+            case "4":
+                strTipo = "Pós Acidente";
+                break;
+        }
+        return strTipo;
+    }
+
     public static String carregarCategoriaVeiculo(String tipo) {
         String strTipo = "";
         switch (tipo) {

@@ -44,17 +44,16 @@ public class VeiculoController {
     }
 
     @GetMapping("/buscar-filtros")
-    public Page<VeiculoResponseDTO> buscarVeiculosFiltros(@RequestParam(required = false) String numeroPermissao,
-                                                          @RequestParam(required = false) String placa,
+    public Page<VeiculoResponseDTO> buscarVeiculosFiltros(@RequestParam(required = false) String placa,
                                                           @RequestParam(required = false) String renavam,
-                                                          @RequestParam(required = false) String numeroTaximetro,
+                                                          @RequestParam(required = false) String cilindrada,
                                                           @RequestParam(required = false) String anoFabricacao,
                                                           @RequestParam(required = true) Integer pageIndex,
                                                           @RequestParam(required = true) Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
         try{
             Page<VeiculoResponseDTO> veiculos = service.listarTodosVeiculosFiltros(
-                    numeroPermissao, placa, renavam, numeroTaximetro, anoFabricacao, pageRequest
+                    placa, renavam, cilindrada, anoFabricacao, pageRequest
             );
 
             return veiculos;
@@ -74,11 +73,10 @@ public class VeiculoController {
 
     @PostMapping("/inserir")
     public ResponseEntity<VeiculoResponseDTO> inserirVeiculo(@RequestParam("veiculo") String veiculo,
-                                                             @RequestParam("crlv") MultipartFile crlv,
-                                                             @RequestParam("comprovanteVistoria") MultipartFile comprovanteVistoria
+                                                             @RequestParam("crlv") MultipartFile crlv
     ) throws IOException {
         VeiculoRequestDTO veiculoRequestDTO = new ObjectMapper().readValue(veiculo, VeiculoRequestDTO.class);
-        return ResponseEntity.ok(service.inserirVeiculo(veiculoRequestDTO, crlv, comprovanteVistoria));
+        return ResponseEntity.ok(service.inserirVeiculo(veiculoRequestDTO, crlv));
     }
 
     @PostMapping("/alterar")
@@ -116,8 +114,6 @@ public class VeiculoController {
                 return ResponseEntity.status(401).body(null);
             if(e.getMessage().equals("402"))
                 return ResponseEntity.status(402).body(null);
-            if(e.getMessage().equals("403"))
-                return ResponseEntity.status(403).body(null);
             if(e.getMessage().equals("500"))
                 return ResponseEntity.status(500).body(null);
         }
@@ -145,8 +141,29 @@ public class VeiculoController {
                 return ResponseEntity.status(401).body(null);
             if(e.getMessage().equals("402"))
                 return ResponseEntity.status(402).body(null);
-            if(e.getMessage().equals("403"))
-                return ResponseEntity.status(403).body(null);
+            if(e.getMessage().equals("500"))
+                return ResponseEntity.status(500).body(null);
+        }
+        return  null;
+    }
+
+    @GetMapping("/imprimir-anexo-crlv")
+    public ResponseEntity<byte[]> imprimirAnexoCrlv( @RequestParam(required = true) String idVeiculo,
+                                                      @RequestParam(required = true) String modulo) {
+        try{
+            byte[] fileBytes = service.imprimirAnexoCrlv(idVeiculo, modulo);
+
+            String fileName = "anexoCrlv-" + LocalDate.now() + "Nº" + idVeiculo + ".pdf";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDispositionFormData("attachment", fileName);
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentLength(fileBytes.length);
+
+            return ResponseEntity.ok().headers(headers).body(fileBytes);
+        } catch (Exception e){
+            if(e.getMessage().equals("400"))
+                return ResponseEntity.status(400).body(null);
             if(e.getMessage().equals("500"))
                 return ResponseEntity.status(500).body(null);
         }

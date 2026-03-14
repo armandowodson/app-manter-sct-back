@@ -214,7 +214,6 @@ public class FiscalizacaoServiceImpl {
         fiscalizacaoResponseDTO.setModelo(fiscalizacao.getVeiculo().getModelo());
         fiscalizacaoResponseDTO.setCor(converterIdCor(fiscalizacao.getVeiculo().getCor()));
         fiscalizacaoResponseDTO.setIdPermissionario(fiscalizacao.getVeiculo().getPermissionario().getIdPermissionario().toString());
-        fiscalizacaoResponseDTO.setNumeroPermissao(fiscalizacao.getVeiculo().getNumeroPermissao());
         fiscalizacaoResponseDTO.setNomePermissionario(fiscalizacao.getVeiculo().getPermissionario().getNomePermissionario());
         fiscalizacaoResponseDTO.setCnhPermissionario(fiscalizacao.getVeiculo().getPermissionario().getCnhPermissionario());
         fiscalizacaoResponseDTO.setMotivoInfracao(converterIdMotivoInfracao(fiscalizacao.getMotivoInfracao()));

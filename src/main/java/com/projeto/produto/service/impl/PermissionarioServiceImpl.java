@@ -280,8 +280,10 @@ public class PermissionarioServiceImpl {
     public List<PermissionarioResponseDTO> converterEntityToDTO(List<Permissionario> listaPermissionario){
         List<PermissionarioResponseDTO> listaPermissionarioResponseDTO = new ArrayList<>();
         for(Permissionario permissionario : listaPermissionario){
-            permissionario.setDataNascimento(permissionario.getDataNascimento().plusDays(1));
-            permissionario.setDataValidadeCnh(permissionario.getDataValidadeCnh().plusDays(1));
+            if(Objects.nonNull(permissionario.getDataNascimento()) && !permissionario.getDataNascimento().equals(""))
+                permissionario.setDataNascimento(permissionario.getDataNascimento().plusDays(1));
+            if(Objects.nonNull(permissionario.getDataValidadeCnh()) && !permissionario.getDataValidadeCnh().equals(""))
+                permissionario.setDataValidadeCnh(permissionario.getDataValidadeCnh().plusDays(1));
             PermissionarioResponseDTO permissionarioResponseDTO = converterPermissionarioToPermissionarioDTO(permissionario);
             listaPermissionarioResponseDTO.add(permissionarioResponseDTO);
         }
@@ -371,7 +373,7 @@ public class PermissionarioServiceImpl {
         permissionario.setFiliacaoPai(permissionarioRequestDTO.getFiliacaoPai());
         permissionario.setSexo(permissionarioRequestDTO.getSexo());
         permissionario.setEstadoCivil(permissionarioRequestDTO.getEstadoCivil());
-        if(Objects.nonNull(permissionarioRequestDTO.getDataNascimento())) {
+        if(Objects.nonNull(permissionarioRequestDTO.getDataNascimento()) && !permissionarioRequestDTO.getDataNascimento().isEmpty()) {
             permissionario.setDataNascimento(LocalDate.parse(permissionarioRequestDTO.getDataNascimento()));
         }
         permissionario.setUfPermissionario(permissionarioRequestDTO.getUfPermissionario());
@@ -383,7 +385,7 @@ public class PermissionarioServiceImpl {
         permissionario.setEmailPermissionario(permissionarioRequestDTO.getEmailPermissionario());
         permissionario.setCnhPermissionario(permissionarioRequestDTO.getCnhPermissionario());
         permissionario.setCategoriaCnhPermissionario(permissionarioRequestDTO.getCategoriaCnhPermissionario());
-        if(Objects.nonNull(permissionarioRequestDTO.getDataValidadeCnh())) {
+        if(Objects.nonNull(permissionarioRequestDTO.getDataValidadeCnh()) && !permissionarioRequestDTO.getDataValidadeCnh().isEmpty()) {
             permissionario.setDataValidadeCnh(LocalDate.parse(permissionarioRequestDTO.getDataValidadeCnh()));
         }
         permissionario.setNumeroQuitacaoMilitar(permissionarioRequestDTO.getNumeroQuitacaoMilitar());
@@ -477,15 +479,15 @@ public class PermissionarioServiceImpl {
             parameters.put("numeroRcmt", permissionario.getDataCriacao().getYear() + " / " + permissionario.getIdPermissionario());
             parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao()));
             parameters.put("tipoCondutor", "[x] Autorizatário [ ] Defensor");
-            parameters.put("numeroTas", permissionario.getDataCriacao().getYear() + " / " + veiculo.getIdVeiculo());
+            parameters.put("numeroTas", StringUtils.leftPad(permissionario.getIdPermissionario().toString() + veiculo.getIdVeiculo().toString(), 8, "0") + "/" + permissionario.getDataCriacao().getYear());
             parameters.put("numeroCcmt", String.valueOf(permissionario.getIdPermissionario()));
             parameters.put("numeroCvmt", String.valueOf(veiculo.getIdVeiculo()));
             parameters.put("numeroCav", Objects.nonNull(veiculo.getNumeroCavEmitido()) ? veiculo.getNumeroCavEmitido() : "");
-            parameters.put("statusRegistro", permissionario.getStatus());
+            parameters.put("statusRegistro", "[x] " + permissionario.getStatus());
 
             parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
             parameters.put("validadeRegistroCondutor", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao()) +
-                    " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataValidadeCertificadoCondutor()));
+                    " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao().plusYears(1)));
 
             //PERMISSIONÁRIO/AUTORIZATÁRIO
             parameters.put("nome", permissionario.getNomePermissionario());
@@ -567,6 +569,91 @@ public class PermissionarioServiceImpl {
             return bytes;
         } catch (Exception e){
             logger.error("gerarRegistroCondutorJasper: " + e.getMessage());
+            throw new RuntimeException("500");
+        }
+    }
+
+    public byte[] gerarTermoAutorizacaoServico(String cpfPermissionario, String modulo) {
+        logger.info("Início Gerar Registro Condutor Busca dos Dados");
+        try{
+            Permissionario permissionario = permissionarioRepository.findPermissionarioByCpfPermissionario(cpfPermissionario);
+            if(Objects.isNull(permissionario))
+                throw new RuntimeException("400");
+
+            Veiculo veiculo = veiculoRepository.findVeiculoByPermissionarioAndStatus(permissionario, "ATIVO");
+            if(Objects.isNull(veiculo))
+                throw new RuntimeException("401");
+
+            Defensor defensor = defensorRepository.findDefensorByPermissionario(permissionario);
+
+            byte[] bytes = gerarTermoAutorizacaoServico(defensor, veiculo, permissionario, modulo);
+            return bytes;
+        } catch (Exception e){
+            logger.error("gerarRegistroCondutor - Autorizatário: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public byte[] gerarTermoAutorizacaoServico(Defensor defensor, Veiculo veiculo, Permissionario permissionario, String modulo) {
+        logger.info("Início Gerar Termo de Autorização de Serviço Jasper");
+        try{
+            ClassPathResource resource = new ClassPathResource("reports/termoAutorizacaoMoto.jrxml");
+            JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
+
+            FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoTermoAutorizacaoMoto.png" ).getAbsolutePath());
+            FileInputStream rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeTermoAutorizacaoMoto.png" ).getAbsolutePath());
+
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("imagemCabecalho", cabecalhoStream);
+            parameters.put("imagemRodape", rodapeStream);
+            //PERMISSÃO
+            parameters.put("numeroTas", StringUtils.leftPad(permissionario.getIdPermissionario().toString() + veiculo.getIdVeiculo().toString(), 8, "0") + "/" + permissionario.getDataCriacao().getYear());
+            parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(LocalDate.now()));
+            parameters.put("statusPermissao", "[x] " + permissionario.getStatus());
+            parameters.put("validadePermissao", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao()) +
+                    " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao().plusYears(3)));
+            //PERMISSIONÁRIO
+            parameters.put("idPermissionario", permissionario.getIdPermissionario().toString());
+            parameters.put("nome", permissionario.getNomePermissionario());
+            parameters.put("cpf", permissionario.getCpfPermissionario());
+            parameters.put("rg", permissionario.getRgPermissionario());
+            parameters.put("orgao", permissionario.getOrgaoEmissor());
+            parameters.put("cnhPermissionario", permissionario.getCnhPermissionario());
+            parameters.put("categoriaCnh", CarregarTipos.carregarCategoriaCnh(permissionario.getCategoriaCnhPermissionario()));
+            parameters.put("dataValidadeCnh", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataValidadeCnh()));
+            parameters.put("dataNascimento", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataNascimento()));
+            parameters.put("sexo", permissionario.getSexo().equals("1") ? "Masculino" : "Feminino");
+            parameters.put("estadoCivil", CarregarTipos.carregarEstadoCivil(permissionario.getEstadoCivil()));
+            parameters.put("filiacao", permissionario.getFiliacaoMae() + "/" + (Objects.nonNull(permissionario.getFiliacaoPai()) ? permissionario.getFiliacaoPai() : ""));
+            parameters.put("endereco", permissionario.getEnderecoPermissionario() + " - CEP: " + permissionario.getCep());
+            parameters.put("celular", permissionario.getCelularPermissionario());
+            parameters.put("email", Objects.nonNull(permissionario.getEmailPermissionario()) ? permissionario.getEmailPermissionario() : "");
+            //VEÍCULO
+            parameters.put("idVeiculo", veiculo.getIdVeiculo().toString());
+            parameters.put("placa", veiculo.getPlaca());
+            parameters.put("renavam", veiculo.getRenavam());
+            parameters.put("marcaModelo", veiculo.getMarca() + "/" + veiculo.getModelo());
+            parameters.put("anoFabricacao", veiculo.getAnoFabricacao());
+            parameters.put("cor", obterCor(veiculo.getCor()));
+            parameters.put("chassi", veiculo.getChassi());
+            parameters.put("numeroCav", Objects.nonNull(veiculo.getNumeroCavEmitido()) ? veiculo.getNumeroCavEmitido() : StringUtils.leftPad(veiculo.getIdVeiculo().toString(), 5, "0") + " / " + LocalDate.now().getYear());
+            parameters.put("dataVistoria", (Objects.nonNull(veiculo.getDataVistoria()) && Objects.nonNull(veiculo.getDataVistoria())) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataVistoria()) : "");
+            parameters.put("quilometragem", Objects.nonNull(veiculo.getQuilometragem()) ? veiculo.getQuilometragem() : "");
+            parameters.put("cilindrada", Objects.nonNull(veiculo.getCilindrada()) ? veiculo.getCilindrada() : "");
+            //DEFENSOR
+            parameters.put("numeroRcmt", Objects.nonNull(defensor.getIdDefensor()) ? defensor.getIdDefensor().toString() : "");
+            parameters.put("nomeDefensor", Objects.nonNull(defensor.getNomeDefensor()) ? defensor.getNomeDefensor() : "");
+            parameters.put("cpfDefensor", Objects.nonNull(defensor.getCpfDefensor()) ? defensor.getCpfDefensor() : "");
+            parameters.put("rgDefensor", Objects.nonNull(defensor.getRgDefensor()) ? defensor.getRgDefensor() : "");
+            parameters.put("cnhDefensor", Objects.nonNull(defensor.getCnhDefensor()) ? defensor.getCnhDefensor() : "");
+            parameters.put("validadeCnh", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataValidadeCnh()));
+
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+
+            byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
+            return bytes;
+        } catch (Exception e){
+            logger.error("gerarTermoAutorizacaoServico: " + e.getMessage());
             throw new RuntimeException("500");
         }
     }

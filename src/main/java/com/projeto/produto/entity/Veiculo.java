@@ -17,8 +17,6 @@ public class Veiculo {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_PERMISSIONARIO")
     private Permissionario permissionario;
-    @Column(name = "NUMERO_PERMISSAO")
-    private String numeroPermissao;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_PONTOS_TAXI")
     private PontoTaxi pontoTaxi;
@@ -59,6 +57,8 @@ public class Veiculo {
     private LocalDate dataRetorno;
     @Column(name = "STATUS_VISTORIA")
     private String statusVistoria;
+    @Column(name = "TIPO_VISTORIA")
+    private String tipoVistoria;
     @Column(name = "RESSALVAS")
     private String ressalvas;
     @Column(name = "MATRICULA_VISTORIADOR")
