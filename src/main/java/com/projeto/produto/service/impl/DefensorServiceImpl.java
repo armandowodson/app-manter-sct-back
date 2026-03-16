@@ -5,6 +5,7 @@ import com.projeto.produto.dto.DefensorResponseDTO;
 import com.projeto.produto.entity.*;
 import com.projeto.produto.repository.*;
 import com.projeto.produto.utils.CarregarTipos;
+import com.projeto.produto.utils.ImprimirAnexosServiceImpl;
 import com.projeto.produto.utils.ValidaCPF;
 import com.projeto.produto.utils.ValidaEmail;
 import net.sf.jasperreports.engine.*;
@@ -44,6 +45,9 @@ public class DefensorServiceImpl {
 
     @Autowired
     private PermissionarioRepository permissionarioRepository;
+
+    @Autowired
+    private ImprimirAnexosServiceImpl imprimirAnexosService;
 
     private static final Logger logger = LogManager.getLogger(AuditoriaServiceImpl.class);
 
@@ -587,6 +591,17 @@ public class DefensorServiceImpl {
         } catch (Exception e){
             logger.error("gerarRegistroCondutorJasper: " + e.getMessage());
             throw new RuntimeException("500");
+        }
+    }
+
+    public byte[] imprimirAnexo(String idAplicacao, String aplicacao, String anexo, String modulo) {
+        logger.info("Início Impressão do Anexo do Defensor Busca dos Dados");
+        try{
+            byte[] bytes = imprimirAnexosService.imprimirAnexo(idAplicacao, aplicacao, anexo, modulo);
+            return bytes;
+        } catch (Exception e){
+            logger.error("imprimirAnexo - Defensor: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 

@@ -156,4 +156,29 @@ public class DefensorController {
 
         return null;
     }
+
+    @GetMapping("/imprimir-anexo")
+    public ResponseEntity<byte[]> imprimirAnexo( @RequestParam(required = true) String idAplicacao,
+                                                 @RequestParam(required = true) String aplicacao,
+                                                 @RequestParam(required = true) String anexo,
+                                                 @RequestParam(required = true) String modulo) {
+        try{
+            byte[] fileBytes = service.imprimirAnexo(idAplicacao, aplicacao, anexo, modulo);
+
+            String fileName = "anexo-" + anexo + "-" + LocalDate.now() + "Nº" + idAplicacao + ".pdf";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDispositionFormData("attachment", fileName);
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentLength(fileBytes.length);
+
+            return ResponseEntity.ok().headers(headers).body(fileBytes);
+        } catch (Exception e){
+            if(e.getMessage().equals("400"))
+                return ResponseEntity.status(400).body(null);
+            if(e.getMessage().equals("500"))
+                return ResponseEntity.status(500).body(null);
+        }
+        return  null;
+    }
 }

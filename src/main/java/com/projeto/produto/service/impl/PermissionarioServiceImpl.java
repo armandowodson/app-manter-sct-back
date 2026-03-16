@@ -5,6 +5,7 @@ import com.projeto.produto.dto.PermissionarioResponseDTO;
 import com.projeto.produto.entity.*;
 import com.projeto.produto.repository.*;
 import com.projeto.produto.utils.CarregarTipos;
+import com.projeto.produto.utils.ImprimirAnexosServiceImpl;
 import com.projeto.produto.utils.ValidaCPF;
 import com.projeto.produto.utils.ValidaEmail;
 import net.sf.jasperreports.engine.*;
@@ -48,6 +49,9 @@ public class PermissionarioServiceImpl {
 
     @Autowired
     private DefensorRepository defensorRepository;
+
+    @Autowired
+    private ImprimirAnexosServiceImpl imprimirAnexosService;
 
     private static final Logger logger = LogManager.getLogger(Permissionario.class);
 
@@ -655,6 +659,17 @@ public class PermissionarioServiceImpl {
         } catch (Exception e){
             logger.error("gerarTermoAutorizacaoServico: " + e.getMessage());
             throw new RuntimeException("500");
+        }
+    }
+
+    public byte[] imprimirAnexo(String idAplicacao, String aplicacao, String anexo, String modulo) {
+        logger.info("Início Impressão do Anexo do Autorizatário Busca dos Dados");
+        try{
+            byte[] bytes = imprimirAnexosService.imprimirAnexo(idAplicacao, aplicacao, anexo, modulo);
+            return bytes;
+        } catch (Exception e){
+            logger.error("imprimirAnexo - Autorizatário: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 

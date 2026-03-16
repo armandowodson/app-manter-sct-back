@@ -70,11 +70,12 @@ public class AuditoriaServiceImpl {
     }
 
     public byte[] imprimirAuditoria(String nomeModulo, String usuarioOperacao,
-                                                String operacao, String dataInicioOperacao,
-                                                String dataFimOperacao, PageRequest pageRequest) throws JRException, SQLException, IOException {
+                                    String operacao, String dataInicioOperacao,
+                                    String dataFimOperacao, PageRequest pageRequest) {
         logger.info("Início Imprimir Auditoria");
         try{
-            Page<AuditoriaDTO> listaAuditoriasPage = listarTodosAuditoriaFiltros(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao, pageRequest);
+            Page<AuditoriaDTO> listaAuditoriasPage = listarTodosAuditoriaFiltros(nomeModulo, usuarioOperacao, operacao,
+                    dataInicioOperacao, dataFimOperacao, pageRequest);
             List<AuditoriaDTO> listaAuditorias = listaAuditoriasPage.getContent();
             byte[] bytes = gerarRelatorio(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao, listaAuditorias);
             return bytes;
@@ -90,36 +91,45 @@ public class AuditoriaServiceImpl {
 
         logger.info("Início Listar Todas Auditorias por Filtro");
         try{
-            LocalDate localDateInicio = LocalDate.now();
+            LocalDate localDateInicio = null;
             if(Objects.nonNull(dataInicioOperacao)) {
-                String data = dataInicioOperacao;
-                Integer indexChar = data.indexOf('(');
-                if(indexChar > 0){
-                    data = data.substring(0, indexChar);
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss 'GMT'Z", Locale.ENGLISH);
-                    ZonedDateTime zonedDateTime = ZonedDateTime.parse(data.trim(), formatter);
-                    localDateInicio = zonedDateTime.toLocalDate();
-                }
-            }else{
-                localDateInicio = null;
+                localDateInicio = LocalDate.parse(dataInicioOperacao);
             }
 
-            LocalDate localDateFim = LocalDate.now();
+            LocalDate localDateFim = null;
             if(Objects.nonNull(dataFimOperacao)) {
-                String data = dataFimOperacao;
-                Integer indexChar = data.indexOf('(');
-                if(indexChar > 0){
-                    data = data.substring(0, indexChar);
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss 'GMT'Z", Locale.ENGLISH);
-                    ZonedDateTime zonedDateTime = ZonedDateTime.parse(data.trim(), formatter);
-                    localDateFim = zonedDateTime.toLocalDate();
-                }
-            }else{
-                localDateFim = null;
+                localDateFim = LocalDate.parse(dataFimOperacao);
             }
 
-            List<Auditoria> listaAuditoria;
+            List<Auditoria> listaAuditoria = new ArrayList<>();
             Integer countRegistros = 0;
+
+            if(localDateInicio != null && localDateFim == null){
+                listaAuditoria = auditoriaRepository.listarTodasAuditoriasFiltrosDataInicio(
+                        nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, localDateInicio, pageRequest
+                );
+                countRegistros = auditoriaRepository.listarTodasAuditoriasFiltrosDataInicio(
+                        nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, localDateInicio, null
+                ).size();
+            }
+
+            if(localDateInicio == null && localDateFim != null){
+                listaAuditoria = auditoriaRepository.listarTodasAuditoriasFiltrosDataInicio(
+                        nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, localDateFim, pageRequest
+                );
+                countRegistros = auditoriaRepository.listarTodasAuditoriasFiltrosDataInicio(
+                        nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, localDateFim, null
+                ).size();
+            }
+
+            if(localDateInicio == null && localDateFim == null){
+                listaAuditoria = auditoriaRepository.listarTodasAuditoriasFiltrosSemDatas(
+                        nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, pageRequest
+                );
+                countRegistros = auditoriaRepository.listarTodasAuditoriasFiltrosSemDatas(
+                        nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, null
+                ).size();
+            }
 
             if(localDateInicio != null && localDateFim != null){
                 listaAuditoria = auditoriaRepository.listarTodasAuditoriasFiltros(
@@ -127,13 +137,6 @@ public class AuditoriaServiceImpl {
                 );
                 countRegistros = auditoriaRepository.listarTodasAuditoriasFiltros(
                         nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, localDateInicio, localDateFim, null
-                ).size();
-            }else{
-                listaAuditoria = auditoriaRepository.listarTodasAuditoriasFiltrosSemDatas(
-                        nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, pageRequest
-                );
-                countRegistros = auditoriaRepository.listarTodasAuditoriasFiltrosSemDatas(
-                        nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, null
                 ).size();
             }
 
@@ -195,8 +198,20 @@ public class AuditoriaServiceImpl {
             parameters.put("nomeModulo", Objects.nonNull(nomeModulo) ? nomeModulo : "");
             parameters.put("usuario", Objects.nonNull(usuarioOperacao) ? usuarioOperacao : "");
             parameters.put("operacao", Objects.nonNull(operacao) ? operacao : "");
-            parameters.put("dataInicio", Objects.nonNull(dataInicioOperacao) ? FormataData.formatarDataLocalDate(dataInicioOperacao) : "");
-            parameters.put("dataFim", Objects.nonNull(dataFimOperacao) ? FormataData.formatarDataLocalDate(dataFimOperacao) : "");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+            if(Objects.nonNull(dataInicioOperacao)){
+                LocalDate localDate = LocalDate.parse(dataInicioOperacao);
+                parameters.put("dataInicio", localDate.format(formatter));
+            }else{
+                parameters.put("dataInicio", "");
+            }
+            if(Objects.nonNull(dataFimOperacao)){
+                LocalDate localDate = LocalDate.parse(dataFimOperacao);
+                parameters.put("dataFim", localDate.format(formatter));
+            }else{
+                parameters.put("dataFim", "");
+            }
 
             Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "system", "1978");
             Statement stm = connection.createStatement();

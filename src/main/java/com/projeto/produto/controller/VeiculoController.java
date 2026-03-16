@@ -147,13 +147,15 @@ public class VeiculoController {
         return  null;
     }
 
-    @GetMapping("/imprimir-anexo-crlv")
-    public ResponseEntity<byte[]> imprimirAnexoCrlv( @RequestParam(required = true) String idVeiculo,
-                                                      @RequestParam(required = true) String modulo) {
+    @GetMapping("/imprimir-anexo")
+    public ResponseEntity<byte[]> imprimirAnexo( @RequestParam(required = true) String idAplicacao,
+                                                     @RequestParam(required = true) String aplicacao,
+                                                     @RequestParam(required = true) String anexo,
+                                                     @RequestParam(required = true) String modulo) {
         try{
-            byte[] fileBytes = service.imprimirAnexoCrlv(idVeiculo, modulo);
+            byte[] fileBytes = service.imprimirAnexo(idAplicacao, aplicacao, anexo, modulo);
 
-            String fileName = "anexoCrlv-" + LocalDate.now() + "Nº" + idVeiculo + ".pdf";
+            String fileName = "anexo-" + anexo + "-" + LocalDate.now() + "Nº" + idAplicacao + ".pdf";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentDispositionFormData("attachment", fileName);

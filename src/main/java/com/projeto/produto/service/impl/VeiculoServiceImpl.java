@@ -5,6 +5,7 @@ import com.projeto.produto.dto.VeiculoResponseDTO;
 import com.projeto.produto.entity.*;
 import com.projeto.produto.repository.*;
 import com.projeto.produto.utils.CarregarTipos;
+import com.projeto.produto.utils.ImprimirAnexosServiceImpl;
 import net.sf.jasperreports.engine.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -44,7 +45,7 @@ public class VeiculoServiceImpl {
     private PontosTaxiRepository pontosTaxiRepository;
 
     @Autowired
-    private PermissaoRepository permissaoRepository;
+    private ImprimirAnexosServiceImpl imprimirAnexosService;
 
     private static final Logger logger = LogManager.getLogger(VeiculoServiceImpl.class);
 
@@ -480,38 +481,14 @@ public class VeiculoServiceImpl {
         }
     }
 
-    public byte[] imprimirAnexoCrlv(String idVeiculo, String modulo) {
-        logger.info("Início Impressão Anexo CRLV Busca dos Dados");
+    public byte[] imprimirAnexo(String idAplicacao, String aplicacao, String anexo, String modulo) {
+        logger.info("Início Impressão do Anexo do Veículo Busca dos Dados");
         try{
-            Veiculo veiculo = veiculoRepository.findVeiculoByIdVeiculo(Long.valueOf(idVeiculo));
-            if(Objects.isNull(veiculo))
-                throw new RuntimeException("400");
-
-            byte[] bytes = imprimirAnexoCrlv(veiculo, modulo);
+            byte[] bytes = imprimirAnexosService.imprimirAnexo(idAplicacao, aplicacao, anexo, modulo);
             return bytes;
         } catch (Exception e){
-            logger.error("gerarLaudoVistoria - Permissão: " + e.getMessage());
+            logger.error("imprimirAnexo - Veículo: " + e.getMessage());
             throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    public byte[] imprimirAnexoCrlv(Veiculo veiculo, String modulo) {
-        logger.info("Início Imprimir Anexo CRLV Jasper");
-        try{
-            ClassPathResource resource = new ClassPathResource("reports/anexoCrlv.jrxml");
-            JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
-
-            InputStream fotoStream = new ByteArrayInputStream(veiculo.getCrlv());
-            Map<String, Object> parameters = new HashMap<>();
-            parameters.put("imagemAnexo", fotoStream);
-
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
-
-            byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
-            return bytes;
-        } catch (Exception e){
-            logger.error("imprimirAnexoCrlv: " + e.getMessage());
-            throw new RuntimeException("500");
         }
     }
 
