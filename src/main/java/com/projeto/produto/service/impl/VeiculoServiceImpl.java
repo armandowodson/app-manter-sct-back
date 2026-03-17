@@ -61,7 +61,10 @@ public class VeiculoServiceImpl {
             veiculo = veiculoRepository.save(veiculo);
 
             //Auditoria
-            salvarAuditoria("VEÍCULO TÁXI", "INCLUSÃO", veiculoRequestDTO.getUsuario());
+            salvarAuditoria("VEÍCULO MOTO TÁXI", "INCLUSÃO", veiculoRequestDTO.getUsuario());
+        } catch (RuntimeException e){
+            logger.error("inserirVeiculo: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         } catch (Exception e){
             throw new RuntimeException("Não foi possível inserir os dados do Veículo!");
         }
@@ -82,8 +85,11 @@ public class VeiculoServiceImpl {
             veiculo = veiculoRepository.save(veiculo);
 
             //Auditoria
-            salvarAuditoria("VEÍCULO TÁXI", "ALTERAÇÃO", veiculoRequestDTO.getUsuario());
-        }catch (Exception e){
+            salvarAuditoria("VEÍCULO MOTO TÁXI", "ALTERAÇÃO", veiculoRequestDTO.getUsuario());
+        } catch (RuntimeException e){
+            logger.error("atualizarVeiculo: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        } catch (Exception e){
             throw new RuntimeException("Não foi possível atualizar os dados do Veículo!");
         }
 
@@ -164,7 +170,7 @@ public class VeiculoServiceImpl {
             veiculoRepository.save(veiculo);
 
             //Auditoria
-            salvarAuditoria("VEÍCULO TÁXI", "EXCLUSÃO", usuario);
+            salvarAuditoria("VEÍCULO MOTO TÁXI", "EXCLUSÃO", usuario);
 
             return ResponseEntity.noContent().build();
         }catch (Exception e){
@@ -361,11 +367,9 @@ public class VeiculoServiceImpl {
 
             JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
             FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoCertificadoAnualVistoriaMoto.png" ).getAbsolutePath());
-            FileInputStream rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeCertificadoAnualVistoriaMoto.png" ).getAbsolutePath());
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("imagemCabecalho", cabecalhoStream);
-            parameters.put("imagemRodape", rodapeStream);
 
             //CERTIFICADO
             parameters.put("numeroCavEmitido", Objects.nonNull(veiculo.getNumeroCavEmitido()) ? veiculo.getNumeroCavEmitido() : StringUtils.leftPad(veiculo.getIdVeiculo().toString(), 5, "0") + "/" + LocalDate.now().getYear());
@@ -443,12 +447,10 @@ public class VeiculoServiceImpl {
 
             FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoLaudoVistoriaMoto.png" ).getAbsolutePath());
             FileInputStream itensAvaliacaoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/itensAvaliacaoVeiculoMoto.png" ).getAbsolutePath());
-            FileInputStream rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeLaudoVistoriaMoto.png" ).getAbsolutePath());
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("imagemCabecalho", cabecalhoStream);
             parameters.put("imagemItensAvaliacaoVeiculo", itensAvaliacaoStream);
-            parameters.put("imagemRodape", rodapeStream);
             parameters.put("numeroProcesso", veiculo.getIdVeiculo().toString());
             LocalDate localDate = LocalDate.now();
             parameters.put("diaMesAno", localDate.getDayOfMonth() + " de " + mesDoAno(localDate.getMonthValue())  + " de " + localDate.getYear());

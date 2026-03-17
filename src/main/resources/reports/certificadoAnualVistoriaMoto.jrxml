@@ -52,7 +52,7 @@
 		<band splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="561" splitType="Stretch">
+		<band height="539" splitType="Stretch">
 			<rectangle>
 				<reportElement x="3" y="320" width="546" height="22" backcolor="#E0DADA" uuid="fd7f9fa3-5f20-42a2-ba92-d48e7e196bf2">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -67,10 +67,6 @@
 					<pen lineColor="#FFFFFF"/>
 				</graphicElement>
 			</rectangle>
-			<image scaleImage="FillFrame" hAlign="Left">
-				<reportElement x="5" y="350" width="533" height="200" uuid="886cf715-2a31-43fb-8fbd-56bbc50ca539"/>
-				<imageExpression><![CDATA[$P{imagemRodape}]]></imageExpression>
-			</image>
 			<staticText>
 				<reportElement x="5" y="198" width="94" height="17" uuid="4f0ae908-a716-4298-9dfa-0d53cffd8929"/>
 				<textElement verticalAlignment="Middle">
@@ -470,6 +466,51 @@
 					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Prazo p/ regularização das Ressalvas(max.30 dias)______/______/______ Regularizado em:______/______/_______]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="3" y="346" width="547" height="17" forecolor="#FFFFFF" backcolor="#FF6B6B" uuid="a7e9b055-1729-4878-ab33-fef752f7a3cf"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[!! RESTRIÇÕES E OBRIGAÇÕES ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="364" width="546" height="83" uuid="98ca3876-2f91-42a4-910c-06a3520e32a5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Top">
+					<font fontName="Times New Roman" size="11" isBold="false"/>
+				</textElement>
+				<text><![CDATA[• Este certificado é específico para o veículo identificado acima e intransferível.
+• Manter o veículo em perfeitas condições de segurança e higiene durante toda a vigência.
+• A renovação anual deste Certificado de Vistoria (CAV) é obrigatória para continuidade da operação.
+• Em caso de reprovação na vistoria, o veículo deverá ser retirado imediatamente de operação.
+• O CAV e o TAS deverão permanecer acessíveis durante a prestação do serviço para fins de fiscalização.
+• Cumprir integralmente as normas de trânsito e a legislação municipal.
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="448" width="546" height="25" uuid="70522a1c-6d37-4396-9c89-04034b485e91"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Barreirinhas - MA, _____ de __________________ de _______]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="484" width="262" height="46" uuid="60ff83e6-3209-47e4-853f-e34b78bfd282"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[______________________________________
+Autorizatário]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="278" y="484" width="262" height="46" uuid="8fac9947-65f3-4061-9e8e-333e8c792cc5"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[______________________________________
+Departamento Municipal de Trânsito - DMT]]></text>
 			</staticText>
 		</band>
 	</columnHeader>

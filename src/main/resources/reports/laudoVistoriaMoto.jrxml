@@ -103,10 +103,6 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{renavam}]]></textFieldExpression>
 			</textField>
-			<image scaleImage="RealSize" hAlign="Left">
-				<reportElement x="4" y="508" width="543" height="138" uuid="886cf715-2a31-43fb-8fbd-56bbc50ca539"/>
-				<imageExpression><![CDATA[$P{imagemRodape}]]></imageExpression>
-			</image>
 			<staticText>
 				<reportElement x="6" y="16" width="74" height="17" uuid="4f0ae908-a716-4298-9dfa-0d53cffd8929"/>
 				<textElement verticalAlignment="Middle">
@@ -204,14 +200,14 @@
 				<textFieldExpression><![CDATA[$P{quilometragem}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="282" y="404" width="99" height="17" uuid="b610484f-fe8d-45e0-a9b8-768b44e467e4"/>
+				<reportElement x="282" y="442" width="99" height="17" uuid="b610484f-fe8d-45e0-a9b8-768b44e467e4"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Status Vistoria:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="382" y="404" width="167" height="17" uuid="f2fd4867-37ea-4919-b234-5da10361c101">
+				<reportElement x="382" y="442" width="167" height="17" uuid="f2fd4867-37ea-4919-b234-5da10361c101">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -220,7 +216,7 @@
 				<textFieldExpression><![CDATA[$P{statusVistoria}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="176" y="423" width="93" height="17" uuid="7cc01fde-7320-4dad-9b40-8837211d57f0">
+				<reportElement x="176" y="461" width="93" height="17" uuid="7cc01fde-7320-4dad-9b40-8837211d57f0">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -229,14 +225,14 @@
 				<textFieldExpression><![CDATA[$P{proximaVistoria}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="6" y="423" width="168" height="17" uuid="8ebcdecb-9306-436e-8a67-25aa6fbb95d4"/>
+				<reportElement x="6" y="461" width="168" height="17" uuid="8ebcdecb-9306-436e-8a67-25aa6fbb95d4"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Próxima Vistoria Obrigatória:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="4" y="482" width="544" height="24" uuid="94e78a46-b6b9-497e-92ec-61fd41046e3e">
+				<reportElement x="4" y="520" width="544" height="24" uuid="94e78a46-b6b9-497e-92ec-61fd41046e3e">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Justified">
@@ -268,14 +264,14 @@
 				<text><![CDATA[IDENTIFICAÇÃO DO AUTORIZATÁRIO E DO VEÍCULO]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="3" y="387" width="547" height="17" forecolor="#FFFFFF" backcolor="#2F1491" uuid="6f5ff4eb-5ca9-43a5-9a3f-dd47e0efea28"/>
+				<reportElement mode="Opaque" x="3" y="425" width="547" height="17" forecolor="#FFFFFF" backcolor="#2F1491" uuid="6f5ff4eb-5ca9-43a5-9a3f-dd47e0efea28"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="10" isBold="true"/>
 				</textElement>
 				<text><![CDATA[RESULTADO DA VISTORIA]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="441" y="423" width="108" height="17" uuid="8b3a3e8c-b666-4c91-a639-ffd1dccaf8b9">
+				<reportElement x="441" y="461" width="108" height="17" uuid="8b3a3e8c-b666-4c91-a639-ffd1dccaf8b9">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -284,14 +280,14 @@
 				<textFieldExpression><![CDATA[$P{numeroCavEmitido}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="271" y="423" width="168" height="17" uuid="346faa9c-fc79-449e-bbfd-4268f070bbe9"/>
+				<reportElement x="271" y="461" width="168" height="17" uuid="346faa9c-fc79-449e-bbfd-4268f070bbe9"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Nº CAV Emitido (se aprovado):]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="176" y="443" width="372" height="17" uuid="a4f12c15-80e8-47d5-9f53-9c2a23424c11">
+				<reportElement x="176" y="481" width="372" height="17" uuid="a4f12c15-80e8-47d5-9f53-9c2a23424c11">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -300,21 +296,21 @@
 				<textFieldExpression><![CDATA[$P{ressalvas}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="6" y="443" width="168" height="17" uuid="3a7848a4-6817-4962-9191-60f5b0efd1b7"/>
+				<reportElement x="6" y="481" width="168" height="17" uuid="3a7848a4-6817-4962-9191-60f5b0efd1b7"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Ressalvas / Itens a regularizar: ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="3" y="463" width="547" height="17" forecolor="#FFFFFF" backcolor="#2F1491" uuid="409e1fbc-0aa5-4342-ae93-a225a0b3b2f5"/>
+				<reportElement mode="Opaque" x="3" y="501" width="547" height="17" forecolor="#FFFFFF" backcolor="#2F1491" uuid="409e1fbc-0aa5-4342-ae93-a225a0b3b2f5"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="10" isBold="true"/>
 				</textElement>
 				<text><![CDATA[OBSERVAÇÕES]]></text>
 			</staticText>
 			<image scaleImage="FillFrame" hAlign="Center">
-				<reportElement x="3" y="83" width="542" height="300" uuid="52e54036-6faf-408a-b25f-a64d00460549"/>
+				<reportElement x="3" y="83" width="542" height="334" uuid="52e54036-6faf-408a-b25f-a64d00460549"/>
 				<imageExpression><![CDATA[$P{imagemItensAvaliacaoVeiculo}]]></imageExpression>
 			</image>
 			<staticText>
@@ -366,7 +362,7 @@
 				<textFieldExpression><![CDATA[$P{cor}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="106" y="404" width="174" height="17" uuid="4743b660-2609-40aa-b0d8-5f35d3270080">
+				<reportElement x="106" y="442" width="174" height="17" uuid="4743b660-2609-40aa-b0d8-5f35d3270080">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -375,11 +371,30 @@
 				<textFieldExpression><![CDATA[$P{tipoVistoria}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="6" y="404" width="99" height="17" uuid="3541747f-3591-46e0-9c5b-45788800fe06"/>
+				<reportElement x="6" y="442" width="99" height="17" uuid="3541747f-3591-46e0-9c5b-45788800fe06"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Tipo Vistoria:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="281" y="565" width="262" height="46" uuid="86d62c89-516a-41c3-b3e4-4a70fd5b7747"/>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[__________________________________________
+Vistoriador DMT
+Matrícula: ________________________
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="565" width="262" height="46" uuid="df8cccf6-b229-4fac-a003-4310242435a4"/>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[_________________________________________
+Autorizatário 	
+CPF: _________________________]]></text>
 			</staticText>
 		</band>
 	</columnHeader>

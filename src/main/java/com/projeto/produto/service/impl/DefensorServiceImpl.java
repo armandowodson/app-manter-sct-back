@@ -87,9 +87,12 @@ public class DefensorServiceImpl {
             defensor = defensorRepository.save(defensor);
 
             //Auditoria
-            salvarAuditoria("DEFENSOR TÁXI", "INCLUSÃO", defensorRequestDTO.getUsuario());
+            salvarAuditoria("DEFENSOR MOTO TÁXI", "INCLUSÃO", defensorRequestDTO.getUsuario());
 
             return converterDefensorToDefensorDTO(defensor);
+        } catch (RuntimeException e){
+            logger.error("inserirDefensor: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         } catch (Exception e){
             logger.error("inserirDefensor: " + e.getMessage());
             throw new RuntimeException("Não foi possível inserir os dados do Defensor!");
@@ -133,9 +136,12 @@ public class DefensorServiceImpl {
             defensor = defensorRepository.save(defensor);
 
             //Auditoria
-            salvarAuditoria("DEFENSOR TÁXI", "ALTERAÇÃO", defensorRequestDTO.getUsuario());
+            salvarAuditoria("DEFENSOR MOTO TÁXI", "ALTERAÇÃO", defensorRequestDTO.getUsuario());
 
             return converterDefensorToDefensorDTO(defensorRepository.save(defensor));
+        } catch (RuntimeException e){
+            logger.error("atualizarDefensor: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         } catch (Exception e){
             logger.error("atualizarDefensor: " + e.getMessage());
             throw new RuntimeException("Não foi possível alterar os dados do Defensor!");
@@ -266,7 +272,7 @@ public class DefensorServiceImpl {
             defensorRepository.save(defensor);
 
             //Auditoria
-            salvarAuditoria("DEFENSOR TÁXI", "EXCLUSÃO", usuario);
+            salvarAuditoria("DEFENSOR MOTO TÁXI", "EXCLUSÃO", usuario);
 
             return ResponseEntity.noContent().build();
         } catch (Exception e){
@@ -488,12 +494,10 @@ public class DefensorServiceImpl {
             JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
 
             FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoRegistroCondutorMoto.png" ).getAbsolutePath());
-            FileInputStream rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeRegistroCondutorMoto.png" ).getAbsolutePath());
             InputStream fotoStream = new ByteArrayInputStream(defensor.getFoto());
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("imagemCabecalho", cabecalhoStream);
-            parameters.put("imagemRodape", rodapeStream);
             parameters.put("imagemFoto", fotoStream);
 
             //REGISTRO DO CONDUTOR

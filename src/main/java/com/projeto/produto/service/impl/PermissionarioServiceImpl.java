@@ -28,8 +28,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -40,9 +38,6 @@ public class PermissionarioServiceImpl {
 
     @Autowired
     private AuditoriaRepository auditoriaRepository;
-
-    @Autowired
-    private PermissaoRepository permissaoRepository;
 
     @Autowired
     private VeiculoRepository veiculoRepository;
@@ -96,7 +91,10 @@ public class PermissionarioServiceImpl {
             permissionario = permissionarioRepository.save(permissionario);
 
             //Auditoria
-            salvarAuditoria("AUTORIZATÁRIO TÁXI", "INCLUSÃO", permissionarioRequestDTO.getUsuario());
+            salvarAuditoria("AUTORIZATÁRIO MOTO TÁXI", "INCLUSÃO", permissionarioRequestDTO.getUsuario());
+        } catch (RuntimeException e){
+            logger.error("inserirPermissionario: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         } catch (Exception e){
             logger.error("inserirPermissionario - " + e.getMessage());
             throw new RuntimeException("Não foi possível inserir os dados do Autorizatário!");
@@ -146,7 +144,10 @@ public class PermissionarioServiceImpl {
             permissionario = permissionarioRepository.save(permissionario);
 
             //Auditoria
-            salvarAuditoria("AUTORIZATÁRIO TÁXI", "ALTERAÇÃO", permissionarioRequestDTO.getUsuario());
+            salvarAuditoria("AUTORIZATÁRIO MOTO TÁXI", "ALTERAÇÃO", permissionarioRequestDTO.getUsuario());
+        } catch (RuntimeException e){
+            logger.error("atualizarPermissionario: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         } catch (Exception e){
             logger.error("atualizarPermissionario - " + e.getMessage());
             throw new RuntimeException("Não foi possível alterar os dados do Autorizatário!");
@@ -272,10 +273,13 @@ public class PermissionarioServiceImpl {
             permissionarioRepository.save(permissionario);
 
             //Auditoria
-            salvarAuditoria("AUTORIZATÁRIO TÁXI", "EXCLUSÃO", usuario);
+            salvarAuditoria("AUTORIZATÁRIO MOTO TÁXI", "EXCLUSÃO", usuario);
 
             return ResponseEntity.noContent().build();
-        }catch (Exception e){
+        } catch (RuntimeException e){
+            logger.error("excluirPermissionario: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        } catch (Exception e){
             logger.error("excluirPermissionario - " + e.getMessage());
             throw new RuntimeException(msgErro);
         }
@@ -471,12 +475,10 @@ public class PermissionarioServiceImpl {
             JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
 
             FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoRegistroCondutorMoto.png" ).getAbsolutePath());
-            FileInputStream rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeRegistroCondutorMoto.png" ).getAbsolutePath());
             InputStream fotoStream = new ByteArrayInputStream(permissionario.getFoto());
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("imagemCabecalho", cabecalhoStream);
-            parameters.put("imagemRodape", rodapeStream);
             parameters.put("imagemFoto", fotoStream);
 
             //REGISTRO DO CONDUTOR
@@ -578,7 +580,7 @@ public class PermissionarioServiceImpl {
     }
 
     public byte[] gerarTermoAutorizacaoServico(String cpfPermissionario, String modulo) {
-        logger.info("Início Gerar Registro Condutor Busca dos Dados");
+        logger.info("Início Gerar Termo de Autorização de Serviço Busca dos Dados");
         try{
             Permissionario permissionario = permissionarioRepository.findPermissionarioByCpfPermissionario(cpfPermissionario);
             if(Objects.isNull(permissionario))
@@ -593,7 +595,7 @@ public class PermissionarioServiceImpl {
             byte[] bytes = gerarTermoAutorizacaoServico(defensor, veiculo, permissionario, modulo);
             return bytes;
         } catch (Exception e){
-            logger.error("gerarRegistroCondutor - Autorizatário: " + e.getMessage());
+            logger.error("gerarTermoAutorizacaoServico - Autorizatário: " + e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
     }
@@ -605,11 +607,9 @@ public class PermissionarioServiceImpl {
             JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
 
             FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoTermoAutorizacaoMoto.png" ).getAbsolutePath());
-            FileInputStream rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeTermoAutorizacaoMoto.png" ).getAbsolutePath());
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("imagemCabecalho", cabecalhoStream);
-            parameters.put("imagemRodape", rodapeStream);
             //PERMISSÃO
             parameters.put("numeroTas", StringUtils.leftPad(permissionario.getIdPermissionario().toString() + veiculo.getIdVeiculo().toString(), 8, "0") + "/" + permissionario.getDataCriacao().getYear());
             parameters.put("dataEmissao", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(LocalDate.now()));
@@ -650,7 +650,7 @@ public class PermissionarioServiceImpl {
             parameters.put("cpfDefensor", Objects.nonNull(defensor.getCpfDefensor()) ? defensor.getCpfDefensor() : "");
             parameters.put("rgDefensor", Objects.nonNull(defensor.getRgDefensor()) ? defensor.getRgDefensor() : "");
             parameters.put("cnhDefensor", Objects.nonNull(defensor.getCnhDefensor()) ? defensor.getCnhDefensor() : "");
-            parameters.put("validadeCnh", DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataValidadeCnh()));
+            parameters.put("validadeCnh", Objects.nonNull(defensor.getDataValidadeCnh()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataValidadeCnh()) : "");
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
 

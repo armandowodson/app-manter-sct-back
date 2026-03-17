@@ -66,7 +66,7 @@
 		<band splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="624" splitType="Stretch">
+		<band height="636" splitType="Stretch">
 			<rectangle>
 				<reportElement x="5" y="48" width="544" height="22" uuid="42759a65-a8d6-48b1-961d-d7a19888572f"/>
 			</rectangle>
@@ -245,10 +245,6 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{dataVistoria}]]></textFieldExpression>
 			</textField>
-			<image hAlign="Left">
-				<reportElement x="7" y="430" width="535" height="190" uuid="886cf715-2a31-43fb-8fbd-56bbc50ca539"/>
-				<imageExpression><![CDATA[$P{imagemRodape}]]></imageExpression>
-			</image>
 			<textField>
 				<reportElement x="298" y="51" width="249" height="17" uuid="6abd3a02-6b95-40da-a282-d85164d257e9">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -678,6 +674,51 @@
 					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Validade:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="451" width="546" height="99" uuid="ceaaf385-a7eb-4936-8fa2-ecc2f53cd380">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Top">
+					<font fontName="Times New Roman" size="11" isBold="false"/>
+				</textElement>
+				<text><![CDATA[• Esta autorização é intransferível e de caráter personalíssimo, conforme Art. 6º, §1º da Lei Municipal.
+• Cada autorizatário tem direito a apenas um TAS, vinculado a uma única motocicleta.
+• O autorizatário é responsável pela manutenção do veículo em perfeitas condições de segurança e higiene.
+• Obrigatoriedade de renovação anual do Certificado Anual de Vistoria (CAV) para manutenção desta autorização.
+• A transferência do TAS somente é permitida mediante prévia anuência do DMT (Art. 10).
+• Cumprir integralmente as normas de trânsito e a legislação municipal.
+• É vedado ao condutor prestar o serviço de transporte de passageiros sem portar o presente Termo de Autorização.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="278" y="586" width="262" height="37" uuid="02c85b83-dc1e-4db2-a6dd-486116bb1b0e"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[______________________________________
+Departamento Municipal de Trânsito - DMT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="562" width="546" height="25" uuid="cc4f96eb-e360-4ec8-abe7-613aa706d4eb"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Barreirinhas - MA, _____ de __________________ de _______]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="586" width="262" height="37" uuid="508abfb8-74af-497f-83e9-64f852414fa5"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[______________________________________
+Autorizatário / Responsável]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="3" y="434" width="547" height="17" forecolor="#FFFFFF" backcolor="#FF6B6B" uuid="79242244-97de-43c2-8a2a-d06ee3a35306"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[!! RESTRIÇÕES E OBRIGAÇÕES ]]></text>
 			</staticText>
 		</band>
 	</columnHeader>

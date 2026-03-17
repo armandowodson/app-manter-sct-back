@@ -24,7 +24,7 @@ public class PontoTaxiController {
             Page<PontoTaxiDTO> pontos = service.listarTodosPontosTaxi(pageRequest);
             return pontos;
         } catch (Exception e){
-            throw new RuntimeException("Não foi possível consultar todos os Pontos de Estacionamentos de Táxi cadastrados!");
+            throw new RuntimeException("Não foi possível consultar todos os Pontos de Estacionamentos de Moto Táxi cadastrados!");
         }
     }
 
@@ -33,7 +33,7 @@ public class PontoTaxiController {
         try{
             return ResponseEntity.ok(service.buscarPontoTaxiId(idPontoTaxi));
         } catch (Exception e){
-            throw new RuntimeException("Não foi possível consultar o Ponto de Estacionamento de Táxi pelo ID!");
+            throw new RuntimeException("Não foi possível consultar o Ponto de Estacionamento de Moto Táxi pelo ID!");
         }
     }
 
@@ -55,7 +55,7 @@ public class PontoTaxiController {
 
             return pontos;
         } catch (Exception e){
-            throw new RuntimeException("Não foi possível consultar os Pontos de Estacionamentos de Táxi com os filtros informados!");
+            throw new RuntimeException("Não foi possível consultar os Pontos de Estacionamentos de Moto Táxi com os filtros informados!");
         }
 
     }

@@ -43,9 +43,9 @@ public class PontosTaxiServiceImpl {
             pontoTaxi = pontosTaxiRepository.save(pontoTaxi);
 
             //Auditoria
-            salvarAuditoria("PONTO DE ESTACIONAMENTO DE TÁXI", "INCLUSÃO", pontoTaxiDTO.getUsuario());
+            salvarAuditoria("PONTO DE ESTACIONAMENTO DE MOTO TÁXI", "INCLUSÃO", pontoTaxiDTO.getUsuario());
         } catch (Exception e){
-            throw new RuntimeException("Não foi possível inserir os dados do Ponto de Estacionamento de Táxi!");
+            throw new RuntimeException("Não foi possível inserir os dados do Ponto de Estacionamento de Moto Táxi!");
         }
 
         return converterPontoTaxiToPontoTaxiDTO(pontoTaxi);
@@ -61,9 +61,9 @@ public class PontosTaxiServiceImpl {
             pontoTaxi = converterPontoTaxiDTOToPontoTaxi(pontoTaxiDTO);
             pontoTaxi = pontosTaxiRepository.save(pontoTaxi);
             //Auditoria
-            salvarAuditoria("PONTO DE ESTACIONAMENTO DE TÁXI", "ALTERAÇÃO", pontoTaxiDTO.getUsuario());
+            salvarAuditoria("PONTO DE ESTACIONAMENTO DE MOTO TÁXI", "ALTERAÇÃO", pontoTaxiDTO.getUsuario());
         } catch (Exception e){
-            throw new RuntimeException("Não foi possível alterar os dados do Ponto de Estacionamento de Táxi!");
+            throw new RuntimeException("Não foi possível alterar os dados do Ponto de Estacionamento de Moto Táxi!");
         }
 
         return converterPontoTaxiToPontoTaxiDTO(pontoTaxi);
@@ -138,11 +138,11 @@ public class PontosTaxiServiceImpl {
             pontosTaxiRepository.save(pontoTaxi);
 
             //Auditoria
-            salvarAuditoria("PONTO DE ESTACIONAMENTO DE TÁXI", "EXCLUSÃO", usuario);
+            salvarAuditoria("PONTO DE ESTACIONAMENTO DE MOTO TÁXI", "EXCLUSÃO", usuario);
 
             return ResponseEntity.noContent().build();
         }catch (Exception e){
-            throw new RuntimeException("Erro ao Excluir o Ponto de Estacionamento de Táxi!!!");
+            throw new RuntimeException("Erro ao Excluir o Ponto de Estacionamento de Moto Táxi!!!");
         }
     }
 

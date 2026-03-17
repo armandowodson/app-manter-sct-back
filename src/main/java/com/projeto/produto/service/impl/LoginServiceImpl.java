@@ -7,6 +7,8 @@ import com.projeto.produto.entity.LoginModulo;
 import com.projeto.produto.repository.LoginModuloRepository;
 import com.projeto.produto.repository.LoginRepository;
 import com.projeto.produto.utils.ValidaCPF;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,8 @@ public class LoginServiceImpl {
 
     @Autowired
     private LoginModuloRepository loginModuloRepository;
+
+    private static final Logger logger = LogManager.getLogger(LoginServiceImpl.class);
 
     public LoginDTO efetuarLogin(String login, String senha) {
         if(Objects.nonNull(login) && !login.isEmpty() &&  !ValidaCPF.isCPF(login))
@@ -63,7 +67,11 @@ public class LoginServiceImpl {
                 loginModuloRepository.save(loginModulo);
             }
 
+        } catch (RuntimeException e){
+            logger.error("gravarUsuario: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         } catch (Exception e){
+            logger.error("gravarUsuario: " + e.getMessage());
             throw new RuntimeException("Não foi possível gravar o Usuário!");
         }
         return converterLoginToLoginDTO(login);
@@ -99,7 +107,11 @@ public class LoginServiceImpl {
                 }
             }
 
+        } catch (RuntimeException e){
+            logger.error("alterarSenha: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         } catch (Exception e){
+            logger.error("alterarSenha: " + e.getMessage());
             throw new RuntimeException("Não foi possível alterar a senha do Usuário!");
         }
         return converterLoginToLoginDTO(login);
