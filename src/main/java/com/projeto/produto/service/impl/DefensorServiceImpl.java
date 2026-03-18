@@ -66,10 +66,20 @@ public class DefensorServiceImpl {
                                                    MultipartFile foto) {
         logger.info("Início Inserir Defensor");
         try {
+            String cpfOriginal = "";
+            if(Objects.nonNull(defensorRequestDTO.getCpfDefensor())) {
+                cpfOriginal = defensorRequestDTO.getCpfDefensor();
+                defensorRequestDTO.setCpfDefensor(defensorRequestDTO.getCpfDefensor().replace(".", "").replace("-", ""));
+            }
+            if(Objects.nonNull(defensorRequestDTO.getCpfDefensor()) && !defensorRequestDTO.getCpfDefensor().isEmpty() &&
+                    defensorRequestDTO.getCpfDefensor().length() < 11){
+                defensorRequestDTO.setCpfDefensor(StringUtils.leftPad(defensorRequestDTO.getCpfDefensor(), 11, "0"));
+            }
             if(Objects.nonNull(defensorRequestDTO.getCpfDefensor()) && !defensorRequestDTO.getCpfDefensor().isEmpty() &&
                     !ValidaCPF.isCPF(defensorRequestDTO.getCpfDefensor()))
                 throw new RuntimeException("O CPF " + defensorRequestDTO.getCpfDefensor() + " é inválido!");
 
+            defensorRequestDTO.setCpfDefensor(cpfOriginal);
             if(Objects.nonNull(defensorRequestDTO.getEmailDefensor()) && !defensorRequestDTO.getEmailDefensor().isEmpty() &&
                     !ValidaEmail.isEmail(defensorRequestDTO.getEmailDefensor()))
                 throw new RuntimeException("O E-mail " + defensorRequestDTO.getEmailDefensor() + " é inválido!");
@@ -113,11 +123,21 @@ public class DefensorServiceImpl {
                                                  MultipartFile apoliceSeguroMotocicleta,
                                                  MultipartFile foto) {
         logger.info("Início Atualizar Defensor");
+        String cpfOriginal = "";
         try{
+            if(Objects.nonNull(defensorRequestDTO.getCpfDefensor())) {
+                cpfOriginal = defensorRequestDTO.getCpfDefensor();
+                defensorRequestDTO.setCpfDefensor(defensorRequestDTO.getCpfDefensor().replace(".", "").replace("-", ""));
+            }
+            if(Objects.nonNull(defensorRequestDTO.getCpfDefensor()) && !defensorRequestDTO.getCpfDefensor().isEmpty() &&
+                    defensorRequestDTO.getCpfDefensor().length() < 11){
+                defensorRequestDTO.setCpfDefensor(StringUtils.leftPad(defensorRequestDTO.getCpfDefensor(), 11, "0"));
+            }
             if(Objects.nonNull(defensorRequestDTO.getCpfDefensor()) && !defensorRequestDTO.getCpfDefensor().isEmpty() &&
                     !ValidaCPF.isCPF(defensorRequestDTO.getCpfDefensor()))
                 throw new RuntimeException("O CPF " + defensorRequestDTO.getCpfDefensor() + " é inválido!");
 
+            defensorRequestDTO.setCpfDefensor(cpfOriginal);
             if(Objects.nonNull(defensorRequestDTO.getEmailDefensor()) && !defensorRequestDTO.getEmailDefensor().isEmpty() &&
                     !ValidaEmail.isEmail(defensorRequestDTO.getEmailDefensor()))
                 throw new RuntimeException("O E-mail " + defensorRequestDTO.getEmailDefensor() + " é inválido!");
@@ -161,7 +181,7 @@ public class DefensorServiceImpl {
         }
     }
 
-    public DefensorResponseDTO buscarDefensorId(Long idDefensor) {
+    public DefensorResponseDTO buscarDefensorId(Integer idDefensor) {
         logger.info("Início Buscar Defensor por ID");
         try{
             Defensor defensor = defensorRepository.findDefensorByIdDefensor(idDefensor);
@@ -180,7 +200,7 @@ public class DefensorServiceImpl {
         logger.info("Início Buscar Defensor por Número de Permissão");
         String msg = "";
         try{
-            Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(Long.valueOf(idPermissionario));
+            Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(Integer.valueOf(idPermissionario));
             if(Objects.isNull(permissionario))
                 msg = "Não foi possível encontrar o Autorizatário!";
 
@@ -234,7 +254,7 @@ public class DefensorServiceImpl {
         }
     }
 
-    public List<DefensorResponseDTO> listarDefensoresDisponiveis(Long idDefensor) {
+    public List<DefensorResponseDTO> listarDefensoresDisponiveis(Integer idDefensor) {
         logger.info("Início Listar Defensores Disponíveis");
         try{
             List<DefensorResponseDTO> listaDefensorResponseDTO = new ArrayList<>();
@@ -260,7 +280,7 @@ public class DefensorServiceImpl {
     }
 
     @Transactional
-    public ResponseEntity<Void> excluirDefensor(Long idDefensor, String usuario) {
+    public ResponseEntity<Void> excluirDefensor(Integer idDefensor, String usuario) {
         logger.info("Início Excluir Defensor");
         String msgErro = "Erro ao Excluir o Defensor!!";
         try{
@@ -381,9 +401,6 @@ public class DefensorServiceImpl {
             defensor.setNomeDefensor(defensorRequestDTO.getNomeDefensor());
 
             if(Objects.nonNull(defensorRequestDTO.getCpfDefensor()) && !defensorRequestDTO.getCpfDefensor().isEmpty()){
-                defensorRequestDTO.setCpfDefensor(
-                        defensorRequestDTO.getCpfDefensor().replace(".", "").replace("-", "").replace("/", "")
-                );
                 defensor.setCpfDefensor(StringUtils.leftPad(defensorRequestDTO.getCpfDefensor(), 11, "0"));
             }
 
@@ -467,7 +484,7 @@ public class DefensorServiceImpl {
     public byte[] gerarRegistroCondutor(String idPermissionario, String modulo) {
         logger.info("Início Gerar Registro Condutor Busca dos Dados");
         try{
-            Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(Long.valueOf(idPermissionario));
+            Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(Integer.valueOf(idPermissionario));
             if(Objects.isNull(permissionario))
                 throw new RuntimeException("400");
 
@@ -545,9 +562,9 @@ public class DefensorServiceImpl {
             else
                 documentacaoExigida1 = documentacaoExigida1 + "[ ] CNH Categoria 'A' (mín. 2 anos de experiência)\n";
             if(Objects.nonNull(defensor.getComprovanteResidencia()))
-                documentacaoExigida1 = documentacaoExigida1 + "[x] Comprovante residência em Barreirinhas (mín. 3 anos)\n";
+                documentacaoExigida1 = documentacaoExigida1 + "[x] Comprovante residência em Barreirinhas\n";
             else
-                documentacaoExigida1 = documentacaoExigida1 + "[ ] Comprovante residência em Barreirinhas (mín. 3 anos)\n";
+                documentacaoExigida1 = documentacaoExigida1 + "[ ] Comprovante residência em Barreirinhas\n";
             if(Objects.nonNull(defensor.getCertidaoNegativaMunicipal()))
                 documentacaoExigida1 = documentacaoExigida1 + "[x] Certidão negativa de multas e ocorrências DETRAN-MA\n";
             else

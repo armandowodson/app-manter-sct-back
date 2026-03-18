@@ -17,7 +17,7 @@ public interface PermissionarioRepository extends JpaRepository<Permissionario, 
     )
     List<Permissionario> buscarTodos(Pageable pageable);
 
-    Permissionario findPermissionarioByIdPermissionario(Long idPermissionario);
+    Permissionario findPermissionarioByIdPermissionario(Integer idPermissionario);
 
     @Query(
             value = "SELECT * " +

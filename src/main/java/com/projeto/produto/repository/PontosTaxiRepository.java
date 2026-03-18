@@ -19,11 +19,11 @@ public interface PontosTaxiRepository extends JpaRepository<PontoTaxi, Long> {
     )
     List<PontoTaxi> buscarTodos(Pageable pageable);
 
-    PontoTaxi findByIdPontoTaxi(Long idPontoTaxi);
+    PontoTaxi findByIdPontoTaxi(Integer idPontoTaxi);
 
     PontoTaxi findPontoTaxiByNumeroPonto(String numeroPonto);
 
-    void deletePontoTaxiByIdPontoTaxi(Long idPontoTaxi);
+    void deletePontoTaxiByIdPontoTaxi(Integer idPontoTaxi);
 
     @Query(
             value = "SELECT * " +

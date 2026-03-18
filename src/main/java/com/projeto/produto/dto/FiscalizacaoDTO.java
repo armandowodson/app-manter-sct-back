@@ -9,7 +9,7 @@ public class FiscalizacaoDTO {
     private Long idFiscalizacao;
     private String dataFiscalizacao;
     private String dataFiscalizacaoOriginal;
-    private Long idVeiculo;
+    private Integer idVeiculo;
     private String placa;
     private String marca;
     private String modelo;

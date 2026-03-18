@@ -103,7 +103,7 @@ public class VeiculoServiceImpl {
         return new PageImpl<>(veiculoResponseDTOList, pageRequest, countLista);
     }
 
-    public VeiculoResponseDTO buscarVeiculoId(Long idVeiculo) {
+    public VeiculoResponseDTO buscarVeiculoId(Integer idVeiculo) {
         Veiculo veiculo = veiculoRepository.findVeiculoByIdVeiculo(idVeiculo);
         VeiculoResponseDTO veiculoResponseDTO = new VeiculoResponseDTO();
         if (veiculo != null){
@@ -160,7 +160,7 @@ public class VeiculoServiceImpl {
     }
 
     @Transactional
-    public ResponseEntity<Void> excluirVeiculo(Long idVeiculo, String usuario) {
+    public ResponseEntity<Void> excluirVeiculo(Integer idVeiculo, String usuario) {
         try{
             if(Objects.isNull(usuario) || usuario.isEmpty())
                 throw new RuntimeException("Usuário não logado ou não identificado!");
@@ -340,7 +340,7 @@ public class VeiculoServiceImpl {
     public byte[] gerarCertificadoAnualVistoria(String idVeiculo, String modulo) {
         logger.info("Início Gerar Certificado Anual de Vistoria Busca dos Dados");
         try{
-            Veiculo veiculo = veiculoRepository.findVeiculoByIdVeiculo(Long.valueOf(idVeiculo));
+            Veiculo veiculo = veiculoRepository.findVeiculoByIdVeiculo(Integer.valueOf(idVeiculo));
             if(Objects.isNull(veiculo))
                 throw new RuntimeException("400");
 
@@ -348,9 +348,12 @@ public class VeiculoServiceImpl {
                     Objects.isNull(veiculo.getStatusVistoria()) || veiculo.getStatusVistoria().equals(""))
                 throw new RuntimeException("401");
 
+            if(!veiculo.getStatusVistoria().equals("1"))
+                throw new RuntimeException("402");
+
             Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(veiculo.getPermissionario().getIdPermissionario());
             if(Objects.isNull(permissionario))
-                throw new RuntimeException("402");
+                throw new RuntimeException("403");
 
             byte[] bytes = gerarCertificadoAnualVistoriaJasper(veiculo, permissionario, modulo);
             return bytes;
@@ -367,9 +370,11 @@ public class VeiculoServiceImpl {
 
             JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
             FileInputStream cabecalhoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/cabecalhoCertificadoAnualVistoriaMoto.png" ).getAbsolutePath());
+            FileInputStream rodapeStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/rodapeCertificadoAnualVistoriaMoto.png" ).getAbsolutePath());
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("imagemCabecalho", cabecalhoStream);
+            parameters.put("imagemRodape", rodapeStream);
 
             //CERTIFICADO
             parameters.put("numeroCavEmitido", Objects.nonNull(veiculo.getNumeroCavEmitido()) ? veiculo.getNumeroCavEmitido() : StringUtils.leftPad(veiculo.getIdVeiculo().toString(), 5, "0") + "/" + LocalDate.now().getYear());
@@ -419,7 +424,7 @@ public class VeiculoServiceImpl {
     public byte[] gerarLaudoVistoria(String idVeiculo, String modulo) {
         logger.info("Início Gerar Laudo Vistoria Busca dos Dados");
         try{
-            Veiculo veiculo = veiculoRepository.findVeiculoByIdVeiculo(Long.valueOf(idVeiculo));
+            Veiculo veiculo = veiculoRepository.findVeiculoByIdVeiculo(Integer.valueOf(idVeiculo));
             if(Objects.isNull(veiculo))
                 throw new RuntimeException("400");
 

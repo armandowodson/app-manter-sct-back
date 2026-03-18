@@ -18,7 +18,7 @@ public interface VeiculoRepository extends JpaRepository<Veiculo,Integer> {
     )
     List<Veiculo> buscarTodos(Pageable pageable);
 
-    Veiculo findVeiculoByIdVeiculo(Long idVeiculo);
+    Veiculo findVeiculoByIdVeiculo(Integer idVeiculo);
 
 
     Veiculo findVeiculoByPermissionarioAndStatus(Permissionario permissionario, String status);

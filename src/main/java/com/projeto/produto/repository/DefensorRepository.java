@@ -18,7 +18,7 @@ public interface DefensorRepository extends JpaRepository<Defensor, Integer> {
     )
     List<Defensor> buscarTodos(Pageable pageable);
 
-    Defensor findDefensorByIdDefensor(Long idDefensor);
+    Defensor findDefensorByIdDefensor(Integer idDefensor);
 
     Defensor findDefensorByPermissionario(Permissionario permissionario);
 
@@ -46,6 +46,6 @@ public interface DefensorRepository extends JpaRepository<Defensor, Integer> {
     )
     List<Defensor> listarDefensorsDisponiveis();
 
-    void deleteDefensorByIdDefensor(Long idDefensor);
+    void deleteDefensorByIdDefensor(Integer idDefensor);
 }
 

@@ -35,7 +35,7 @@ public class DefensorController {
     }
 
     @GetMapping("/buscar/{idDefensor}")
-    public ResponseEntity<DefensorResponseDTO> buscarDefensorId(@PathVariable Long idDefensor) {
+    public ResponseEntity<DefensorResponseDTO> buscarDefensorId(@PathVariable Integer idDefensor) {
         try{
             return ResponseEntity.ok(service.buscarDefensorId(idDefensor));
         } catch (Exception e){
@@ -78,7 +78,7 @@ public class DefensorController {
     }
 
     @GetMapping("/buscar-disponiveis/{idDefensor}")
-    public ResponseEntity<List<DefensorResponseDTO>> buscarDefensoresDisponiveisAlteracao(@PathVariable Long idDefensor) {
+    public ResponseEntity<List<DefensorResponseDTO>> buscarDefensoresDisponiveisAlteracao(@PathVariable Integer idDefensor) {
         return ResponseEntity.ok(service.listarDefensoresDisponiveis(idDefensor));
     }
 
@@ -123,7 +123,7 @@ public class DefensorController {
     }
 
     @DeleteMapping("/excluir/{idDefensor}/usuario/{usuario}")
-    public ResponseEntity<Void> excluirDefensor(@PathVariable Long idDefensor, @PathVariable String usuario) {
+    public ResponseEntity<Void> excluirDefensor(@PathVariable Integer idDefensor, @PathVariable String usuario) {
         return service.excluirDefensor(idDefensor, usuario);
     }
 

@@ -114,10 +114,10 @@ public class AuditoriaServiceImpl {
             }
 
             if(localDateInicio == null && localDateFim != null){
-                listaAuditoria = auditoriaRepository.listarTodasAuditoriasFiltrosDataInicio(
+                listaAuditoria = auditoriaRepository.listarTodasAuditoriasFiltrosDataFim(
                         nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, localDateFim, pageRequest
                 );
-                countRegistros = auditoriaRepository.listarTodasAuditoriasFiltrosDataInicio(
+                countRegistros = auditoriaRepository.listarTodasAuditoriasFiltrosDataFim(
                         nomeModulo != null ? nomeModulo.toUpperCase() : null, usuarioOperacao, operacao, localDateFim, null
                 ).size();
             }

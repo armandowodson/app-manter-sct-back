@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AuditoriaDTO {
-    private Long idAuditoria;
+    private Integer idAuditoria;
     private String nomeModulo;
     private String usuarioOperacao;
     private String operacao;

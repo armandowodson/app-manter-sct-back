@@ -76,7 +76,7 @@ public class PontosTaxiServiceImpl {
         return new PageImpl<>(pontosTaxiDTOList, pageRequest, countLista);
     }
 
-    public PontoTaxiDTO buscarPontoTaxiId(Long idPontoTaxi) {
+    public PontoTaxiDTO buscarPontoTaxiId(Integer idPontoTaxi) {
         PontoTaxi pontoTaxi = pontosTaxiRepository.findByIdPontoTaxi(idPontoTaxi);
         PontoTaxiDTO pontoTaxiDTO = new PontoTaxiDTO();
         if (pontoTaxi != null){
@@ -128,7 +128,7 @@ public class PontosTaxiServiceImpl {
     }
 
     @Transactional
-    public ResponseEntity<Void> excluirPontoTaxi(Long idPontoTaxi, String usuario) {
+    public ResponseEntity<Void> excluirPontoTaxi(Integer idPontoTaxi, String usuario) {
         try{
             if(Objects.isNull(usuario) || usuario.isEmpty())
                 throw new RuntimeException("Usuário não logado ou não identificado!");

@@ -9,8 +9,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class DefensorRequestDTO {
-    private Long idDefensor;
-    private Long idPermissionario;
+    private Integer idDefensor;
+    private Integer idPermissionario;
     private String nomeDefensor;
     private String cpfDefensor;
     private String rgDefensor;

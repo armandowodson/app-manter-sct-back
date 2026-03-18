@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PermissionarioRequestDTO {
-    private Long idPermissionario;
+    private Integer idPermissionario;
     private String numeroPermissao;
     private String nomePermissionario;
     private String cpfPermissionario;

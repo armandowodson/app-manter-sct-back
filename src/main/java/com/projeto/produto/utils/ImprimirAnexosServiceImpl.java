@@ -48,7 +48,7 @@ public class ImprimirAnexosServiceImpl {
         try{
             Veiculo veiculo = new Veiculo();
             if(aplicacao.equals("veiculo")){
-                veiculo = veiculoRepository.findVeiculoByIdVeiculo(Long.valueOf(idAplicacao));
+                veiculo = veiculoRepository.findVeiculoByIdVeiculo(Integer.valueOf(idAplicacao));
                 if(Objects.isNull(veiculo))
                     throw new RuntimeException("400");
                 byte[] bytes = imprimirAnexoVeiculoJasper(veiculo, anexo, modulo);
@@ -57,7 +57,7 @@ public class ImprimirAnexosServiceImpl {
 
             Permissionario permissionario = new Permissionario();
             if(aplicacao.equals("permissionario")){
-                permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(Long.valueOf(idAplicacao));
+                permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(Integer.valueOf(idAplicacao));
                 if(Objects.isNull(veiculo))
                     throw new RuntimeException("400");
                 byte[] bytes = imprimirAnexoAutorizatarioJasper(permissionario, anexo, modulo);
@@ -66,7 +66,7 @@ public class ImprimirAnexosServiceImpl {
 
             Defensor defensor = new Defensor();
             if(aplicacao.equals("defensor")){
-                defensor = defensorRepository.findDefensorByIdDefensor(Long.valueOf(idAplicacao));
+                defensor = defensorRepository.findDefensorByIdDefensor(Integer.valueOf(idAplicacao));
                 if(Objects.isNull(veiculo))
                     throw new RuntimeException("400");
                 byte[] bytes = imprimirAnexoDefensorJasper(defensor, anexo, modulo);

@@ -134,16 +134,19 @@ public class CarregarTipos {
         String strCategoria = "";
         switch (categoria) {
             case "1":
-                strCategoria = "B";
+                strCategoria = "A";
                 break;
             case "2":
-                strCategoria = "C";
+                strCategoria = "AB";
                 break;
             case "3":
-                strCategoria = "D";
+                strCategoria = "B";
                 break;
             case "4":
-                strCategoria = "E";
+                strCategoria = "C";
+                break;
+            case "5":
+                strCategoria = "D";
                 break;
         }
         return strCategoria;

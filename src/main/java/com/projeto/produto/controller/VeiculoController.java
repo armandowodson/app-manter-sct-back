@@ -35,7 +35,7 @@ public class VeiculoController {
     }
 
     @GetMapping("/buscar/{idVeiculo}")
-    public ResponseEntity<VeiculoResponseDTO> buscarVeiculoId(@PathVariable Long idVeiculo) {
+    public ResponseEntity<VeiculoResponseDTO> buscarVeiculoId(@PathVariable Integer idVeiculo) {
         try {
             return ResponseEntity.ok(service.buscarVeiculoId(idVeiculo));
         } catch (Exception e){
@@ -89,7 +89,7 @@ public class VeiculoController {
     }
 
     @DeleteMapping("/excluir/{idVeiculo}/usuario/{usuario}")
-    public ResponseEntity<Void> excluirVeiculo(@PathVariable Long idVeiculo, @PathVariable String usuario) {
+    public ResponseEntity<Void> excluirVeiculo(@PathVariable Integer idVeiculo, @PathVariable String usuario) {
         return service.excluirVeiculo(idVeiculo, usuario);
     }
 

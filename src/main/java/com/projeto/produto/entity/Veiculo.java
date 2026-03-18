@@ -7,13 +7,13 @@ import java.time.LocalDate;
 
 @Entity (name = "proj.veiculo")
 @Table(name="veiculo", schema="proj")
-@SequenceGenerator(name = "seq_veiculo", schema = "proj", sequenceName = "seq_veiculo", initialValue = 10, allocationSize = 1)
 @Data
 public class Veiculo {
+
     @Id
-    @Column(name = "ID_VEICULO")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_veiculo")
-    private Long idVeiculo;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID_VEICULO", nullable = false)
+    private Integer idVeiculo;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_PERMISSIONARIO")
     private Permissionario permissionario;

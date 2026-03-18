@@ -29,7 +29,7 @@ public class PontoTaxiController {
     }
 
     @GetMapping("/buscar/{idPontoTaxi}")
-    public ResponseEntity<PontoTaxiDTO> buscarPontoTaxiId(@PathVariable Long idPontoTaxi) {
+    public ResponseEntity<PontoTaxiDTO> buscarPontoTaxiId(@PathVariable Integer idPontoTaxi) {
         try{
             return ResponseEntity.ok(service.buscarPontoTaxiId(idPontoTaxi));
         } catch (Exception e){
@@ -76,7 +76,7 @@ public class PontoTaxiController {
     }
 
     @DeleteMapping("/excluir/{idPontoTaxi}/usuario/{usuario}")
-    public ResponseEntity<Void> excluirPontoTaxi(@PathVariable Long idPontoTaxi, @PathVariable String usuario) {
+    public ResponseEntity<Void> excluirPontoTaxi(@PathVariable Integer idPontoTaxi, @PathVariable String usuario) {
         return service.excluirPontoTaxi(idPontoTaxi, usuario);
     }
 

@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -41,6 +42,7 @@ public class LoginServiceImpl {
         }
     }
 
+    @Transactional
     public LoginDTO gravarUsuario(RegistroDTO registro) {
         if(Objects.nonNull(registro.getUsuario()) && !registro.getUsuario().isEmpty() &&  !ValidaCPF.isCPF(registro.getUsuario()))
             throw new RuntimeException("O CPF " + registro.getUsuario() + " é inválido!");
@@ -77,6 +79,7 @@ public class LoginServiceImpl {
         return converterLoginToLoginDTO(login);
     }
 
+    @Transactional
     public LoginDTO alterarSenha(RegistroDTO registro) {
         if(Objects.nonNull(registro.getUsuario()) && !registro.getUsuario().isEmpty() &&  !ValidaCPF.isCPF(registro.getUsuario()))
             throw new RuntimeException("O CPF " + registro.getUsuario() + " é inválido!");

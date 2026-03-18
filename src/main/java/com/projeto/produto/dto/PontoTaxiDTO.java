@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PontoTaxiDTO {
-    private Long idPontoTaxi;
+    private Integer idPontoTaxi;
     private String numeroPonto;
     private String descricaoPonto;
     private String fatorRotatividade;

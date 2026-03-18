@@ -35,7 +35,7 @@ public class PermissionarioController {
     }
 
     @GetMapping("/buscar/{idPermissionario}")
-    public ResponseEntity<PermissionarioResponseDTO> buscarPermissionarioId(@PathVariable Long idPermissionario) {
+    public ResponseEntity<PermissionarioResponseDTO> buscarPermissionarioId(@PathVariable Integer idPermissionario) {
         try{
             return ResponseEntity.ok(service.buscarPermissionarioId(idPermissionario));
         } catch (Exception e){
@@ -72,7 +72,7 @@ public class PermissionarioController {
     }
 
     @GetMapping("/buscar-disponiveis/{idPermissionario}")
-    public ResponseEntity<List<PermissionarioResponseDTO>> buscarPermissionariosDisponiveisAlteracao(@PathVariable Long idPermissionario) {
+    public ResponseEntity<List<PermissionarioResponseDTO>> buscarPermissionariosDisponiveisAlteracao(@PathVariable Integer idPermissionario) {
         return ResponseEntity.ok(service.listarPermissionariosDisponiveis(idPermissionario));
     }
 
@@ -117,7 +117,7 @@ public class PermissionarioController {
     }
 
     @DeleteMapping("/excluir/{idPermissionario}/usuario/{usuario}")
-    public ResponseEntity<Void> excluirPermissionario(@PathVariable Long idPermissionario, @PathVariable String usuario) {
+    public ResponseEntity<Void> excluirPermissionario(@PathVariable Integer idPermissionario, @PathVariable String usuario) {
         return service.excluirPermissionario(idPermissionario, usuario);
     }
 

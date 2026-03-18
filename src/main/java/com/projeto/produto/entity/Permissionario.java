@@ -7,13 +7,13 @@ import java.time.LocalDate;
 
 @Entity (name = "proj.permissionario")
 @Table(name="permissionario", schema="proj")
-@SequenceGenerator(name = "seq_permissionario", schema = "proj", sequenceName = "seq_permissionario", initialValue = 10, allocationSize = 1)
 @Data
 public class Permissionario {
+
     @Id
-    @Column(name = "ID_PERMISSIONARIO")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_permissionario")
-    private Long idPermissionario;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID_PERMISSIONARIO", nullable = false)
+    private Integer idPermissionario;
     @Column(name = "NUMERO_PERMISSAO")
     private String numeroPermissao;
     @Column(name = "NOME_PERMISSIONARIO")

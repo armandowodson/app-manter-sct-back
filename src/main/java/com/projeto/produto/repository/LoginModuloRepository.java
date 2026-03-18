@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface LoginModuloRepository extends JpaRepository<LoginModulo,Integer> {
 
-    LoginModulo findLoginModuloByIdLoginAndNumeroModulo (Long idLogin, Integer modulo);
+    LoginModulo findLoginModuloByIdLoginAndNumeroModulo (Integer idLogin, Integer modulo);
 
     @Query(
             value = "SELECT * " +
@@ -18,6 +18,6 @@ public interface LoginModuloRepository extends JpaRepository<LoginModulo,Integer
                     "WHERE ID_LOGIN = :idLogin " ,
             nativeQuery = true
     )
-    List<LoginModulo> buscarModulosLogin(Long idLogin);
+    List<LoginModulo> buscarModulosLogin(Integer idLogin);
 }
 

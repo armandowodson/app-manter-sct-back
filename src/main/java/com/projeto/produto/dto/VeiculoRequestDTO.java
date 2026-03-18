@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class VeiculoRequestDTO {
-    private Long idVeiculo;
-    private Long idPermissionario;
-    private Long idPontoTaxi;
+    private Integer idVeiculo;
+    private Integer idPermissionario;
+    private Integer idPontoTaxi;
     private String numeroPermissao;
     private String placa;
     private String renavam;

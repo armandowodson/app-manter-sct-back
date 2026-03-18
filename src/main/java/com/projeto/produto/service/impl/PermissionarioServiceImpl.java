@@ -65,6 +65,13 @@ public class PermissionarioServiceImpl {
                                                                MultipartFile foto) {
 
         logger.info("Início Inserir Autorizatário");
+        String cpfOriginal = "";
+        if(Objects.nonNull(permissionarioRequestDTO.getCpfPermissionario())) {
+            cpfOriginal = permissionarioRequestDTO.getCpfPermissionario();
+            permissionarioRequestDTO.setCpfPermissionario(
+                    permissionarioRequestDTO.getCpfPermissionario().replace(".", "").replace("-", "")
+            );
+        }
         if(Objects.nonNull(permissionarioRequestDTO.getCpfPermissionario()) && !permissionarioRequestDTO.getCpfPermissionario().isEmpty() &&
                 permissionarioRequestDTO.getCpfPermissionario().length() < 11){
             permissionarioRequestDTO.setCpfPermissionario(StringUtils.leftPad(permissionarioRequestDTO.getCpfPermissionario(), 11, "0"));
@@ -73,6 +80,8 @@ public class PermissionarioServiceImpl {
         if(Objects.nonNull(permissionarioRequestDTO.getCpfPermissionario()) && !permissionarioRequestDTO.getCpfPermissionario().isEmpty() &&
                 !ValidaCPF.isCPF(permissionarioRequestDTO.getCpfPermissionario()))
             throw new RuntimeException("O CPF " + permissionarioRequestDTO.getCpfPermissionario() + " é inválido!");
+
+        permissionarioRequestDTO.setCpfPermissionario(cpfOriginal);
 
         if(Objects.nonNull(permissionarioRequestDTO.getEmailPermissionario()) && !permissionarioRequestDTO.getEmailPermissionario().isEmpty() &&
                 !ValidaEmail.isEmail(permissionarioRequestDTO.getEmailPermissionario()))
@@ -117,6 +126,13 @@ public class PermissionarioServiceImpl {
                                                              MultipartFile apoliceSeguroMotocicleta,
                                                              MultipartFile foto) {
         logger.info("Início Atualização Autorizatário");
+        String cpfOriginal = "";
+        if(Objects.nonNull(permissionarioRequestDTO.getCpfPermissionario())) {
+            cpfOriginal = permissionarioRequestDTO.getCpfPermissionario();
+            permissionarioRequestDTO.setCpfPermissionario(
+                    permissionarioRequestDTO.getCpfPermissionario().replace(".", "").replace("-", "")
+            );
+        }
         if(Objects.nonNull(permissionarioRequestDTO.getCpfPermissionario()) && !permissionarioRequestDTO.getCpfPermissionario().isEmpty() &&
                 permissionarioRequestDTO.getCpfPermissionario().length() < 11){
             permissionarioRequestDTO.setCpfPermissionario(StringUtils.leftPad(permissionarioRequestDTO.getCpfPermissionario(), 11, "0"));
@@ -126,6 +142,7 @@ public class PermissionarioServiceImpl {
                 !ValidaCPF.isCPF(permissionarioRequestDTO.getCpfPermissionario()))
             throw new RuntimeException("O CPF " + permissionarioRequestDTO.getCpfPermissionario() + " é inválido!");
 
+        permissionarioRequestDTO.setCpfPermissionario(cpfOriginal);
         if(Objects.nonNull(permissionarioRequestDTO.getEmailPermissionario()) && !permissionarioRequestDTO.getEmailPermissionario().isEmpty() &&
                 !ValidaEmail.isEmail(permissionarioRequestDTO.getEmailPermissionario()))
             throw new RuntimeException("O E-mail " + permissionarioRequestDTO.getEmailPermissionario() + " é inválido!");
@@ -163,7 +180,7 @@ public class PermissionarioServiceImpl {
         return new PageImpl<>(permissionarioResponseDTOList, pageRequest, countLista);
     }
 
-    public PermissionarioResponseDTO buscarPermissionarioId(Long idPermissionario) {
+    public PermissionarioResponseDTO buscarPermissionarioId(Integer idPermissionario) {
         Permissionario permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(idPermissionario);
         PermissionarioResponseDTO permissionarioResponseDTO = new PermissionarioResponseDTO();
         if (permissionario != null){
@@ -203,7 +220,7 @@ public class PermissionarioServiceImpl {
         }
     }
 
-    public List<PermissionarioResponseDTO> listarPermissionariosDisponiveis(Long idPermissionario) {
+    public List<PermissionarioResponseDTO> listarPermissionariosDisponiveis(Integer idPermissionario) {
         logger.info("Início da Listagem dos Autorizatários disponíveis para o Veículo/Defensor");
         try{
             List<PermissionarioResponseDTO> listaPermissionarioResponseDTO = new ArrayList<>();
@@ -228,7 +245,7 @@ public class PermissionarioServiceImpl {
         }
     }
 
-    public List<PermissionarioResponseDTO> listarPermissionariosDisponiveisDefensor(Long idPermissionario) {
+    public List<PermissionarioResponseDTO> listarPermissionariosDisponiveisDefensor(Integer idPermissionario) {
         logger.info("Início da Listagem dos Autorizatários disponíveis para o Defensor");
         try{
             List<PermissionarioResponseDTO> listaPermissionarioResponseDTO = new ArrayList<>();
@@ -254,7 +271,7 @@ public class PermissionarioServiceImpl {
     }
 
     @Transactional
-    public ResponseEntity<Void> excluirPermissionario(Long idPermissionario, String usuario) {
+    public ResponseEntity<Void> excluirPermissionario(Integer idPermissionario, String usuario) {
         logger.info("Início da Exclusão do Autorizatário");
         String msgErro = "Erro ao Excluir o Autorizatário!!";
         try{
@@ -367,14 +384,7 @@ public class PermissionarioServiceImpl {
 
         permissionario.setNumeroPermissao(permissionarioRequestDTO.getNumeroPermissao());
         permissionario.setNomePermissionario(permissionarioRequestDTO.getNomePermissionario());
-
-        if(Objects.nonNull(permissionarioRequestDTO.getCpfPermissionario()) && !permissionarioRequestDTO.getCpfPermissionario().isEmpty()){
-            permissionarioRequestDTO.setCpfPermissionario(
-                    permissionarioRequestDTO.getCpfPermissionario().replace(".", "").replace("-", "").replace("/", "")
-            );
-            permissionario.setCpfPermissionario(StringUtils.leftPad(permissionarioRequestDTO.getCpfPermissionario(), 11, "0"));
-        }
-
+        permissionario.setCpfPermissionario(permissionarioRequestDTO.getCpfPermissionario());
         permissionario.setRgPermissionario(permissionarioRequestDTO.getRgPermissionario());
         permissionario.setOrgaoEmissor(permissionarioRequestDTO.getOrgaoEmissor());
         permissionario.setFiliacaoMae(permissionarioRequestDTO.getFiliacaoMae());
@@ -526,9 +536,9 @@ public class PermissionarioServiceImpl {
             else
                 documentacaoExigida1 = documentacaoExigida1 + "[ ] CNH Categoria 'A' (mín. 2 anos de experiência)\n";
             if(Objects.nonNull(permissionario.getComprovanteResidencia()))
-                documentacaoExigida1 = documentacaoExigida1 + "[x] Comprovante residência em Barreirinhas (mín. 3 anos)\n";
+                documentacaoExigida1 = documentacaoExigida1 + "[x] Comprovante residência em Barreirinhas\n";
             else
-                documentacaoExigida1 = documentacaoExigida1 + "[ ] Comprovante residência em Barreirinhas (mín. 3 anos)\n";
+                documentacaoExigida1 = documentacaoExigida1 + "[ ] Comprovante residência em Barreirinhas\n";
             if(Objects.nonNull(permissionario.getCertidaoNegativaMunicipal()))
                 documentacaoExigida1 = documentacaoExigida1 + "[x] Certidão negativa de multas e ocorrências DETRAN-MA\n";
             else
@@ -645,12 +655,21 @@ public class PermissionarioServiceImpl {
             parameters.put("quilometragem", Objects.nonNull(veiculo.getQuilometragem()) ? veiculo.getQuilometragem() : "");
             parameters.put("cilindrada", Objects.nonNull(veiculo.getCilindrada()) ? veiculo.getCilindrada() : "");
             //DEFENSOR
-            parameters.put("numeroRcmt", Objects.nonNull(defensor.getIdDefensor()) ? defensor.getIdDefensor().toString() : "");
-            parameters.put("nomeDefensor", Objects.nonNull(defensor.getNomeDefensor()) ? defensor.getNomeDefensor() : "");
-            parameters.put("cpfDefensor", Objects.nonNull(defensor.getCpfDefensor()) ? defensor.getCpfDefensor() : "");
-            parameters.put("rgDefensor", Objects.nonNull(defensor.getRgDefensor()) ? defensor.getRgDefensor() : "");
-            parameters.put("cnhDefensor", Objects.nonNull(defensor.getCnhDefensor()) ? defensor.getCnhDefensor() : "");
-            parameters.put("validadeCnh", Objects.nonNull(defensor.getDataValidadeCnh()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataValidadeCnh()) : "");
+            if(Objects.nonNull(defensor)){
+                parameters.put("numeroRcmt", Objects.nonNull(defensor.getIdDefensor()) ? defensor.getIdDefensor().toString() : "");
+                parameters.put("nomeDefensor", Objects.nonNull(defensor.getNomeDefensor()) ? defensor.getNomeDefensor() : "");
+                parameters.put("cpfDefensor", Objects.nonNull(defensor.getCpfDefensor()) ? defensor.getCpfDefensor() : "");
+                parameters.put("rgDefensor", Objects.nonNull(defensor.getRgDefensor()) ? defensor.getRgDefensor() : "");
+                parameters.put("cnhDefensor", Objects.nonNull(defensor.getCnhDefensor()) ? defensor.getCnhDefensor() : "");
+                parameters.put("validadeCnh", Objects.nonNull(defensor.getDataValidadeCnh()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataValidadeCnh()) : "");
+            }else{
+                parameters.put("numeroRcmt", "");
+                parameters.put("nomeDefensor", "");
+                parameters.put("cpfDefensor", "");
+                parameters.put("rgDefensor", "");
+                parameters.put("cnhDefensor", "");
+                parameters.put("validadeCnh", "");
+            }
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
 

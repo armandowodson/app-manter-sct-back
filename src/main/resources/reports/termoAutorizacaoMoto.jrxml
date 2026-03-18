@@ -68,6 +68,12 @@
 	<columnHeader>
 		<band height="636" splitType="Stretch">
 			<rectangle>
+				<reportElement x="3" y="70" width="544" height="44" backcolor="#FCD8D7" uuid="88a0157e-6ff5-4b7c-ab22-c5d5a193cf13"/>
+				<graphicElement>
+					<pen lineColor="#FFFFFF"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
 				<reportElement x="5" y="48" width="544" height="22" uuid="42759a65-a8d6-48b1-961d-d7a19888572f"/>
 			</rectangle>
 			<rectangle>
