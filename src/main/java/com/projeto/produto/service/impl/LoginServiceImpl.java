@@ -80,7 +80,7 @@ public class LoginServiceImpl {
     }
 
     @Transactional
-    public LoginDTO alterarSenha(RegistroDTO registro) {
+    public LoginDTO alterarSenha(RegistroDTO registro, String novaSenha) {
         if(Objects.nonNull(registro.getUsuario()) && !registro.getUsuario().isEmpty() &&  !ValidaCPF.isCPF(registro.getUsuario()))
             throw new RuntimeException("O CPF " + registro.getUsuario() + " é inválido!");
 
@@ -89,13 +89,13 @@ public class LoginServiceImpl {
         if(Objects.isNull(login))
             throw new RuntimeException("Não foi encontrado o usuário: " + registro.getUsuario() + "!");
 
-        if(!login.getSenhaUsuario().equals(registro.getNome()))
+        if(!login.getSenhaUsuario().equals(registro.getSenha()))
             throw new RuntimeException("A senha atual informada não é igual a registrada na Base de Dados!");
 
         String[] modulos = registro.getModulos().split("#");
 
         try{
-            login.setSenhaUsuario(registro.getSenha());
+            login.setSenhaUsuario(novaSenha);
             login.setDataCriacao(LocalDate.now());
             login = loginRepository.save(login);
 

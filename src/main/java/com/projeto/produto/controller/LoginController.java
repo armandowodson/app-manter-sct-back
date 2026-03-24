@@ -26,8 +26,8 @@ public class LoginController {
     }
 
     @PostMapping("/alterar")
-    public ResponseEntity<LoginDTO> alterarSenha(@RequestBody RegistroDTO registro) {
-        return ResponseEntity.ok(service.alterarSenha(registro));
+    public ResponseEntity<LoginDTO> alterarSenha(@RequestBody RegistroDTO registro, @RequestParam String novaSenha) {
+        return ResponseEntity.ok(service.alterarSenha(registro, novaSenha));
     }
 
 }

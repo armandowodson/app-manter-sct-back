@@ -383,21 +383,21 @@ public class PermissionarioServiceImpl {
         }
 
         permissionario.setNumeroPermissao(permissionarioRequestDTO.getNumeroPermissao());
-        permissionario.setNomePermissionario(permissionarioRequestDTO.getNomePermissionario());
+        permissionario.setNomePermissionario(permissionarioRequestDTO.getNomePermissionario().toUpperCase());
         permissionario.setCpfPermissionario(permissionarioRequestDTO.getCpfPermissionario());
         permissionario.setRgPermissionario(permissionarioRequestDTO.getRgPermissionario());
-        permissionario.setOrgaoEmissor(permissionarioRequestDTO.getOrgaoEmissor());
-        permissionario.setFiliacaoMae(permissionarioRequestDTO.getFiliacaoMae());
-        permissionario.setFiliacaoPai(permissionarioRequestDTO.getFiliacaoPai());
+        permissionario.setOrgaoEmissor(permissionarioRequestDTO.getOrgaoEmissor().toUpperCase());
+        permissionario.setFiliacaoMae(permissionarioRequestDTO.getFiliacaoMae().toUpperCase());
+        permissionario.setFiliacaoPai(Objects.nonNull(permissionarioRequestDTO.getFiliacaoPai()) ? permissionarioRequestDTO.getFiliacaoPai().toUpperCase() : "");
         permissionario.setSexo(permissionarioRequestDTO.getSexo());
         permissionario.setEstadoCivil(permissionarioRequestDTO.getEstadoCivil());
         if(Objects.nonNull(permissionarioRequestDTO.getDataNascimento()) && !permissionarioRequestDTO.getDataNascimento().isEmpty()) {
             permissionario.setDataNascimento(LocalDate.parse(permissionarioRequestDTO.getDataNascimento()));
         }
         permissionario.setUfPermissionario(permissionarioRequestDTO.getUfPermissionario());
-        permissionario.setCidadePermissionario(permissionarioRequestDTO.getCidadePermissionario());
-        permissionario.setBairroPermissionario(permissionarioRequestDTO.getBairroPermissionario());
-        permissionario.setEnderecoPermissionario(permissionarioRequestDTO.getEnderecoPermissionario());
+        permissionario.setCidadePermissionario(permissionarioRequestDTO.getCidadePermissionario().toUpperCase());
+        permissionario.setBairroPermissionario(permissionarioRequestDTO.getBairroPermissionario().toUpperCase());
+        permissionario.setEnderecoPermissionario(permissionarioRequestDTO.getEnderecoPermissionario().toUpperCase());
         permissionario.setCep(permissionarioRequestDTO.getCep());
         permissionario.setCelularPermissionario(permissionarioRequestDTO.getCelularPermissionario());
         permissionario.setEmailPermissionario(permissionarioRequestDTO.getEmailPermissionario());
@@ -440,7 +440,7 @@ public class PermissionarioServiceImpl {
             permissionario.setDataCriacao(LocalDate.now());
 
         permissionario.setAplicativoAlternativo(permissionarioRequestDTO.getAplicativoAlternativo());
-        permissionario.setObservacao(permissionarioRequestDTO.getObservacao());
+        permissionario.setObservacao(permissionarioRequestDTO.getObservacao().toUpperCase());
 
         permissionario.setStatus("ATIVO");
 
@@ -456,8 +456,9 @@ public class PermissionarioServiceImpl {
         auditoriaRepository.save(auditoria);
     }
 
-    public byte[] gerarRegistroCondutor(String cpfPermissionario, String modulo) {
+    public byte[] gerarRegistroCondutor(String cpfPermissionario, String modulo) throws InterruptedException {
         logger.info("Início Gerar Registro Condutor Busca dos Dados");
+        Thread.sleep(3000);
         try{
             Permissionario permissionario = permissionarioRepository.findPermissionarioByCpfPermissionario(cpfPermissionario);
             if(Objects.isNull(permissionario))

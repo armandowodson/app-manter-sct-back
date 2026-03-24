@@ -398,25 +398,25 @@ public class DefensorServiceImpl {
                 permissionario = permissionarioRepository.findPermissionarioByIdPermissionario(defensorRequestDTO.getIdPermissionario());
             defensor.setPermissionario(permissionario);
 
-            defensor.setNomeDefensor(defensorRequestDTO.getNomeDefensor());
+            defensor.setNomeDefensor(defensorRequestDTO.getNomeDefensor().toUpperCase());
 
             if(Objects.nonNull(defensorRequestDTO.getCpfDefensor()) && !defensorRequestDTO.getCpfDefensor().isEmpty()){
                 defensor.setCpfDefensor(StringUtils.leftPad(defensorRequestDTO.getCpfDefensor(), 11, "0"));
             }
 
             defensor.setRgDefensor(defensorRequestDTO.getRgDefensor());
-            defensor.setOrgaoEmissor(defensorRequestDTO.getOrgaoEmissor());
-            defensor.setFiliacaoMae(defensorRequestDTO.getFiliacaoMae());
-            defensor.setFiliacaoPai(defensorRequestDTO.getFiliacaoPai());
+            defensor.setOrgaoEmissor(defensorRequestDTO.getOrgaoEmissor().toUpperCase());
+            defensor.setFiliacaoMae(defensorRequestDTO.getFiliacaoMae().toUpperCase());
+            defensor.setFiliacaoPai(Objects.nonNull(defensorRequestDTO.getFiliacaoPai()) ? defensorRequestDTO.getFiliacaoPai().toUpperCase() : "");
             defensor.setSexo(defensorRequestDTO.getSexo());
             defensor.setEstadoCivil(defensorRequestDTO.getEstadoCivil());
             if(Objects.nonNull(defensorRequestDTO.getDataNascimento()) && !defensorRequestDTO.getDataNascimento().isEmpty()) {
                 defensor.setDataNascimento(LocalDate.parse(defensorRequestDTO.getDataNascimento()));
             }
             defensor.setUfDefensor(defensorRequestDTO.getUfDefensor());
-            defensor.setCidadeDefensor(defensorRequestDTO.getCidadeDefensor());
-            defensor.setBairroDefensor(defensorRequestDTO.getBairroDefensor());
-            defensor.setEnderecoDefensor(defensorRequestDTO.getEnderecoDefensor());
+            defensor.setCidadeDefensor(defensorRequestDTO.getCidadeDefensor().toUpperCase());
+            defensor.setBairroDefensor(defensorRequestDTO.getBairroDefensor().toUpperCase());
+            defensor.setEnderecoDefensor(defensorRequestDTO.getEnderecoDefensor().toUpperCase());
             defensor.setCep(defensorRequestDTO.getCep());
             defensor.setCelularDefensor(defensorRequestDTO.getCelularDefensor());
             defensor.setEmailDefensor(defensorRequestDTO.getEmailDefensor());
