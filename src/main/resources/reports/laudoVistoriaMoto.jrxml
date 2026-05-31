@@ -26,6 +26,7 @@
 	<parameter name="tipoVistoria" class="java.lang.String"/>
 	<parameter name="numeroCcmt" class="java.lang.String"/>
 	<parameter name="numeroCvmt" class="java.lang.String"/>
+	<parameter name="dataVistoria" class="java.lang.String"/>
 	<queryString language="SQL">
 		<![CDATA[]]>
 	</queryString>
@@ -200,14 +201,16 @@
 				<textFieldExpression><![CDATA[$P{quilometragem}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="282" y="442" width="99" height="17" uuid="b610484f-fe8d-45e0-a9b8-768b44e467e4"/>
+				<reportElement x="340" y="442" width="80" height="17" uuid="b610484f-fe8d-45e0-a9b8-768b44e467e4">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Status Vistoria:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="382" y="442" width="167" height="17" uuid="f2fd4867-37ea-4919-b234-5da10361c101">
+				<reportElement x="420" y="442" width="130" height="17" uuid="f2fd4867-37ea-4919-b234-5da10361c101">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -216,7 +219,7 @@
 				<textFieldExpression><![CDATA[$P{statusVistoria}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="176" y="461" width="93" height="17" uuid="7cc01fde-7320-4dad-9b40-8837211d57f0">
+				<reportElement x="173" y="461" width="93" height="17" uuid="7cc01fde-7320-4dad-9b40-8837211d57f0">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -225,7 +228,7 @@
 				<textFieldExpression><![CDATA[$P{proximaVistoria}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="6" y="461" width="168" height="17" uuid="8ebcdecb-9306-436e-8a67-25aa6fbb95d4"/>
+				<reportElement x="3" y="461" width="168" height="17" uuid="8ebcdecb-9306-436e-8a67-25aa6fbb95d4"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
@@ -287,7 +290,7 @@
 				<text><![CDATA[Nº CAV Emitido (se aprovado):]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="176" y="481" width="372" height="17" uuid="a4f12c15-80e8-47d5-9f53-9c2a23424c11">
+				<reportElement x="173" y="481" width="376" height="17" uuid="a4f12c15-80e8-47d5-9f53-9c2a23424c11">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -296,7 +299,7 @@
 				<textFieldExpression><![CDATA[$P{ressalvas}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="6" y="481" width="168" height="17" uuid="3a7848a4-6817-4962-9191-60f5b0efd1b7"/>
+				<reportElement x="3" y="481" width="168" height="17" uuid="3a7848a4-6817-4962-9191-60f5b0efd1b7"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
@@ -362,7 +365,7 @@
 				<textFieldExpression><![CDATA[$P{cor}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="106" y="442" width="174" height="17" uuid="4743b660-2609-40aa-b0d8-5f35d3270080">
+				<reportElement x="222" y="442" width="118" height="17" uuid="4743b660-2609-40aa-b0d8-5f35d3270080">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -371,7 +374,7 @@
 				<textFieldExpression><![CDATA[$P{tipoVistoria}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="6" y="442" width="99" height="17" uuid="3541747f-3591-46e0-9c5b-45788800fe06"/>
+				<reportElement x="148" y="442" width="74" height="17" uuid="3541747f-3591-46e0-9c5b-45788800fe06"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
@@ -395,6 +398,24 @@ Matrícula: ________________________
 				<text><![CDATA[_________________________________________
 Autorizatário 	
 CPF: _________________________]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="78" y="442" width="68" height="17" uuid="a18d2c31-1a35-49a6-b103-e7902275cb42">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{dataVistoria}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="442" width="73" height="17" uuid="ff230d76-0b99-45a4-a1e0-49b5cf9f66c7">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Vistoria:]]></text>
 			</staticText>
 		</band>
 	</columnHeader>

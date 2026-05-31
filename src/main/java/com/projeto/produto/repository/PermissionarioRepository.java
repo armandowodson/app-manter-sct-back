@@ -23,13 +23,14 @@ public interface PermissionarioRepository extends JpaRepository<Permissionario, 
             value = "SELECT * " +
                     "FROM proj.permissionario " +
                     "WHERE 1 = 1 " +
+                    "AND (:idPermissionario IS NULL OR ID_PERMISSIONARIO = :idPermissionario) " +
                     "AND (:nomePermissionario IS NULL OR UPPER(NOME_PERMISSIONARIO) LIKE %:nomePermissionario%) " +
                     "AND (:cpfPermissionario IS NULL OR CPF_PERMISSIONARIO = :cpfPermissionario) " +
                     "AND (:cnhPermissionario IS NULL OR CNH_PERMISSIONARIO = :cnhPermissionario) ",
             nativeQuery = true
     )
     List<Permissionario> listarTodosPermissionariosFiltros(
-            String nomePermissionario, String cpfPermissionario, String cnhPermissionario, Pageable pageable
+            String idPermissionario, String nomePermissionario, String cpfPermissionario, String cnhPermissionario, Pageable pageable
     );
 
     @Query(

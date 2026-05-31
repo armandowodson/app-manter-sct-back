@@ -527,7 +527,7 @@ public class DefensorServiceImpl {
             parameters.put("numeroCav", Objects.nonNull(veiculo.getNumeroCavEmitido()) ? veiculo.getNumeroCavEmitido() : "");
             parameters.put("statusRegistro", "[x] " + defensor.getStatus());
 
-            parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
+            parameters.put("categoriaServicoAutorizado", "");
             parameters.put("validadeRegistroCondutor", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao()) +
                     " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao().plusYears(1)));
 

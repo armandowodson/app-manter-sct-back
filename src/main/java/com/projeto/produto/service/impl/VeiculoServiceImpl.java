@@ -472,6 +472,7 @@ public class VeiculoServiceImpl {
             parameters.put("capacidade", veiculo.getCapacidade());
             parameters.put("quilometragem", veiculo.getQuilometragem());
             parameters.put("ressalvas", Objects.nonNull(veiculo.getRessalvas()) ? veiculo.getRessalvas() : "");
+            parameters.put("dataVistoria", Objects.nonNull(veiculo.getDataVistoria()) ? DateTimeFormatter.ofPattern("dd/MM/yyyy").format(veiculo.getDataVistoria()) : "");
             parameters.put("tipoVistoria", "[x] " + CarregarTipos.carregarTipoVistoriaVeiculo(veiculo.getTipoVistoria()));
             parameters.put("statusVistoria", "[x] " + CarregarTipos.carregarStatusVistoriaVeiculo(veiculo.getStatusVistoria()));
             parameters.put("numeroCavEmitido", Objects.nonNull(veiculo.getNumeroCavEmitido()) ? veiculo.getNumeroCavEmitido() : "");

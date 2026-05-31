@@ -8,16 +8,7 @@ public class CarregarTipos {
                 strTipo = "Gasolina";
                 break;
             case "2":
-                strTipo = "Álcool/Etanol";
-                break;
-            case "3":
-                strTipo = "Diesel";
-                break;
-            case "4":
-                strTipo = "Gás Natural";
-                break;
-            case "5":
-                strTipo = "Eletricidade";
+                strTipo = "Elétrico";
                 break;
         }
         return strTipo;

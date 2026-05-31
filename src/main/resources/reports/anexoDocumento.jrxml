@@ -12,7 +12,7 @@
 	</background>
 	<columnHeader>
 		<band height="644" splitType="Stretch">
-			<image scaleImage="RealSize" hAlign="Center">
+			<image scaleImage="RetainShape" hAlign="Center">
 				<reportElement x="15" y="36" width="520" height="520" uuid="2e93be38-7968-440a-8e18-aa219e0bce36"/>
 				<imageExpression><![CDATA[$P{imagemAnexo}]]></imageExpression>
 			</image>

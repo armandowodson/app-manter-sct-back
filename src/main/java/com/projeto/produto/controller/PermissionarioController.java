@@ -44,7 +44,8 @@ public class PermissionarioController {
     }
 
     @GetMapping("/buscar-filtros")
-    public Page<PermissionarioResponseDTO> buscarPermissionariosFiltros(@RequestParam(required = false) String nomePermissionario,
+    public Page<PermissionarioResponseDTO> buscarPermissionariosFiltros(@RequestParam(required = false) String idPermissionario,
+                                                                        @RequestParam(required = false) String nomePermissionario,
                                                                         @RequestParam(required = false) String cpfPermissionario,
                                                                         @RequestParam(required = false) String cnhPermissionario,
                                                                         @RequestParam(required = true) Integer pageIndex,
@@ -52,7 +53,7 @@ public class PermissionarioController {
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
         try{
             Page<PermissionarioResponseDTO> permissionarios = service.listarTodosPermissionarioFiltros(
-                   nomePermissionario, cpfPermissionario, cnhPermissionario, pageRequest
+                    idPermissionario, nomePermissionario, cpfPermissionario, cnhPermissionario, pageRequest
             );
 
             return permissionarios;

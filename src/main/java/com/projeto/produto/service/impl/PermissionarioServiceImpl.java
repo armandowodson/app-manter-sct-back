@@ -189,19 +189,19 @@ public class PermissionarioServiceImpl {
         return permissionarioResponseDTO;
     }
 
-    public Page<PermissionarioResponseDTO> listarTodosPermissionarioFiltros(String nomePermissionario, String cpfPermissionario,
-                                                                            String cnhPermissionario, PageRequest pageRequest) {
+    public Page<PermissionarioResponseDTO> listarTodosPermissionarioFiltros(String idPermissionario, String nomePermissionario,
+                                                                            String cpfPermissionario, String cnhPermissionario, PageRequest pageRequest) {
         logger.error("Início da Listagem de Todos os Dados do Autorizatário");
         try{
             if(Objects.nonNull(cpfPermissionario) && !cpfPermissionario.equals(""))
                 cpfPermissionario = StringUtils.leftPad(cpfPermissionario, 11, "0");
             List<Permissionario> listaPermissionario = permissionarioRepository.listarTodosPermissionariosFiltros(
-                    nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
+                    idPermissionario, nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
                     cpfPermissionario, cnhPermissionario, pageRequest
             );
 
             Integer countRegistros = permissionarioRepository.listarTodosPermissionariosFiltros(
-                    nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
+                    idPermissionario, nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
                     cpfPermissionario, cnhPermissionario, null
             ).size();
 
@@ -502,7 +502,7 @@ public class PermissionarioServiceImpl {
             parameters.put("numeroCav", Objects.nonNull(veiculo.getNumeroCavEmitido()) ? veiculo.getNumeroCavEmitido() : "");
             parameters.put("statusRegistro", "[x] " + permissionario.getStatus());
 
-            parameters.put("categoriaServicoAutorizado", CarregarTipos.carregarCategoriaVeiculo(veiculo.getTipoVeiculo()));
+            parameters.put("categoriaServicoAutorizado", "");
             parameters.put("validadeRegistroCondutor", "De " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao()) +
                     " até " + DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao().plusYears(1)));
 
