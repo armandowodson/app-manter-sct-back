@@ -48,5 +48,8 @@ public class PermissionarioResponseDTO {
     private String status;
     private String aplicativoAlternativo;
     private String observacao;
+    private String numeroTas;
+    private String dataFimValidadeCertificadoCondutor;
+    private String rcVencido;
 
 }

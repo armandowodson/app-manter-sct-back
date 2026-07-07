@@ -45,5 +45,8 @@ public class DefensorResponseDTO {
     private byte[] foto;
     private String dataCriacao;
     private String status;
+    private String numeroTas;
+    private String dataFimValidadeCertificadoCondutor;
+    private String rcVencido;
 
 }

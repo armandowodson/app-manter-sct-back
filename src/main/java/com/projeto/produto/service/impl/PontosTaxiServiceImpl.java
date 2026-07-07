@@ -1,23 +1,35 @@
 package com.projeto.produto.service.impl;
 
+import com.projeto.produto.dto.AuditoriaDTO;
 import com.projeto.produto.dto.PontoTaxiDTO;
 import com.projeto.produto.entity.Auditoria;
 import com.projeto.produto.entity.PontoTaxi;
+import com.projeto.produto.entity.Veiculo;
 import com.projeto.produto.repository.AuditoriaRepository;
 import com.projeto.produto.repository.PontosTaxiRepository;
+import com.projeto.produto.repository.VeiculoRepository;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
 import javax.transaction.Transactional;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class PontosTaxiServiceImpl {
@@ -26,6 +38,11 @@ public class PontosTaxiServiceImpl {
 
     @Autowired
     private AuditoriaRepository auditoriaRepository;
+
+    @Autowired
+    private VeiculoRepository veiculoRepository;
+
+    private static final Logger logger = LogManager.getLogger(PontosTaxiServiceImpl.class);
 
     @Transactional
     public PontoTaxiDTO inserirPontoTaxi(PontoTaxiDTO pontoTaxiDTO) {
@@ -125,6 +142,101 @@ public class PontosTaxiServiceImpl {
         }
 
         return listaPontoTaxiDTO;
+    }
+
+    public byte[] imprimirPontosEstacionamentosMotoTaxi(String numeroPonto, String descricaoPonto,
+                                                        String fatorRotatividade, String numeroVagas,
+                                                        String referenciaPonto, PageRequest pageRequest) {
+        logger.info("Início Imprimir Pontos de Estacionamentos de Moto Táxi");
+        try{
+            Page<PontoTaxiDTO> listaPontosTaxiPage = listarTodosPontosTaxiFiltros(numeroPonto, descricaoPonto, fatorRotatividade,
+                    numeroVagas, referenciaPonto, null, pageRequest);
+            List<PontoTaxiDTO> listaPontosTaxi = listaPontosTaxiPage.getContent();
+            byte[] bytes = gerarRelatorio(numeroPonto, descricaoPonto, fatorRotatividade, numeroVagas, referenciaPonto, listaPontosTaxi);
+            return bytes;
+        } catch (Exception e){
+            logger.error("imprimirPontosTaxi: " + e.getMessage());
+            throw new RuntimeException("Erro ao Imprimir Pontos de Estacionamentos de Moto Táxi");
+        }
+    }
+
+    public byte[] gerarRelatorio(String numeroPonto, String descricaoPonto, String fatorRotatividade, String numeroVagas,
+                                 String referenciaPonto, List<PontoTaxiDTO> listaPontosTaxi) {
+        logger.info("Início Gerar Reltório");
+        List<PontoTaxiDTO> listaPontosTaxiFinal = new ArrayList<>();
+        try{
+            ClassPathResource resource = new ClassPathResource("reports/relatorioPontosEstacionamentosMotoTaxi.jrxml");
+            JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
+            FileInputStream logoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/tituloRelatorioPontosEstacionamentosMotoTaxi.png" ).getAbsolutePath());
+
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("imagemPath", logoStream);
+            parameters.put("numeroPonto", Objects.nonNull(numeroPonto) ? numeroPonto : "");
+            parameters.put("descricaoPonto", Objects.nonNull(descricaoPonto) ? descricaoPonto : "");
+            parameters.put("referenciaPonto", Objects.nonNull(referenciaPonto) ? referenciaPonto : "");
+            parameters.put("numeroVagas", Objects.nonNull(numeroVagas) ? numeroVagas : "");
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate dataEmissao = LocalDate.now();
+            parameters.put("dataEmissaoRelatorio", dataEmissao.format(formatter));
+
+            if(Objects.nonNull(listaPontosTaxi)){
+
+                Integer totalVagas = 0;
+                Integer totalFixo = 0;
+                Integer totalRotativo = 0;
+                Integer totalFixoRotativo = 0;
+
+                for(PontoTaxiDTO pontoTaxiDTO : listaPontosTaxi){
+                    totalVagas = totalVagas + Integer.valueOf(pontoTaxiDTO.getNumeroVagas());
+                    if (pontoTaxiDTO.getModalidade().equals("1")){
+                        totalFixo++;
+                        pontoTaxiDTO.setModalidade("FIXO");
+                    }
+
+                    if (pontoTaxiDTO.getModalidade().equals("2")){
+                        totalRotativo++;
+                        pontoTaxiDTO.setModalidade("ROTATIVO");
+                    }
+
+                    if (pontoTaxiDTO.getModalidade().equals("3")){
+                        totalFixoRotativo++;
+                        pontoTaxiDTO.setModalidade("FIXO-ROTATIVO");
+                    }
+
+                    listaPontosTaxiFinal.add(pontoTaxiDTO);
+                }
+
+                parameters.put("totalVagas", String.valueOf(totalVagas));
+                List<Veiculo> listaVeiculos = veiculoRepository.buscarVeiculosAtivos();
+                Integer totalVagasOcupadas = listaVeiculos.size();
+                parameters.put("totalVagasOcupadas", String.valueOf(totalVagasOcupadas));
+                if(totalVagas.compareTo(0) != 0){
+                    BigDecimal percentualOcupacao = new BigDecimal(totalVagasOcupadas).multiply(new BigDecimal(100)).divide(new BigDecimal(totalVagas), 2, RoundingMode.HALF_UP);
+                    parameters.put("percentualOcupacao", String.valueOf(percentualOcupacao));
+                } else {
+                    parameters.put("percentualOcupacao", "0");
+                }
+
+                parameters.put("totalFixo", String.valueOf(totalFixo));
+                parameters.put("totalRotativo", String.valueOf(totalRotativo));
+                parameters.put("totalFixoRotativo", String.valueOf(totalFixoRotativo));
+
+                JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(listaPontosTaxiFinal);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+                byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
+                return bytes;
+            }else{
+                throw new SQLException();
+            }
+        } catch (SQLException s) {
+            logger.error("gerarRelatorio: " + s.getMessage());
+            throw new RuntimeException("Não há dados para gerar Relatório");
+        } catch (Exception e){
+            logger.error("gerarRelatorio: " + e.getMessage());
+            throw new RuntimeException("Erro ao Gerar Reltório");
+        }
     }
 
     @Transactional

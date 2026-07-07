@@ -58,7 +58,7 @@ public class AuditoriaController {
                                                      @RequestParam(required = false) String dataFimOperacao,
                                                      @RequestParam(required = true) Integer pageIndex,
                                                      @RequestParam(required = true) Integer pageSize)
-            throws JRException, SQLException, IOException {
+    {
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
         byte[] fileBytes = service.imprimirAuditoria(nomeModulo, usuarioOperacao, operacao, dataInicioOperacao, dataFimOperacao, pageRequest);
 

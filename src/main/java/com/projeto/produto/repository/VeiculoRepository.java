@@ -23,6 +23,8 @@ public interface VeiculoRepository extends JpaRepository<Veiculo,Integer> {
 
     Veiculo findVeiculoByPermissionarioAndStatus(Permissionario permissionario, String status);
 
+    Veiculo findVeiculoByPermissionario(Permissionario permissionario);
+
     @Query(
             value = "SELECT * " +
                     "FROM proj.veiculo " +
@@ -44,5 +46,13 @@ public interface VeiculoRepository extends JpaRepository<Veiculo,Integer> {
             nativeQuery = true
     )
     List<Veiculo> buscarVeiculoPlaca(String placa);
+
+    @Query(
+            value = "SELECT * " +
+                    "FROM proj.veiculo " +
+                    "WHERE STATUS = 'ATIVO' ",
+            nativeQuery = true
+    )
+    List<Veiculo> buscarVeiculosAtivos();
 }
 

@@ -3,6 +3,7 @@ package com.projeto.produto.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projeto.produto.dto.DefensorRequestDTO;
 import com.projeto.produto.dto.DefensorResponseDTO;
+import com.projeto.produto.dto.PermissionarioResponseDTO;
 import com.projeto.produto.service.impl.DefensorServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/defensor")
@@ -70,6 +72,59 @@ public class DefensorController {
         } catch (Exception e){
             throw new RuntimeException("Não foi possível consultar os Defensores com os filtros informados!");
         }
+    }
+
+    @GetMapping("/buscar-filtros-relatorio")
+    public Page<DefensorResponseDTO> buscarDefensoresFiltrosRelatorio(
+            @RequestParam(required = false) String idDefensor,
+            @RequestParam(required = false) String nomeDefensor,
+            @RequestParam(required = false) String dataInicioValidadeCnh,
+            @RequestParam(required = false) String dataFimValidadeCnh,
+            @RequestParam(required = false) String dataInicioValidadeRc,
+            @RequestParam(required = false) String dataFimValidadeRc,
+            @RequestParam(required = true) Integer pageIndex,
+            @RequestParam(required = true) Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        try{
+            Page<DefensorResponseDTO> defensores = service.listarTodosDefensoresFiltrosRelatorio(
+                    idDefensor, nomeDefensor, dataInicioValidadeCnh, dataFimValidadeCnh,
+                    dataInicioValidadeRc, dataFimValidadeRc, pageRequest
+            );
+
+            return defensores;
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar os Defensores com os filtros informados!");
+        }
+    }
+
+    @GetMapping("/imprimir")
+    public ResponseEntity<byte[]> imprimirRelatorio( @RequestParam(required = false) String idDefensor,
+                                                     @RequestParam(required = false) String nomeDefensor,
+                                                     @RequestParam(required = false) String dataInicioValidadeCnh,
+                                                     @RequestParam(required = false) String dataFimValidadeCnh,
+                                                     @RequestParam(required = false) String dataInicioValidadeRc,
+                                                     @RequestParam(required = false) String dataFimValidadeRc,
+                                                     @RequestParam(required = true) Integer pageIndex,
+                                                     @RequestParam(required = true) Integer pageSize)
+    {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        byte[] fileBytes = service.imprimirRelatorio(
+                idDefensor, nomeDefensor, dataInicioValidadeCnh, dataFimValidadeCnh,
+                dataInicioValidadeRc, dataFimValidadeRc, pageRequest
+        );
+
+        Random gerador = new Random();
+        Integer numAleatorio = gerador.nextInt(100);
+        String fileName = "defensor-" + LocalDate.now() + ":" + numAleatorio + ".pdf";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDispositionFormData("attachment", fileName);
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentLength(fileBytes.length);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(fileBytes);
     }
 
     @GetMapping("/buscar-disponiveis")

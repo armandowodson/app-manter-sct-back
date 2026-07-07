@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface DefensorRepository extends JpaRepository<Defensor, Integer> {
@@ -36,6 +37,23 @@ public interface DefensorRepository extends JpaRepository<Defensor, Integer> {
     List<Defensor> listarTodosDefensorsFiltros(
             String nomeDefensor, String cpfDefensor,
             String cnhDefensor, String nomePermissionario, String cpfPermissionario, Pageable pageable
+    );
+
+    @Query(
+            value = "SELECT * " +
+                    "FROM proj.defensor " +
+                    "WHERE 1 = 1 " +
+                    "AND (:idDefensor IS NULL OR ID_DEFENSOR = :idDefensor) " +
+                    "AND (:nomeDefensor IS NULL OR UPPER(NOME_DEFENSOR) LIKE %:nomeDefensor%) " +
+                    "AND (:dataInicioValidadeCnh IS NULL OR DATA_VALIDADE_CNH >= :dataInicioValidadeCnh) " +
+                    "AND (:dataFimValidadeCnh IS NULL OR DATA_VALIDADE_CNH <= :dataFimValidadeCnh) " +
+                    "AND (:dataInicioValidadeRc IS NULL OR DATA_CRIACAO >= :dataInicioValidadeRc) " +
+                    "AND (:dataFimValidadeRc IS NULL OR DATA_CRIACAO <= :dataFimValidadeRc) ",
+            nativeQuery = true
+    )
+    List<Defensor> listarTodosDefensoresFiltrosRelatorio(
+            String idDefensor, String nomeDefensor, LocalDate dataInicioValidadeCnh, LocalDate dataFimValidadeCnh,
+            LocalDate dataInicioValidadeRc, LocalDate dataFimValidadeRc, Pageable pageable
     );
 
     @Query(

@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/permissionario")
@@ -60,6 +61,59 @@ public class PermissionarioController {
         } catch (Exception e){
             throw new RuntimeException("Não foi possível consultar os Autorizatários com os filtros informados!");
         }
+    }
+
+    @GetMapping("/buscar-filtros-relatorio")
+    public Page<PermissionarioResponseDTO> buscarPermissionariosFiltrosRelatorio(
+                                                                        @RequestParam(required = false) String idPermissionario,
+                                                                        @RequestParam(required = false) String nomePermissionario,
+                                                                        @RequestParam(required = false) String dataInicioValidadeCnh,
+                                                                        @RequestParam(required = false) String dataFimValidadeCnh,
+                                                                        @RequestParam(required = false) String dataInicioValidadeRc,
+                                                                        @RequestParam(required = false) String dataFimValidadeRc,
+                                                                        @RequestParam(required = true) Integer pageIndex,
+                                                                        @RequestParam(required = true) Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        try{
+            Page<PermissionarioResponseDTO> permissionarios = service.listarTodosPermissionarioFiltrosRelatorio(
+                    idPermissionario, nomePermissionario, dataInicioValidadeCnh, dataFimValidadeCnh,
+                    dataInicioValidadeRc, dataFimValidadeRc, pageRequest
+            );
+
+            return permissionarios;
+        } catch (Exception e){
+            throw new RuntimeException("Não foi possível consultar os Autorizatários com os filtros informados!");
+        }
+    }
+
+    @GetMapping("/imprimir")
+    public ResponseEntity<byte[]> imprimirRelatorio( @RequestParam(required = false) String idPermissionario,
+                                                     @RequestParam(required = false) String nomePermissionario,
+                                                     @RequestParam(required = false) String dataInicioValidadeCnh,
+                                                     @RequestParam(required = false) String dataFimValidadeCnh,
+                                                     @RequestParam(required = false) String dataInicioValidadeRc,
+                                                     @RequestParam(required = false) String dataFimValidadeRc,
+                                                     @RequestParam(required = true) Integer pageIndex,
+                                                     @RequestParam(required = true) Integer pageSize)
+    {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        byte[] fileBytes = service.imprimirRelatorio(
+                idPermissionario, nomePermissionario, dataInicioValidadeCnh, dataFimValidadeCnh,
+                dataInicioValidadeRc, dataFimValidadeRc, pageRequest
+        );
+
+        Random gerador = new Random();
+        Integer numAleatorio = gerador.nextInt(100);
+        String fileName = "autorizatario-" + LocalDate.now() + ":" + numAleatorio + ".pdf";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDispositionFormData("attachment", fileName);
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentLength(fileBytes.length);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(fileBytes);
     }
 
     @GetMapping("/buscar-disponiveis")

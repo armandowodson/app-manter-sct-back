@@ -9,6 +9,10 @@
 	<parameter name="operacao" class="java.lang.String"/>
 	<parameter name="dataInicio" class="java.lang.String"/>
 	<parameter name="dataFim" class="java.lang.String"/>
+	<parameter name="dataEmissaoRelatorio" class="java.lang.String"/>
+	<parameter name="usuarioAcoes" class="java.lang.String"/>
+	<parameter name="moduloAcessado" class="java.lang.String"/>
+	<parameter name="operacaoAplicada" class="java.lang.String"/>
 	<queryString language="SQL">
 		<![CDATA[]]>
 	</queryString>
@@ -20,37 +24,15 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="130" splitType="Stretch">
-			<staticText>
-				<reportElement x="108" y="100" width="350" height="25" uuid="194fb156-d8a9-4b34-83d0-7782f192d0da"/>
-				<textElement textAlignment="Center">
-					<font size="16" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Município de Barreirinhas - MA]]></text>
-			</staticText>
-			<image>
-				<reportElement x="240" y="5" width="80" height="70" uuid="2e93be38-7968-440a-8e18-aa219e0bce36"/>
+		<band height="162" splitType="Stretch">
+			<image scaleImage="FillFrame">
+				<reportElement x="50" y="-10" width="470" height="152" uuid="2e93be38-7968-440a-8e18-aa219e0bce36"/>
 				<imageExpression><![CDATA[$P{imagemPath}]]></imageExpression>
 			</image>
-			<staticText>
-				<reportElement x="40" y="75" width="480" height="25" uuid="a7be2470-924c-4cd1-b7b9-6765a7202202"/>
-				<textElement textAlignment="Center">
-					<font size="16" isBold="true"/>
-				</textElement>
-				<text><![CDATA[SGSC - Sistema de Gerenciamento de Serviços Concedidos]]></text>
-			</staticText>
 		</band>
 	</title>
 	<pageHeader>
-		<band height="41" splitType="Stretch">
-			<staticText>
-				<reportElement x="101" y="7" width="399" height="30" uuid="b0eb1979-2828-4735-963a-0c75012c905e"/>
-				<textElement textAlignment="Center">
-					<font size="16" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Relatório de Auditoria dos Módulos do Sistema]]></text>
-			</staticText>
-		</band>
+		<band splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
 		<band height="134" splitType="Stretch">
@@ -196,9 +178,9 @@
 		<band splitType="Stretch"/>
 	</columnFooter>
 	<pageFooter>
-		<band height="40" splitType="Stretch">
+		<band height="33" splitType="Stretch">
 			<textField>
-				<reportElement x="466" y="10" width="87" height="20" uuid="543fce21-dc75-4be1-b18a-f9899dfe6936"/>
+				<reportElement x="466" y="7" width="87" height="20" uuid="543fce21-dc75-4be1-b18a-f9899dfe6936"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
@@ -207,6 +189,60 @@
 		</band>
 	</pageFooter>
 	<summary>
-		<band splitType="Stretch"/>
+		<band height="97" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="440" y="76" width="113" height="17" uuid="4a088186-dde5-483f-93f0-fa36cebb4503">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{dataEmissaoRelatorio}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="9" width="136" height="17" uuid="4fe9ee5c-395d-45c9-8223-e165d33d7b29"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Usuário com Mais Ações:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="150" y="9" width="270" height="17" uuid="f1dc7c72-41ba-4c0a-856b-66e69fe6aa76">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{usuarioAcoes}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="32" width="136" height="17" uuid="35c76356-63b6-419d-9b75-33aafc9c70ca"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Módulo Mais Acessado:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="150" y="32" width="270" height="17" uuid="8c2187d3-552d-4460-bfc0-33881a7e5ede">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{moduloAcessado}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="150" y="54" width="270" height="17" uuid="736ffbc7-3e25-41f0-a9ce-083412d6bdde">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{operacaoAplicada}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="54" width="136" height="17" uuid="efc0c90e-a06b-4bd0-8b40-d4c836e1d2d9"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Operação Mais Aplicada:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="77" width="97" height="17" uuid="789405ec-7b37-4718-8cd3-a4d753dce1ce"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data da Emissão:]]></text>
+			</staticText>
+		</band>
 	</summary>
 </jasperReport>

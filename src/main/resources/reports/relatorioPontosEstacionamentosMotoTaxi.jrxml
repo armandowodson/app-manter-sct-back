@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SCT-REPORTS" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="85fa479f-3717-4d1e-a4a2-c4ea08982cc9">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Sample DB"/>
+	<parameter name="imagemPath" class="java.io.InputStream"/>
+	<parameter name="numeroPonto" class="java.lang.String"/>
+	<parameter name="descricaoPonto" class="java.lang.String"/>
+	<parameter name="referenciaPonto" class="java.lang.String"/>
+	<parameter name="numeroVagas" class="java.lang.String"/>
+	<parameter name="dataEmissaoRelatorio" class="java.lang.String"/>
+	<parameter name="totalVagas" class="java.lang.String"/>
+	<parameter name="totalVagasOcupadas" class="java.lang.String"/>
+	<parameter name="percentualOcupacao" class="java.lang.String"/>
+	<parameter name="totalFixo" class="java.lang.String"/>
+	<parameter name="totalFixoRotativo" class="java.lang.String"/>
+	<parameter name="totalRotativo" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[]]>
+	</queryString>
+	<field name="numeroPonto" class="java.lang.String"/>
+	<field name="descricaoPonto" class="java.lang.String"/>
+	<field name="referenciaPonto" class="java.lang.String"/>
+	<field name="numeroVagas" class="java.lang.String"/>
+	<field name="modalidade" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="162" splitType="Stretch">
+			<image scaleImage="FillFrame">
+				<reportElement x="50" y="-10" width="470" height="152" uuid="2e93be38-7968-440a-8e18-aa219e0bce36"/>
+				<imageExpression><![CDATA[$P{imagemPath}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="136" splitType="Stretch">
+			<staticText>
+				<reportElement x="4" y="116" width="56" height="15" uuid="2450918d-3696-4f1f-a033-868a07d50705">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nº PONTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="62" y="116" width="134" height="15" uuid="4fe447c9-42c0-4561-86da-8de925bd10d9"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DESCRIÇÃO PONTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="198" y="116" width="151" height="15" uuid="0b123b44-c5c7-4fc6-a3bf-7c800c1583ff">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PONTO REFERÊNCIA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="350" y="116" width="60" height="15" uuid="2c7cbcc1-cfd1-403c-a2e2-7c1bcb322cba">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nº VAGAS]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="6" y="24" width="100" height="17" uuid="2dc5e344-72dd-4314-b03e-3e81ac3fbbfb"/>
+				<textFieldExpression><![CDATA[$P{numeroPonto}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="4" width="100" height="17" uuid="013bb842-810a-470f-a434-786ccef03305"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nº Ponto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="4" width="100" height="17" uuid="9a4c4f0b-cb78-4512-92b1-64dee170ebf2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Descrição Ponto]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="110" y="24" width="234" height="17" uuid="887039de-6611-4907-aa22-8ee432ed27af"/>
+				<textFieldExpression><![CDATA[$P{descricaoPonto}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="351" y="24" width="202" height="17" uuid="39fe5172-ca57-455e-bf75-b3be896842eb"/>
+				<textFieldExpression><![CDATA[$P{referenciaPonto}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="351" y="4" width="157" height="17" uuid="4705374d-327b-49b0-a567-9c2e71a93683"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ponto Referência]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="6" y="65" width="147" height="17" uuid="b83838a8-e836-4537-93d8-b88b429699d0"/>
+				<textFieldExpression><![CDATA[$P{numeroVagas}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="45" width="100" height="17" uuid="62d26458-73f3-40f8-aa76-8d20f23059dd"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nº Vagas]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="96" width="222" height="17" uuid="53eaf47d-428c-4c7a-9866-dd61b8aff366"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Lista de Pontos de Estacionamentos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="415" y="116" width="129" height="15" uuid="bd019950-aeb3-4242-afc5-31dc8a27433f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[MODALIDADE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="26" splitType="Stretch">
+			<textField>
+				<reportElement x="198" y="2" width="151" height="20" uuid="f0b8de71-acfa-4619-ae14-e2ba7eb8aba1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{referenciaPonto}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="4" y="2" width="56" height="20" uuid="85a2a9de-2007-4c42-9d98-00a2032a8feb">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numeroPonto}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="61" y="2" width="134" height="20" uuid="f11df101-86ab-4381-8244-d1c14bcb2ad1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{descricaoPonto}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="350" y="2" width="60" height="20" uuid="e7c283eb-92c1-435b-ada8-d2644a934e2d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numeroVagas}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="415" y="2" width="129" height="20" uuid="f5bcd327-6d15-4b6f-a6ad-7c493d190ba4">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{modalidade}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<textField>
+				<reportElement x="466" y="7" width="87" height="20" uuid="543fce21-dc75-4be1-b18a-f9899dfe6936"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="97" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="440" y="76" width="113" height="17" uuid="4a088186-dde5-483f-93f0-fa36cebb4503">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{dataEmissaoRelatorio}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="9" width="136" height="17" uuid="4fe9ee5c-395d-45c9-8223-e165d33d7b29"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total de Vagas:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="144" y="9" width="70" height="17" uuid="f1dc7c72-41ba-4c0a-856b-66e69fe6aa76">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{totalVagas}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="32" width="136" height="17" uuid="35c76356-63b6-419d-9b75-33aafc9c70ca"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Vagas Ocupadas:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="144" y="32" width="60" height="17" uuid="8c2187d3-552d-4460-bfc0-33881a7e5ede">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{totalVagasOcupadas}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="144" y="54" width="60" height="17" uuid="736ffbc7-3e25-41f0-a9ce-083412d6bdde">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{totalFixo}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="54" width="136" height="17" uuid="efc0c90e-a06b-4bd0-8b40-d4c836e1d2d9"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[QTD Fixo:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="77" width="97" height="17" uuid="789405ec-7b37-4718-8cd3-a4d753dce1ce"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data da Emissão:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="311" y="33" width="59" height="17" uuid="769c2d89-62fb-45b6-bb5a-5a9c4763464f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{percentualOcupacao}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="215" y="33" width="95" height="17" uuid="625646af-af2c-42b6-b281-ee1bad9ecde7"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[% de Ocupação:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="216" y="54" width="95" height="17" uuid="146f9b68-76d2-4c50-a072-3461a9070f2a"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[QTD Rotativo:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="312" y="54" width="58" height="17" uuid="8ccd6344-059f-40ac-95ac-762915f985be">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{totalRotativo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="480" y="53" width="58" height="17" uuid="db440e5f-d706-42aa-88ea-6b39bdf9904e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{totalFixoRotativo}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="373" y="53" width="106" height="17" uuid="52ab44ec-36ea-4c27-9c0b-11f192044d1d"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[QTD Fixo-Rotativo:]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,5 +1,6 @@
 package com.projeto.produto.service.impl;
 
+import com.projeto.produto.dto.AuditoriaDTO;
 import com.projeto.produto.dto.PermissionarioRequestDTO;
 import com.projeto.produto.dto.PermissionarioResponseDTO;
 import com.projeto.produto.entity.*;
@@ -9,6 +10,7 @@ import com.projeto.produto.utils.ImprimirAnexosServiceImpl;
 import com.projeto.produto.utils.ValidaCPF;
 import com.projeto.produto.utils.ValidaEmail;
 import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,6 +29,10 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -220,6 +226,194 @@ public class PermissionarioServiceImpl {
         }
     }
 
+    public Page<PermissionarioResponseDTO> listarTodosPermissionarioFiltrosRelatorio(
+            String idPermissionario, String nomePermissionario, String dataInicioValidadeCnh, String dataFimValidadeCnh,
+            String dataInicioValidadeRc, String dataFimValidadeRc, PageRequest pageRequest) {
+        logger.error("Início da Listagem de Todos os Dados do Autorizatário");
+
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("EEE MMM dd yyyy", Locale.ENGLISH);
+        LocalDate localDataInicioValidadeCnh = null;
+        if(Objects.nonNull(dataInicioValidadeCnh)) {
+            localDataInicioValidadeCnh = LocalDate.parse(dataInicioValidadeCnh.substring(0, 15), formatador);
+        }
+        LocalDate localDataFimValidadeCnh = null;
+        if(Objects.nonNull(dataFimValidadeCnh)) {
+            localDataFimValidadeCnh = LocalDate.parse(dataFimValidadeCnh.substring(0, 15), formatador);
+        }
+
+        LocalDate localDataInicioValidadeRc = null;
+        if(Objects.nonNull(dataInicioValidadeRc)) {
+            localDataInicioValidadeRc = LocalDate.parse(dataInicioValidadeRc.substring(0, 15), formatador);
+        }
+        LocalDate localDataFimValidadeRc = null;
+        if(Objects.nonNull(dataFimValidadeRc)) {
+            localDataFimValidadeRc = LocalDate.parse(dataFimValidadeRc.substring(0, 15), formatador);
+        }
+
+        try{
+            List<Permissionario> listaPermissionario = permissionarioRepository.listarTodosPermissionariosFiltrosRelatorio(
+                    idPermissionario, nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
+                    localDataInicioValidadeCnh, localDataFimValidadeCnh, localDataInicioValidadeRc, localDataFimValidadeRc, pageRequest
+            );
+
+            Integer countRegistros = permissionarioRepository.listarTodosPermissionariosFiltrosRelatorio(
+                    idPermissionario, nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
+                    localDataInicioValidadeCnh, localDataFimValidadeCnh, localDataInicioValidadeRc, localDataFimValidadeRc, null
+            ).size();
+
+            List<PermissionarioResponseDTO> listaPermissionarioResponseDTO = new ArrayList<>();
+            if (!listaPermissionario.isEmpty()){
+                for (Permissionario permissionario : listaPermissionario) {
+                    PermissionarioResponseDTO permissionarioResponseDTORetornado = converterPermissionarioToPermissionarioDTO(permissionario);
+                    listaPermissionarioResponseDTO.add(permissionarioResponseDTORetornado);
+                }
+            }
+
+            return new PageImpl<>(listaPermissionarioResponseDTO, pageRequest, countRegistros);
+        } catch (Exception e){
+            logger.error("listarTodosPermissionarioFiltrosRelatorio - " + e.getMessage());
+            throw new RuntimeException("Não foi possível listar todos os dados dos Autorizatários!");
+        }
+    }
+
+    public byte[] imprimirRelatorio(String idPermissionario, String nomePermissionario, String dataInicioValidadeCnh, String dataFimValidadeCnh,
+                                         String dataInicioValidadeRc, String dataFimValidadeRc, PageRequest pageRequest) {
+        logger.info("Início Imprimir Autorizatário");
+        try{
+            DateTimeFormatter formatador = DateTimeFormatter.ofPattern("EEE MMM dd yyyy", Locale.ENGLISH);
+            LocalDate localDataInicioValidadeCnh = null;
+            if(Objects.nonNull(dataInicioValidadeCnh)) {
+                localDataInicioValidadeCnh = LocalDate.parse(dataInicioValidadeCnh.substring(0, 15), formatador);
+            }
+            LocalDate localDataFimValidadeCnh = null;
+            if(Objects.nonNull(dataFimValidadeCnh)) {
+                localDataFimValidadeCnh = LocalDate.parse(dataFimValidadeCnh.substring(0, 15), formatador);
+            }
+
+            LocalDate localDataInicioValidadeRc = null;
+            if(Objects.nonNull(dataInicioValidadeRc)) {
+                localDataInicioValidadeRc = LocalDate.parse(dataInicioValidadeRc.substring(0, 15), formatador);
+            }
+            LocalDate localDataFimValidadeRc = null;
+            if(Objects.nonNull(dataFimValidadeRc)) {
+                localDataFimValidadeRc = LocalDate.parse(dataFimValidadeRc.substring(0, 15), formatador);
+            }
+
+            List<Permissionario> listaPermissionario = permissionarioRepository.listarTodosPermissionariosFiltrosRelatorio(
+                    idPermissionario, nomePermissionario != null ? nomePermissionario.toUpperCase() : nomePermissionario,
+                    localDataInicioValidadeCnh, localDataFimValidadeCnh, localDataInicioValidadeRc, localDataFimValidadeRc, pageRequest
+            );
+            byte[] bytes = gerarRelatorio(nomePermissionario, dataInicioValidadeCnh, dataFimValidadeCnh,
+                    dataInicioValidadeRc, dataFimValidadeRc, listaPermissionario);
+            return bytes;
+        } catch (Exception e){
+            logger.error("imprimirAutorizatario: " + e.getMessage());
+            throw new RuntimeException("Erro ao Imprimir Autorizatário");
+        }
+    }
+
+    public byte[] gerarRelatorio(String nomePermissionario, String dataInicioValidadeCnh, String dataFimValidadeCnh,
+                                 String dataInicioValidadeRc, String dataFimValidadeRc, List<Permissionario> listaPermissionario) {
+        logger.info("Início Gerar Reltório");
+        try{
+            ClassPathResource resource = new ClassPathResource("reports/relatorioAutorizatario.jrxml");
+            JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
+            FileInputStream  logoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/tituloRelatorioAutorizatario.png" ).getAbsolutePath());
+
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("imagemPath", logoStream);
+            parameters.put("nomeAutorizatario", Objects.nonNull(nomePermissionario) ? nomePermissionario : "");
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            if(Objects.nonNull(dataInicioValidadeCnh)){
+                LocalDate localDate = LocalDate.parse(dataInicioValidadeCnh);
+                parameters.put("dataInicioValidadeCnh", localDate.format(formatter));
+            }else{
+                parameters.put("dataInicioValidadeCnh", "");
+            }
+            if(Objects.nonNull(dataFimValidadeCnh)){
+                LocalDate localDate = LocalDate.parse(dataFimValidadeCnh);
+                parameters.put("dataFimValidadeCnh", localDate.format(formatter));
+            }else{
+                parameters.put("dataFimValidadeCnh", "");
+            }
+            if(Objects.nonNull(dataInicioValidadeRc)){
+                LocalDate localDate = LocalDate.parse(dataInicioValidadeRc);
+                parameters.put("dataInicioValidadeRc", localDate.format(formatter));
+            }else{
+                parameters.put("dataInicioValidadeRc", "");
+            }
+            if(Objects.nonNull(dataFimValidadeRc)){
+                LocalDate localDate = LocalDate.parse(dataFimValidadeRc);
+                parameters.put("dataFimValidadeRc", localDate.format(formatter));
+            }else{
+                parameters.put("dataFimValidadeRc", "");
+            }
+
+            LocalDate dataEmissao = LocalDate.now();
+            parameters.put("dataEmissaoRelatorio", dataEmissao.format(formatter));
+
+            List<PermissionarioResponseDTO> listaPermissionarioDTO = new ArrayList<>();
+            LocalDate localDataAtual = LocalDate.now();
+            if(Objects.nonNull(listaPermissionario)){
+                LocalDate localDataAuxiliar;
+                Integer qtdRcsVencidos = 0;
+                Integer qtdCnhsVencidas = 0;
+                Integer qtdCategoriaA = 0;
+                Integer qtdCategoriaAB = 0;
+                for(Permissionario permissionario : listaPermissionario){
+                    PermissionarioResponseDTO permissionarioResponseDTO = new PermissionarioResponseDTO();
+                    localDataAuxiliar = permissionario.getDataCriacao().plusYears(1);
+                    if(localDataAuxiliar.isBefore(localDataAtual)){
+                        qtdRcsVencidos++;
+                        permissionarioResponseDTO.setRcVencido("SIM");
+                    }else{
+                        permissionarioResponseDTO.setRcVencido("NÃO");
+                    }
+
+                    if(permissionario.getDataValidadeCnh().isBefore(localDataAtual))
+                        qtdCnhsVencidas++;
+                    if(permissionario.getCategoriaCnhPermissionario().equals("1"))
+                        qtdCategoriaA++;
+                    if(permissionario.getCategoriaCnhPermissionario().equals("2"))
+                        qtdCategoriaAB++;
+
+                    permissionarioResponseDTO.setNomePermissionario(permissionario.getNomePermissionario());
+                    permissionarioResponseDTO.setCpfPermissionario(permissionario.getCpfPermissionario());
+                    permissionarioResponseDTO.setDataValidadeCnh(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataValidadeCnh()));
+                    permissionarioResponseDTO.setCategoriaCnhPermissionario(permissionario.getCategoriaCnhPermissionario().equals("1") ? "A" : "AB");
+                    Veiculo veiculo = veiculoRepository.findVeiculoByPermissionario(permissionario);
+                    permissionarioResponseDTO.setNumeroTas(StringUtils.leftPad(permissionario.getIdPermissionario().toString() +
+                            veiculo.getIdVeiculo().toString(), 8, "0") + "/" + permissionario.getDataCriacao().getYear());
+                    permissionarioResponseDTO.setDataCriacao(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao()));
+                    permissionarioResponseDTO.setDataFimValidadeCertificadoCondutor(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao().plusYears(1)));
+
+                    listaPermissionarioDTO.add(permissionarioResponseDTO);
+                }
+
+                parameters.put("qtdRcsVencidos", String.valueOf(qtdRcsVencidos));
+                parameters.put("qtdRcsValidos", String.valueOf(listaPermissionario.size() - qtdRcsVencidos));
+                parameters.put("qtdCnhsVencidas", String.valueOf(qtdCnhsVencidas));
+                parameters.put("qtdCategoriaA", String.valueOf(qtdCategoriaA));
+                parameters.put("qtdCategoriaAB", String.valueOf(qtdCategoriaAB));
+
+                JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(listaPermissionarioDTO);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+                byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
+                return bytes;
+            }else{
+                throw new SQLException();
+            }
+        } catch (SQLException s) {
+            logger.error("gerarRelatorio: " + s.getMessage());
+            throw new RuntimeException("Não há dados para gerar Relatório");
+        } catch (Exception e){
+            logger.error("gerarRelatorio: " + e.getMessage());
+            throw new RuntimeException("Erro ao Gerar Relatório");
+        }
+    }
+
     public List<PermissionarioResponseDTO> listarPermissionariosDisponiveis(Integer idPermissionario) {
         logger.info("Início da Listagem dos Autorizatários disponíveis para o Veículo/Defensor");
         try{
@@ -334,7 +528,7 @@ public class PermissionarioServiceImpl {
         permissionarioResponseDTO.setDataNascimento(permissionario.getDataNascimento().toString());
         permissionarioResponseDTO.setCnhPermissionario(permissionario.getCnhPermissionario());
         permissionarioResponseDTO.setCategoriaCnhPermissionario(permissionario.getCategoriaCnhPermissionario());
-        permissionarioResponseDTO.setDataValidadeCnh(permissionario.getDataValidadeCnh().toString());
+        permissionarioResponseDTO.setDataValidadeCnh(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataValidadeCnh()));
         permissionarioResponseDTO.setUfPermissionario(permissionario.getUfPermissionario());
         permissionarioResponseDTO.setCidadePermissionario(permissionario.getCidadePermissionario());
         permissionarioResponseDTO.setBairroPermissionario(permissionario.getBairroPermissionario());
@@ -357,10 +551,19 @@ public class PermissionarioServiceImpl {
         permissionarioResponseDTO.setApoliceSeguroVida(permissionario.getApoliceSeguroVida());
         permissionarioResponseDTO.setApoliceSeguroMotocicleta(permissionario.getApoliceSeguroMotocicleta());
         permissionarioResponseDTO.setFoto(permissionario.getFoto());
-        permissionarioResponseDTO.setDataCriacao(permissionario.getDataCriacao().toString());
+        permissionarioResponseDTO.setDataCriacao(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao()));
         permissionarioResponseDTO.setStatus(permissionario.getStatus());
         permissionarioResponseDTO.setAplicativoAlternativo(permissionario.getAplicativoAlternativo());
         permissionarioResponseDTO.setObservacao(permissionario.getObservacao());
+        Veiculo veiculo = veiculoRepository.findVeiculoByPermissionario(permissionario);
+        if(Objects.nonNull(veiculo)){
+            permissionarioResponseDTO.setNumeroTas(StringUtils.leftPad(permissionario.getIdPermissionario().toString() + veiculo.getIdVeiculo().toString(), 8, "0") + "/" + permissionario.getDataCriacao().getYear());
+        }
+        permissionarioResponseDTO.setDataFimValidadeCertificadoCondutor(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(permissionario.getDataCriacao().plusYears(1)));
+        if(permissionario.getDataCriacao().plusYears(1).isBefore(LocalDate.now()))
+            permissionarioResponseDTO.setRcVencido("SIM");
+        else
+            permissionarioResponseDTO.setRcVencido("NÃO");
 
         return permissionarioResponseDTO;
     }

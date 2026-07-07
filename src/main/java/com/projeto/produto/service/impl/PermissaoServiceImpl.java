@@ -473,7 +473,7 @@ public class PermissaoServiceImpl {
             parameters.put("totalEmUso", totalEmUso2);
             parameters.put("totalAbandonada", totalAbandonada9);
 
-            Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "system", "1978");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/proj", "system", "1978");
             Statement stm = connection.createStatement();
             String query = "";
             if(Objects.nonNull(permissaoRelatorioDTOList)){

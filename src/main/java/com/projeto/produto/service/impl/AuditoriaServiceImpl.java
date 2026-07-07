@@ -189,9 +189,9 @@ public class AuditoriaServiceImpl {
                                String dataFimOperacao, List<AuditoriaDTO> listaAuditorias) throws JRException, SQLException, IOException {
         logger.info("Início Gerar Reltório");
         try{
-            ClassPathResource resource = new ClassPathResource("reports/auditoria.jrxml");
+            ClassPathResource resource = new ClassPathResource("reports/relatorioAuditoria.jrxml");
             JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
-            FileInputStream  logoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/LogoPrefeitura.png" ).getAbsolutePath());
+            FileInputStream  logoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/tituloRelatorioAuditoria.png" ).getAbsolutePath());
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("imagemPath", logoStream);
@@ -199,6 +199,8 @@ public class AuditoriaServiceImpl {
             parameters.put("usuario", Objects.nonNull(usuarioOperacao) ? usuarioOperacao : "");
             parameters.put("operacao", Objects.nonNull(operacao) ? operacao : "");
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate dataEmissao = LocalDate.now();
+            parameters.put("dataEmissaoRelatorio", dataEmissao.format(formatter));
 
             if(Objects.nonNull(dataInicioOperacao)){
                 LocalDate localDate = LocalDate.parse(dataInicioOperacao);
@@ -213,27 +215,91 @@ public class AuditoriaServiceImpl {
                 parameters.put("dataFim", "");
             }
 
-            Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "system", "1978");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/proj", "root", "1978");
             Statement stm = connection.createStatement();
             String query = "";
             if(Objects.nonNull(listaAuditorias)){
+
+                String usuarioComMaisAcoes = obterUsuarioComMaisAcoes(listaAuditorias);
+                parameters.put("usuarioAcoes", usuarioComMaisAcoes);
+
+                String moduloMaisAcessado = obterModuloMaisAcessado(listaAuditorias);
+                parameters.put("moduloAcessado", moduloMaisAcessado);
+
+                String operacaoMaisAplicada = obterOperacaoMaisAplicada(listaAuditorias);
+                parameters.put("operacaoAplicada", operacaoMaisAplicada);
+
                 JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(listaAuditorias);
                 JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
                 byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
                 return bytes;
             }else{
-                query = "SELECT NOME_MODULO, USUARIO_OPERACAO, OPERACAO, TO_CHAR(DATA_OPERACAO, 'dd/MM/yyyy') DATA_OPERACAO FROM PROJ.AUDITORIA";
-                ResultSet rs = stm.executeQuery( query );
-                JRResultSetDataSource jrRS = new JRResultSetDataSource( rs );
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, jrRS);
-
-                byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
-                return bytes;
+                throw new SQLException();
             }
+        } catch (SQLException s) {
+            logger.error("gerarRelatorio: " + s.getMessage());
+            throw new RuntimeException("Não há dados para gerar Relatório");
         } catch (Exception e){
             logger.error("gerarRelatorio: " + e.getMessage());
             throw new RuntimeException("Erro ao Gerar Reltório");
+        }
+    }
+
+    public String obterUsuarioComMaisAcoes(List<AuditoriaDTO> listaAuditorias){
+        Map<String, Integer> contador = new HashMap<>();
+
+        for (AuditoriaDTO audit : listaAuditorias) {
+            contador.put(audit.getUsuarioOperacao(), contador.getOrDefault(audit.getUsuarioOperacao(), 0) + 1);
+        }
+
+        Map.Entry<String, Integer> maiorEntrada = contador.entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .orElse(null);
+
+        if(Objects.nonNull(maiorEntrada)){
+            return maiorEntrada.getKey() + " - QTD: " + maiorEntrada.getValue();
+        }else{
+            return "";
+        }
+    }
+
+    public String obterModuloMaisAcessado(List<AuditoriaDTO> listaAuditorias){
+        Map<String, Integer> contador = new HashMap<>();
+
+        for (AuditoriaDTO audit : listaAuditorias) {
+            contador.put(audit.getNomeModulo(), contador.getOrDefault(audit.getNomeModulo(), 0) + 1);
+        }
+
+        Map.Entry<String, Integer> maiorEntrada = contador.entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .orElse(null);
+
+        if(Objects.nonNull(maiorEntrada)){
+            return maiorEntrada.getKey() + " - QTD: " + maiorEntrada.getValue();
+        }else{
+            return "";
+        }
+    }
+
+    public String obterOperacaoMaisAplicada(List<AuditoriaDTO> listaAuditorias){
+        Map<String, Integer> contador = new HashMap<>();
+
+        for (AuditoriaDTO audit : listaAuditorias) {
+            contador.put(audit.getOperacao(), contador.getOrDefault(audit.getOperacao(), 0) + 1);
+        }
+
+        Map.Entry<String, Integer> maiorEntrada = contador.entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .orElse(null);
+
+        if(Objects.nonNull(maiorEntrada)){
+            return maiorEntrada.getKey() + " - QTD: " + maiorEntrada.getValue();
+        }else{
+            return "";
         }
     }
 

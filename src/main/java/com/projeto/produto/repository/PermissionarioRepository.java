@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface PermissionarioRepository extends JpaRepository<Permissionario, Integer> {
@@ -31,6 +32,28 @@ public interface PermissionarioRepository extends JpaRepository<Permissionario, 
     )
     List<Permissionario> listarTodosPermissionariosFiltros(
             String idPermissionario, String nomePermissionario, String cpfPermissionario, String cnhPermissionario, Pageable pageable
+    );
+
+    @Query(
+            value = "SELECT p.* " +
+                    "FROM proj.permissionario p " +
+                    "WHERE 1 = 1 " +
+                    "AND (:idPermissionario IS NULL OR p.ID_PERMISSIONARIO = :idPermissionario) " +
+                    "AND (:nomePermissionario IS NULL OR UPPER(p.NOME_PERMISSIONARIO) LIKE %:nomePermissionario%) " +
+                    "AND (:dataInicioValidadeCnh IS NULL OR p.DATA_VALIDADE_CNH >= :dataInicioValidadeCnh) " +
+                    "AND (:dataFimValidadeCnh IS NULL OR p.DATA_VALIDADE_CNH <= :dataFimValidadeCnh) " +
+                    "AND (:dataInicioValidadeRc IS NULL OR p.DATA_CRIACAO >= :dataInicioValidadeRc) " +
+                    "AND (:dataFimValidadeRc IS NULL OR p.DATA_CRIACAO <= :dataFimValidadeRc) " +
+                    "AND EXISTS ( " +
+                    "   SELECT 0 " +
+                    "   FROM proj.veiculo v " +
+                    "    WHERE v.ID_PERMISSIONARIO = p.ID_PERMISSIONARIO " +
+                    ") ",
+            nativeQuery = true
+    )
+    List<Permissionario> listarTodosPermissionariosFiltrosRelatorio(
+            String idPermissionario, String nomePermissionario, LocalDate dataInicioValidadeCnh, LocalDate dataFimValidadeCnh,
+            LocalDate dataInicioValidadeRc, LocalDate dataFimValidadeRc, Pageable pageable
     );
 
     @Query(

@@ -2,6 +2,7 @@ package com.projeto.produto.service.impl;
 
 import com.projeto.produto.dto.DefensorRequestDTO;
 import com.projeto.produto.dto.DefensorResponseDTO;
+import com.projeto.produto.dto.PermissionarioResponseDTO;
 import com.projeto.produto.entity.*;
 import com.projeto.produto.repository.*;
 import com.projeto.produto.utils.CarregarTipos;
@@ -9,6 +10,7 @@ import com.projeto.produto.utils.ImprimirAnexosServiceImpl;
 import com.projeto.produto.utils.ValidaCPF;
 import com.projeto.produto.utils.ValidaEmail;
 import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -254,6 +257,194 @@ public class DefensorServiceImpl {
         }
     }
 
+    public Page<DefensorResponseDTO> listarTodosDefensoresFiltrosRelatorio(
+            String idDefensor, String nomeDefensor, String dataInicioValidadeCnh, String dataFimValidadeCnh,
+            String dataInicioValidadeRc, String dataFimValidadeRc, PageRequest pageRequest) {
+        logger.error("Início da Listagem de Todos os Dados do Defensor");
+
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("EEE MMM dd yyyy", Locale.ENGLISH);
+        LocalDate localDataInicioValidadeCnh = null;
+        if(Objects.nonNull(dataInicioValidadeCnh)) {
+            localDataInicioValidadeCnh = LocalDate.parse(dataInicioValidadeCnh.substring(0, 15), formatador);
+        }
+        LocalDate localDataFimValidadeCnh = null;
+        if(Objects.nonNull(dataFimValidadeCnh)) {
+            localDataFimValidadeCnh = LocalDate.parse(dataFimValidadeCnh.substring(0, 15), formatador);
+        }
+
+        LocalDate localDataInicioValidadeRc = null;
+        if(Objects.nonNull(dataInicioValidadeRc)) {
+            localDataInicioValidadeRc = LocalDate.parse(dataInicioValidadeRc.substring(0, 15), formatador);
+        }
+        LocalDate localDataFimValidadeRc = null;
+        if(Objects.nonNull(dataFimValidadeRc)) {
+            localDataFimValidadeRc = LocalDate.parse(dataFimValidadeRc.substring(0, 15), formatador);
+        }
+
+        try{
+            List<Defensor> listaDefensor = defensorRepository.listarTodosDefensoresFiltrosRelatorio(
+                    idDefensor, nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
+                    localDataInicioValidadeCnh, localDataFimValidadeCnh, localDataInicioValidadeRc, localDataFimValidadeRc, pageRequest
+            );
+
+            Integer countRegistros = defensorRepository.listarTodosDefensoresFiltrosRelatorio(
+                    idDefensor, nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
+                    localDataInicioValidadeCnh, localDataFimValidadeCnh, localDataInicioValidadeRc, localDataFimValidadeRc, null
+            ).size();
+
+            List<DefensorResponseDTO> listaDefensorResponseDTO = new ArrayList<>();
+            if (!listaDefensor.isEmpty()){
+                for (Defensor defensor : listaDefensor) {
+                    DefensorResponseDTO defensorResponseDTORetornado = converterDefensorToDefensorDTO(defensor);
+                    listaDefensorResponseDTO.add(defensorResponseDTORetornado);
+                }
+            }
+
+            return new PageImpl<>(listaDefensorResponseDTO, pageRequest, countRegistros);
+        } catch (Exception e){
+            logger.error("listarTodosDefensoresFiltrosRelatorio - " + e.getMessage());
+            throw new RuntimeException("Não foi possível listar todos os dados dos Defensores!");
+        }
+    }
+
+    public byte[] imprimirRelatorio(String idDefensor, String nomeDefensor, String dataInicioValidadeCnh, String dataFimValidadeCnh,
+                                    String dataInicioValidadeRc, String dataFimValidadeRc, PageRequest pageRequest) {
+        logger.info("Início Imprimir Autorizatário");
+        try{
+            DateTimeFormatter formatador = DateTimeFormatter.ofPattern("EEE MMM dd yyyy", Locale.ENGLISH);
+            LocalDate localDataInicioValidadeCnh = null;
+            if(Objects.nonNull(dataInicioValidadeCnh)) {
+                localDataInicioValidadeCnh = LocalDate.parse(dataInicioValidadeCnh.substring(0, 15), formatador);
+            }
+            LocalDate localDataFimValidadeCnh = null;
+            if(Objects.nonNull(dataFimValidadeCnh)) {
+                localDataFimValidadeCnh = LocalDate.parse(dataFimValidadeCnh.substring(0, 15), formatador);
+            }
+
+            LocalDate localDataInicioValidadeRc = null;
+            if(Objects.nonNull(dataInicioValidadeRc)) {
+                localDataInicioValidadeRc = LocalDate.parse(dataInicioValidadeRc.substring(0, 15), formatador);
+            }
+            LocalDate localDataFimValidadeRc = null;
+            if(Objects.nonNull(dataFimValidadeRc)) {
+                localDataFimValidadeRc = LocalDate.parse(dataFimValidadeRc.substring(0, 15), formatador);
+            }
+
+            List<Defensor> listaDefensor = defensorRepository.listarTodosDefensoresFiltrosRelatorio(
+                    idDefensor, nomeDefensor != null ? nomeDefensor.toUpperCase() : nomeDefensor,
+                    localDataInicioValidadeCnh, localDataFimValidadeCnh, localDataInicioValidadeRc, localDataFimValidadeRc, pageRequest
+            );
+            byte[] bytes = gerarRelatorio(nomeDefensor, dataInicioValidadeCnh, dataFimValidadeCnh,
+                    dataInicioValidadeRc, dataFimValidadeRc, listaDefensor);
+            return bytes;
+        } catch (Exception e){
+            logger.error("imprimirDefensor: " + e.getMessage());
+            throw new RuntimeException("Erro ao Imprimir Defensor");
+        }
+    }
+
+    public byte[] gerarRelatorio(String nomeDefensor, String dataInicioValidadeCnh, String dataFimValidadeCnh,
+                                 String dataInicioValidadeRc, String dataFimValidadeRc, List<Defensor> listaDefensor) {
+        logger.info("Início Gerar Reltório");
+        try{
+            ClassPathResource resource = new ClassPathResource("reports/relatorioDefensor.jrxml");
+            JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
+            FileInputStream  logoStream  =  new FileInputStream(ResourceUtils.getFile( "src/main/resources/imagens/tituloRelatorioDefensor.png" ).getAbsolutePath());
+
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("imagemPath", logoStream);
+            parameters.put("nomeDefensor", Objects.nonNull(nomeDefensor) ? nomeDefensor : "");
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            if(Objects.nonNull(dataInicioValidadeCnh)){
+                LocalDate localDate = LocalDate.parse(dataInicioValidadeCnh);
+                parameters.put("dataInicioValidadeCnh", localDate.format(formatter));
+            }else{
+                parameters.put("dataInicioValidadeCnh", "");
+            }
+            if(Objects.nonNull(dataFimValidadeCnh)){
+                LocalDate localDate = LocalDate.parse(dataFimValidadeCnh);
+                parameters.put("dataFimValidadeCnh", localDate.format(formatter));
+            }else{
+                parameters.put("dataFimValidadeCnh", "");
+            }
+            if(Objects.nonNull(dataInicioValidadeRc)){
+                LocalDate localDate = LocalDate.parse(dataInicioValidadeRc);
+                parameters.put("dataInicioValidadeRc", localDate.format(formatter));
+            }else{
+                parameters.put("dataInicioValidadeRc", "");
+            }
+            if(Objects.nonNull(dataFimValidadeRc)){
+                LocalDate localDate = LocalDate.parse(dataFimValidadeRc);
+                parameters.put("dataFimValidadeRc", localDate.format(formatter));
+            }else{
+                parameters.put("dataFimValidadeRc", "");
+            }
+
+            LocalDate dataEmissao = LocalDate.now();
+            parameters.put("dataEmissaoRelatorio", dataEmissao.format(formatter));
+
+            List<DefensorResponseDTO> listaDefensorDTO = new ArrayList<>();
+            LocalDate localDataAtual = LocalDate.now();
+            if(Objects.nonNull(listaDefensor)){
+                LocalDate localDataAuxiliar;
+                Integer qtdRcsVencidos = 0;
+                Integer qtdCnhsVencidas = 0;
+                Integer qtdCategoriaA = 0;
+                Integer qtdCategoriaAB = 0;
+                for(Defensor defensor : listaDefensor){
+                    DefensorResponseDTO defensorResponseDTO = new DefensorResponseDTO();
+                    localDataAuxiliar = defensor.getDataCriacao().plusYears(1);
+                    if(localDataAuxiliar.isBefore(localDataAtual)){
+                        qtdRcsVencidos++;
+                        defensorResponseDTO.setRcVencido("SIM");
+                    }else{
+                        defensorResponseDTO.setRcVencido("NÃO");
+                    }
+
+                    if(defensor.getDataValidadeCnh().isBefore(localDataAtual))
+                        qtdCnhsVencidas++;
+                    if(defensor.getCategoriaCnhDefensor().equals("1"))
+                        qtdCategoriaA++;
+                    if(defensor.getCategoriaCnhDefensor().equals("2"))
+                        qtdCategoriaAB++;
+
+                    defensorResponseDTO.setNomeDefensor(defensor.getNomeDefensor());
+                    defensorResponseDTO.setCpfDefensor(defensor.getCpfDefensor());
+                    defensorResponseDTO.setDataValidadeCnh(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataValidadeCnh()));
+                    defensorResponseDTO.setCategoriaCnhDefensor(defensor.getCategoriaCnhDefensor().equals("1") ? "A" : "AB");
+                    Veiculo veiculo = veiculoRepository.findVeiculoByPermissionario(defensor.getPermissionario());
+                    defensorResponseDTO.setNumeroTas(StringUtils.leftPad(defensor.getIdDefensor().toString() +
+                            veiculo.getIdVeiculo().toString(), 8, "0") + "/" + defensor.getDataCriacao().getYear());
+                    defensorResponseDTO.setDataCriacao(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao()));
+                    defensorResponseDTO.setDataFimValidadeCertificadoCondutor(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao().plusYears(1)));
+
+                    listaDefensorDTO.add(defensorResponseDTO);
+                }
+
+                parameters.put("qtdRcsVencidos", String.valueOf(qtdRcsVencidos));
+                parameters.put("qtdRcsValidos", String.valueOf(listaDefensor.size() - qtdRcsVencidos));
+                parameters.put("qtdCnhsVencidas", String.valueOf(qtdCnhsVencidas));
+                parameters.put("qtdCategoriaA", String.valueOf(qtdCategoriaA));
+                parameters.put("qtdCategoriaAB", String.valueOf(qtdCategoriaAB));
+
+                JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(listaDefensorDTO);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+                byte[] bytes = JasperExportManager.exportReportToPdf(jasperPrint);
+                return bytes;
+            }else{
+                throw new SQLException();
+            }
+        } catch (SQLException s) {
+            logger.error("gerarRelatorio: " + s.getMessage());
+            throw new RuntimeException("Não há dados para gerar Relatório");
+        } catch (Exception e){
+            logger.error("gerarRelatorio: " + e.getMessage());
+            throw new RuntimeException("Erro ao Gerar Relatório");
+        }
+    }
+
     public List<DefensorResponseDTO> listarDefensoresDisponiveis(Integer idDefensor) {
         logger.info("Início Listar Defensores Disponíveis");
         try{
@@ -335,7 +526,7 @@ public class DefensorServiceImpl {
             defensorResponseDTO.setDataNascimento(defensor.getDataNascimento().toString());
             defensorResponseDTO.setCnhDefensor(defensor.getCnhDefensor());
             defensorResponseDTO.setCategoriaCnhDefensor(defensor.getCategoriaCnhDefensor());
-            defensorResponseDTO.setDataValidadeCnh(defensor.getDataValidadeCnh().toString());
+            defensorResponseDTO.setDataValidadeCnh(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataValidadeCnh()));
             defensorResponseDTO.setUfDefensor(defensor.getUfDefensor());
             defensorResponseDTO.setCidadeDefensor(defensor.getCidadeDefensor());
             defensorResponseDTO.setBairroDefensor(defensor.getBairroDefensor());
@@ -363,8 +554,17 @@ public class DefensorServiceImpl {
             defensorResponseDTO.setApoliceSeguroVida(defensor.getApoliceSeguroVida());
             defensorResponseDTO.setApoliceSeguroMotocicleta(defensor.getApoliceSeguroMotocicleta());
             defensorResponseDTO.setFoto(defensor.getFoto());
-            defensorResponseDTO.setDataCriacao(defensor.getDataCriacao().toString());
+            defensorResponseDTO.setDataCriacao(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao()));
             defensorResponseDTO.setStatus(defensor.getStatus());
+            Veiculo veiculo = veiculoRepository.findVeiculoByPermissionario(defensor.getPermissionario());
+            if(Objects.nonNull(veiculo)){
+                defensorResponseDTO.setNumeroTas(StringUtils.leftPad(defensor.getPermissionario().getIdPermissionario().toString() + veiculo.getIdVeiculo().toString(), 8, "0") + "/" + defensor.getDataCriacao().getYear());
+            }
+            defensorResponseDTO.setDataFimValidadeCertificadoCondutor(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(defensor.getDataCriacao().plusYears(1)));
+            if(defensor.getDataCriacao().plusYears(1).isBefore(LocalDate.now()))
+                defensorResponseDTO.setRcVencido("SIM");
+            else
+                defensorResponseDTO.setRcVencido("NÃO");
 
             return defensorResponseDTO;
         } catch (Exception e){
