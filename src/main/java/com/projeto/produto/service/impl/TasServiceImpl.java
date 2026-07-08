@@ -78,7 +78,7 @@ public class TasServiceImpl {
 
             List<TasDTO> tasDTOList = new ArrayList<>();
 
-            List<Permissionario> listaPermissionario = permissionarioRepository.buscarTodos(pageRequest);
+            List<Permissionario> listaPermissionario = permissionarioRepository.buscarTodosRelatorio(pageRequest);
 
             Integer countRegistros = listaPermissionario.size();
 
@@ -87,12 +87,12 @@ public class TasServiceImpl {
                 Boolean adicionarNaLista = false;
                 TasDTO tasDTOCheck = montarTasDto(permissionario);
                 if(Objects.nonNull(qtdDias) && !qtdDias.isEmpty() && Objects.nonNull(operacao) && !operacao.isEmpty()){
-                    if(operacao.equals(">=")) {
-                        if(Integer.valueOf(qtdDias) >= Integer.valueOf(tasDTOCheck.getQtdDiasVencer()))
+                    if(operacao.equals("1")) {
+                        if(Integer.valueOf(tasDTOCheck.getQtdDiasVencer()) >= Integer.valueOf(qtdDias))
                             adicionarNaLista = true;
                     }
-                    if(operacao.equals("<=")) {
-                        if(Integer.valueOf(qtdDias) <= Integer.valueOf(tasDTOCheck.getQtdDiasVencer()))
+                    if(operacao.equals("2")) {
+                        if(Integer.valueOf(tasDTOCheck.getQtdDiasVencer()) >= Integer.valueOf(qtdDias))
                             adicionarNaLista = true;
                     }
                 }
@@ -111,8 +111,7 @@ public class TasServiceImpl {
                         adicionarNaLista = true;
                 }
 
-                if((Objects.isNull(qtdDias) || qtdDias.isEmpty()) && (Objects.isNull(operacao) && operacao.isEmpty()) &&
-                        (Objects.isNull(inicioValidadeTas) || inicioValidadeTas.isEmpty()) &&
+                if((Objects.isNull(qtdDias) || qtdDias.isEmpty()) && (Objects.isNull(inicioValidadeTas) || inicioValidadeTas.isEmpty()) &&
                         (Objects.isNull(fimValidadeTas) || fimValidadeTas.isEmpty())){
                     adicionarNaLista = true;
                 }
@@ -144,21 +143,18 @@ public class TasServiceImpl {
 
             List<TasDTO> tasDTOList = new ArrayList<>();
 
-            List<Permissionario> listaPermissionario = permissionarioRepository.buscarTodos(pageRequest);
-
-            Integer countRegistros = listaPermissionario.size();
-
+            List<Permissionario> listaPermissionario = permissionarioRepository.buscarTodosRelatorio(pageRequest);
 
             for(Permissionario permissionario : listaPermissionario){
                 Boolean adicionarNaLista = false;
                 TasDTO tasDTOCheck = montarTasDto(permissionario);
                 if(Objects.nonNull(qtdDias) && !qtdDias.isEmpty() && Objects.nonNull(operacao) && !operacao.isEmpty()){
-                    if(operacao.equals(">=")) {
-                        if(Integer.valueOf(qtdDias) >= Integer.valueOf(tasDTOCheck.getQtdDiasVencer()))
+                    if(operacao.equals("1")) {
+                        if(Integer.valueOf(tasDTOCheck.getQtdDiasVencer()) >= Integer.valueOf(qtdDias))
                             adicionarNaLista = true;
                     }
-                    if(operacao.equals("<=")) {
-                        if(Integer.valueOf(qtdDias) <= Integer.valueOf(tasDTOCheck.getQtdDiasVencer()))
+                    if(operacao.equals("2")) {
+                        if(Integer.valueOf(tasDTOCheck.getQtdDiasVencer()) >= Integer.valueOf(qtdDias))
                             adicionarNaLista = true;
                     }
                 }
@@ -177,8 +173,7 @@ public class TasServiceImpl {
                         adicionarNaLista = true;
                 }
 
-                if((Objects.isNull(qtdDias) || qtdDias.isEmpty()) && (Objects.isNull(operacao) && operacao.isEmpty()) &&
-                        (Objects.isNull(inicioValidadeTas) || inicioValidadeTas.isEmpty()) &&
+                if((Objects.isNull(qtdDias) || qtdDias.isEmpty()) && (Objects.isNull(inicioValidadeTas) || inicioValidadeTas.isEmpty()) &&
                         (Objects.isNull(fimValidadeTas) || fimValidadeTas.isEmpty())){
                     adicionarNaLista = true;
                 }
@@ -223,13 +218,17 @@ public class TasServiceImpl {
             Map<String, Object> parameters = new HashMap<>();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             parameters.put("imagemPath", logoStream);
-            parameters.put("qtDias", Objects.nonNull(qtdDias) ? operacao + " " +  qtdDias : "");
-            parameters.put("inicioValidadeTas", (Objects.nonNull(inicioValidadeTas) && !inicioValidadeTas.isEmpty()) ?
-                    LocalDate.parse(inicioValidadeTas).format(formatter) : "");
-            parameters.put("fimValidadeTas", (Objects.nonNull(fimValidadeTas) && !fimValidadeTas.isEmpty()) ?
-                    LocalDate.parse(fimValidadeTas).format(formatter) : "");
 
-            parameters.put("operacao", Objects.nonNull(operacao) ? operacao : "");
+            String operador = "";
+            if(Objects.nonNull(operacao) && !operacao.isEmpty()){
+                operador = operacao.equals("1") ? ">=" : "<=";
+            }
+            parameters.put("operador", operador);
+            parameters.put("qtDiasVencer", Objects.nonNull(qtdDias) && !qtdDias.isEmpty() ? qtdDias  : "");
+            parameters.put("dataInicioValidadeTas", (Objects.nonNull(inicioValidadeTas) && !inicioValidadeTas.isEmpty()) ?
+                    LocalDate.parse(inicioValidadeTas).format(formatter) : "");
+            parameters.put("dataFimValidadeTas", (Objects.nonNull(fimValidadeTas) && !fimValidadeTas.isEmpty()) ?
+                    LocalDate.parse(fimValidadeTas).format(formatter) : "");
 
             LocalDate dataEmissao = LocalDate.now();
             parameters.put("dataEmissaoRelatorio", dataEmissao.format(formatter));
@@ -247,8 +246,8 @@ public class TasServiceImpl {
                 }
                 tasDTOListFinal.add(tasDTO);
             }
-            parameters.put("qtdRegular", qtdRegular);
-            parameters.put("qtdVencido", qtdVencido);
+            parameters.put("qtdTasRegulares", String.valueOf(qtdRegular));
+            parameters.put("qtdTasVencidos", String.valueOf(qtdVencido));
 
             if(Objects.nonNull(tasDTOListFinal)){
                 JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(tasDTOListFinal);

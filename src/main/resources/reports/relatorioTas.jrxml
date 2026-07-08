@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SCT-REPORTS" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryWithPageHeaderAndFooter="true" uuid="85fa479f-3717-4d1e-a4a2-c4ea08982cc9">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Sample DB"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="imagemPath" class="java.io.InputStream"/>
+	<parameter name="operador" class="java.lang.String"/>
+	<parameter name="qtdDiasVencer" class="java.lang.String"/>
+	<parameter name="dataInicioValidadeTas" class="java.lang.String"/>
+	<parameter name="dataFimValidadeTas" class="java.lang.String"/>
+	<parameter name="dataEmissaoRelatorio" class="java.lang.String"/>
+	<parameter name="qtdTasRegulares" class="java.lang.String"/>
+	<parameter name="qtdTasVencidos" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[]]>
+	</queryString>
+	<field name="numeroTas" class="java.lang.String"/>
+	<field name="nomeAutorizatario" class="java.lang.String"/>
+	<field name="cpfAutorizatario" class="java.lang.String"/>
+	<field name="inicioValidadeTas" class="java.lang.String"/>
+	<field name="placa" class="java.lang.String"/>
+	<field name="renavam" class="java.lang.String"/>
+	<field name="fimValidadeTas" class="java.lang.String"/>
+	<field name="qtdDiasVencer" class="java.lang.String"/>
+	<field name="vencido" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="162" splitType="Stretch">
+			<image scaleImage="FillFrame">
+				<reportElement x="150" y="-10" width="470" height="152" uuid="2e93be38-7968-440a-8e18-aa219e0bce36"/>
+				<imageExpression><![CDATA[$P{imagemPath}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="103" splitType="Stretch">
+			<staticText>
+				<reportElement x="92" y="84" width="204" height="15" uuid="2450918d-3696-4f1f-a033-868a07d50705">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NOME AUTORIZATÁRIO]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="6" y="24" width="100" height="17" uuid="2dc5e344-72dd-4314-b03e-3e81ac3fbbfb"/>
+				<textFieldExpression><![CDATA[$P{operador}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="4" width="100" height="17" uuid="013bb842-810a-470f-a434-786ccef03305"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Operador]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="116" y="4" width="104" height="17" uuid="9a4c4f0b-cb78-4512-92b1-64dee170ebf2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[QTD Dias p/ Vencer]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="116" y="24" width="104" height="17" uuid="887039de-6611-4907-aa22-8ee432ed27af"/>
+				<textFieldExpression><![CDATA[$P{qtdDiasVencer}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="230" y="24" width="124" height="17" uuid="b83838a8-e836-4537-93d8-b88b429699d0"/>
+				<textFieldExpression><![CDATA[$P{dataInicioValidadeTas}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="230" y="4" width="124" height="17" uuid="62d26458-73f3-40f8-aa76-8d20f23059dd"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Início Valid. TAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="362" y="4" width="100" height="17" uuid="e7fd378c-bfa6-44d8-8c53-8d93db53ce7d"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Fim Valid. TAS]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="362" y="24" width="99" height="17" uuid="0184fea9-8c03-4d89-99c2-213b8b03b0ae"/>
+				<textFieldExpression><![CDATA[$P{dataFimValidadeTas}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="56" width="146" height="17" uuid="53eaf47d-428c-4c7a-9866-dd61b8aff366"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Lista de TAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="296" y="84" width="88" height="15" uuid="2824729e-4fb6-4f3b-a32a-13702de35c71"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CPF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="84" width="88" height="15" uuid="71cc4123-874d-4aaf-879e-341b56e3aeed">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nº TAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="385" y="84" width="71" height="15" uuid="b4735cfb-c2a6-4e4e-a386-6e51140056e5">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[TAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="458" y="84" width="69" height="15" uuid="8379e60c-f1c1-4a10-be9e-7350de739a09">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Placa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="529" y="84" width="69" height="15" uuid="554ad6f8-72b3-404a-93db-48c0d7e11bf8">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Renavam]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="598" y="84" width="71" height="15" uuid="dad6624a-dad3-4663-bc0b-e7e36078fc11">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Validade TAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="671" y="84" width="71" height="15" uuid="12339678-4792-4d28-89d3-f27343ce0b3a">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vencer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="671" y="67" width="71" height="17" uuid="44b3ed32-7da6-47e8-a087-28bf504aaa10">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[QTD Dias p/]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="385" y="67" width="71" height="17" uuid="f8618542-d54c-43b6-aefe-65b58385c361">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Emissão]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="598" y="67" width="71" height="17" uuid="ebbed01b-2dd3-4bf0-b2c5-380496a89eb7">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Fim]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="743" y="84" width="59" height="15" uuid="f9f9afed-bf71-4201-8b82-c6b0f5c9070d">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vencido]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="27" splitType="Stretch">
+			<textField>
+				<reportElement x="92" y="2" width="203" height="20" uuid="85a2a9de-2007-4c42-9d98-00a2032a8feb">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nomeAutorizatario}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="296" y="2" width="89" height="20" uuid="baf0f4fa-c359-4c37-95bd-df9d16191400">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cpfAutorizatario}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="3" y="2" width="88" height="20" uuid="5ca0605a-28fd-412c-a410-2ce76f262b09">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numeroTas}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="385" y="2" width="71" height="20" uuid="b5a374b7-d039-4898-be8a-bcc7e8a1ad48">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{inicioValidadeTas}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="458" y="2" width="69" height="20" uuid="c4b66186-6cea-4fc6-8835-d840b25312a3">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{placa}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="529" y="2" width="69" height="20" uuid="b7fb25a5-2e45-4616-8fb8-fddb48ff5ff2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{renavam}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="598" y="2" width="71" height="20" uuid="848edb0c-1d5b-4ee8-ae76-b7b08c322dcb">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fimValidadeTas}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="671" y="2" width="71" height="20" uuid="04ce91ef-461c-49b1-ac2b-94f75271a67c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qtdDiasVencer}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="743" y="2" width="59" height="20" uuid="2133516b-36ad-47b9-bb26-439935dfd6f5">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vencido}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="33" splitType="Stretch">
+			<textField>
+				<reportElement x="706" y="7" width="87" height="20" uuid="543fce21-dc75-4be1-b18a-f9899dfe6936"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="80" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="680" y="56" width="113" height="17" uuid="4a088186-dde5-483f-93f0-fa36cebb4503">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{dataEmissaoRelatorio}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="-1" width="110" height="17" uuid="4fe9ee5c-395d-45c9-8223-e165d33d7b29"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[QTD TAS Regulares:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="126" y="-1" width="75" height="17" uuid="f1dc7c72-41ba-4c0a-856b-66e69fe6aa76">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{qtdTasRegulares}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="22" width="111" height="17" uuid="35c76356-63b6-419d-9b75-33aafc9c70ca"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[QTD TAS Vencidos:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="127" y="22" width="74" height="17" uuid="8c2187d3-552d-4460-bfc0-33881a7e5ede">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$P{qtdTasVencidos}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="580" y="57" width="97" height="17" uuid="789405ec-7b37-4718-8cd3-a4d753dce1ce"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data da Emissão:]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

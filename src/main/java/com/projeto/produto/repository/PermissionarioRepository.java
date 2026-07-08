@@ -18,6 +18,20 @@ public interface PermissionarioRepository extends JpaRepository<Permissionario, 
     )
     List<Permissionario> buscarTodos(Pageable pageable);
 
+    @Query(
+            value = "SELECT p.* " +
+                    "FROM proj.permissionario p " +
+                    "WHERE 1 = 1 " +
+                    "AND EXISTS ( " +
+                    "   SELECT 0 " +
+                    "   FROM proj.veiculo v " +
+                    "    WHERE v.ID_PERMISSIONARIO = p.ID_PERMISSIONARIO " +
+                    ") " +
+                    "ORDER BY p.NOME_PERMISSIONARIO ASC" ,
+            nativeQuery = true
+    )
+    List<Permissionario> buscarTodosRelatorio(Pageable pageable);
+
     Permissionario findPermissionarioByIdPermissionario(Integer idPermissionario);
 
     @Query(
